@@ -32,7 +32,7 @@ export default function ObraForm({ onCreated }: { onCreated: () => void }) {
   }
 
   return (
-    <Card asChild>
+    <Card>
       <form onSubmit={handleSubmit}>
         <CardHeader>
           <CardTitle>Dar de alta obra</CardTitle>
