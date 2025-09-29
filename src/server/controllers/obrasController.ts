@@ -193,3 +193,49 @@ export const desvincularExposicion = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error desvinculando exposición' });
   }
 };
+
+export const updateObra = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const body: any = req.body
+    const anio = body.anio ?? body.año
+
+    const r = await pool.query(
+      `UPDATE obras_arte
+       SET autor = COALESCE($1, autor),
+           titulo = COALESCE($2, titulo),
+           año = COALESCE($3, año),
+           medidas = COALESCE($4, medidas),
+           tecnica = COALESCE($5, tecnica),
+           disponibilidad = COALESCE($6, disponibilidad),
+           precio_salida = COALESCE($7, precio_salida),
+           ubicacion = COALESCE($8, ubicacion),
+           tipo = COALESCE($9, tipo),
+           links = COALESCE($10, links),
+           descripcion = COALESCE($11, descripcion),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id_obra = $12
+       RETURNING id_obra, autor, titulo, año AS anio, medidas, tecnica, disponibilidad,
+                 precio_salida, ubicacion, tipo, links, descripcion, created_at, updated_at`,
+      [
+        body.autor ?? null,
+        body.titulo ?? null,
+        anio ?? null,
+        body.medidas ?? null,
+        body.tecnica ?? null,
+        body.disponibilidad ?? null,
+        body.precio_salida ?? null,
+        body.ubicacion ?? null,
+        body.tipo ?? null,
+        body.links ? JSON.stringify(body.links) : null,
+        body.descripcion ?? null,
+        id
+      ]
+    )
+
+    if (r.rowCount === 0) return res.status(404).json({ error: 'Obra no encontrada' })
+    res.json(r.rows[0])
+  } catch (e) {
+    res.status(500).json({ error: 'Error actualizando obra' })
+  }
+}

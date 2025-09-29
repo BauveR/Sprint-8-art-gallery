@@ -9,6 +9,7 @@ import {
   getRelaciones,
   vincularTienda, desvincularTienda,
   vincularExposicion, desvincularExposicion,
+  updateObra, 
 } from '../controllers/obrasController';
 
 const router = Router();
@@ -27,5 +28,6 @@ router.post('/:id/vincular/tienda', vincularTienda);
 router.delete('/:id/vincular/tienda', desvincularTienda);
 router.post('/:id/vincular/exposicion', vincularExposicion);
 router.delete('/:id/vincular/exposicion', desvincularExposicion);
+router.put('/:id', updateObra)
 
 export default router;

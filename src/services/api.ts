@@ -15,6 +15,7 @@ export const obrasAPI = {
   create: (obra: ObraCreate) => api.post<ObraArte>('/obras', obra),
 
   // NUEVOS
+  update: (id: number, obra: Partial<ObraCreate>) => api.put<ObraArte>(`/obras/${id}`, obra),
   delete: (id: number) => api.delete<{ ok: boolean; id: number }>(`/obras/${id}`),
   getRelations: (id: number) => api.get(`/obras/${id}/relaciones`),
   linkStore: (id: number, payload: { id_tienda: number; stock?: number; precio_venta?: number; codigo_inventario?: string }) =>
