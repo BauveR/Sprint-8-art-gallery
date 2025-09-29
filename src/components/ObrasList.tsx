@@ -11,7 +11,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from  "sonner"
 
 export function ObrasList() {
   const { obras, loading, error } = useObras()
@@ -26,7 +26,7 @@ export function ObrasList() {
 
   const remove = async (id: number) => {
     await obrasAPI.delete(id)
-    toast({ title: 'Obra eliminada', description: `ID ${id}` })
+    toast('Obra eliminada', { description: `ID ${id}` })
     await reload()
   }
 

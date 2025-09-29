@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react';
-import { obrasAPI } from '../services/api';
+import { useEffect, useState } from 'react'
+import { obrasAPI } from '../services/api'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Relations({ obraId }: { obraId: number }) {
-  const [data, setData] = useState<{ tiendas: any[]; exposiciones: any[] } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<{ tiendas: any[]; exposiciones: any[] } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     (async () => {
       try {
-        setError(null);
-        const r = await obrasAPI.getRelations(obraId);
-        setData(r.data);
-      } catch (e) {
-        console.error(e);
-        setError('No se pudieron cargar las relaciones');
+        setError(null)
+        const r = await obrasAPI.getRelations(obraId)
+        setData(r.data)
+      } catch {
+        setError('No se pudieron cargar las relaciones')
       }
-    })();
-  }, [obraId]);
+    })()
+  }, [obraId])
 
-  if (error) return <div className="text-sm text-red-600">{error}</div>;
-  if (!data) return <div className="text-sm text-gray-500">Cargando relaciones…</div>;
+  if (error) return <div className="text-sm text-destructive">{error}</div>
+  if (!data) return <Skeleton className="h-16 w-full" />
 
   return (
-    <div className="text-sm space-y-2">
+    <div className="text-sm space-y-3">
       <div>
         <h4 className="font-medium">Tiendas</h4>
         {data.tiendas.length ? (
@@ -34,7 +34,7 @@ export default function Relations({ obraId }: { obraId: number }) {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500">Sin vínculos</p>
+          <p className="text-muted-foreground">Sin vínculos</p>
         )}
       </div>
       <div>
@@ -48,9 +48,9 @@ export default function Relations({ obraId }: { obraId: number }) {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500">Sin vínculos</p>
+          <p className="text-muted-foreground">Sin vínculos</p>
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "composite": true,
+
     // Objetivo y entorno
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -21,7 +23,7 @@
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
 
-    // Rutas y alias para shadcn/ui
+    // Rutas y alias (puedes dejarlos aquí también; el validador mirará el raíz)
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
