@@ -2,10 +2,12 @@ import { useMemo, useState } from "react"
 import type { ObraArte } from "../types/ObraArte"
 import { obrasAPI } from "../services/api"
 
+import axios from "axios"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+
 import {
   Table, TableBody, TableCaption, TableCell,
   TableHead, TableHeader, TableRow
@@ -31,15 +33,16 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
-type Props = {
-  obras: ObraArte[]
-  onChanged?: () => void
-  defaultPageSize?: number
-}
+// ---------- Opciones tipadas ----------
+const TIPO_OPTIONS: ObraArte["tipo"][] = [
+  "pintura", "escultura", "fotografia", "digital", "mixta", "otros",
+]
 
-type SortKey = "titulo" | "autor" | "tipo" | "anio" | "precio_salida" | "disponibilidad"
-type SortDir = "asc" | "desc"
+const DISPON_OPTIONS: ObraArte["disponibilidad"][] = [
+  "disponible", "vendido", "reservado", "no disponible", "en_exposicion", "en_tienda",
+]
 
+// ---------- Helpers ----------
 const disponToVariant = (d: ObraArte["disponibilidad"]) => {
   switch (d) {
     case "disponible": return "secondary"
@@ -55,6 +58,27 @@ const disponToVariant = (d: ObraArte["disponibilidad"]) => {
 const fmtEUR = (n: number) =>
   new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(n)
 
+const getAxiosErrorMessage = (err: unknown) => {
+  if (axios.isAxiosError(err)) {
+    const res = err.response
+    return (res?.data as any)?.error
+      ?? `${res?.status ?? ""} ${res?.statusText ?? ""}`.trim()
+      ?? err.message
+  }
+  return err && typeof err === "object" && "message" in err
+    ? String((err as Error).message)
+    : "Error desconocido"
+}
+
+type Props = {
+  obras: ObraArte[]
+  onChanged?: () => void | Promise<void>
+  defaultPageSize?: number
+}
+
+type SortKey = "titulo" | "autor" | "tipo" | "anio" | "precio_salida" | "disponibilidad"
+type SortDir = "asc" | "desc"
+
 export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: Props) {
   const [query, setQuery] = useState("")
   const [sortKey, setSortKey] = useState<SortKey>("titulo")
@@ -67,7 +91,11 @@ export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: P
   const [editObra, setEditObra] = useState<ObraArte | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
-  // ====== Filtro + orden tipados (sin any)
+  // Loading de acciones
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState<number | null>(null)
+
+  // ====== Filtro + orden tipados
   const getComparable = (o: ObraArte, key: SortKey): string | number => {
     switch (key) {
       case "titulo": return o.titulo ?? ""
@@ -114,19 +142,53 @@ export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: P
 
   // ====== Acciones
   const remove = async (id: number) => {
-    await obrasAPI.delete(id)
-    toast("Obra eliminada", { description: `ID ${id}` })
-    setConfirmDeleteId(null)
-    onChanged?.()
+    try {
+      setDeleting(id)
+      await obrasAPI.delete(id)
+      toast("Obra eliminada", { description: `ID ${id}` })
+      setConfirmDeleteId(null)
+      await onChanged?.()
+    } catch (e) {
+      console.error(e)
+      toast("No se pudo eliminar", { description: `ID ${id}` })
+    } finally {
+      setDeleting(null)
+    }
   }
 
   const saveEdit = async () => {
     if (!editObra) return
-    const { id_obra, ...payload } = editObra
-    await obrasAPI.update(id_obra, payload)
-    toast("Obra actualizada", { description: editObra.titulo })
-    setEditObra(null)
-    onChanged?.()
+    try {
+      setSaving(true)
+      const { id_obra, ...payload } = editObra
+      const obraId = Number(id_obra)
+      if (!Number.isFinite(obraId)) {
+        toast("No se pudo actualizar", { description: "ID inválido" })
+        return
+      }
+
+      // Envía solo campos que tu backend acepta
+      const body = {
+        autor: payload.autor,
+        titulo: payload.titulo,
+        anio: payload.anio,
+        precio_salida: payload.precio_salida,
+        tipo: payload.tipo,
+        disponibilidad: payload.disponibilidad,
+        // añade aquí medidas, tecnica, ubicacion, descripcion si también las editas
+      }
+
+      await obrasAPI.update(obraId, body)
+      toast("Obra actualizada", { description: editObra.titulo })
+      setEditObra(null)
+      await onChanged?.()
+    } catch (err: unknown) {
+      const msg = getAxiosErrorMessage(err)
+      console.error("PUT /obras/:id error:", err)
+      toast("No se pudo actualizar", { description: msg || "Error" })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const SortHeader = ({ label, keyName, alignRight = false }:
@@ -236,7 +298,10 @@ export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: P
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <AlertDialog open={confirmDeleteId === o.id_obra} onOpenChange={(open) => setConfirmDeleteId(open ? o.id_obra : null)}>
+                      <AlertDialog
+                        open={confirmDeleteId === o.id_obra}
+                        onOpenChange={(open) => setConfirmDeleteId(open ? o.id_obra : null)}
+                      >
                         <AlertDialogTrigger asChild>
                           <DropdownMenuItem className="text-destructive focus:text-destructive">
                             Eliminar…
@@ -253,10 +318,14 @@ export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: P
                             <AlertDialogCancel asChild>
                               <Button variant="outline" type="button">Cancelar</Button>
                             </AlertDialogCancel>
-                            {/* Forzamos type="button" para evitar submits accidentales */}
                             <AlertDialogAction asChild>
-                              <Button variant="destructive" type="button" onClick={() => remove(o.id_obra)}>
-                                Sí, borrar
+                              <Button
+                                variant="destructive"
+                                type="button"
+                                onClick={() => remove(o.id_obra)}
+                                disabled={deleting === o.id_obra}
+                              >
+                                {deleting === o.id_obra ? "Borrando…" : "Sí, borrar"}
                               </Button>
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -344,38 +413,68 @@ export default function ObrasTable({ obras, onChanged, defaultPageSize = 10 }: P
             <DialogDescription>{editObra?.titulo}</DialogDescription>
           </DialogHeader>
 
-          {!!editObra && (
-            <div className="grid gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_titulo">Título</Label>
-                <Input id="e_titulo" value={editObra.titulo} onChange={(e) => setEditObra({ ...editObra, titulo: e.target.value })} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_autor">Autor</Label>
-                <Input id="e_autor" value={editObra.autor} onChange={(e) => setEditObra({ ...editObra, autor: e.target.value })} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_anio">Año</Label>
-                <Input id="e_anio" type="number" value={editObra.anio} onChange={(e) => setEditObra({ ...editObra, anio: Number(e.target.value) })} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_precio">Precio salida (€)</Label>
-                <Input id="e_precio" type="number" step="0.01" value={editObra.precio_salida} onChange={(e) => setEditObra({ ...editObra, precio_salida: Number(e.target.value) })} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_tipo">Tipo</Label>
-                <Input id="e_tipo" value={editObra.tipo} onChange={(e) => setEditObra({ ...editObra, tipo: e.target.value as ObraArte["tipo"] })} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="e_dispon">Disponibilidad</Label>
-                <Input id="e_dispon" value={editObra.disponibilidad} onChange={(e) => setEditObra({ ...editObra, disponibilidad: e.target.value as ObraArte["disponibilidad"] })} />
-              </div>
+        {!!editObra && (
+          <div className="grid gap-3">
+            <div className="grid gap-1.5">
+              <Label htmlFor="e_titulo">Título</Label>
+              <Input id="e_titulo" value={editObra.titulo} onChange={(e) => setEditObra({ ...editObra, titulo: e.target.value })} />
             </div>
-          )}
+            <div className="grid gap-1.5">
+              <Label htmlFor="e_autor">Autor</Label>
+              <Input id="e_autor" value={editObra.autor} onChange={(e) => setEditObra({ ...editObra, autor: e.target.value })} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="e_anio">Año</Label>
+              <Input id="e_anio" type="number" value={editObra.anio} onChange={(e) => setEditObra({ ...editObra, anio: Number(e.target.value) })} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="e_precio">Precio salida (€)</Label>
+              <Input id="e_precio" type="number" step="0.01" value={editObra.precio_salida} onChange={(e) => setEditObra({ ...editObra, precio_salida: Number(e.target.value) })} />
+            </div>
+
+            {/* Tipo (Select) */}
+            <div className="grid gap-1.5">
+              <Label>Tipo</Label>
+              <Select
+                value={editObra.tipo}
+                onValueChange={(v) => setEditObra({ ...editObra, tipo: v as ObraArte["tipo"] })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPO_OPTIONS.map(op => (
+                    <SelectItem key={op} value={op}>{op}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Disponibilidad (Select) */}
+            <div className="grid gap-1.5">
+              <Label>Disponibilidad</Label>
+              <Select
+                value={editObra.disponibilidad}
+                onValueChange={(v) => setEditObra({ ...editObra, disponibilidad: v as ObraArte["disponibilidad"] })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DISPON_OPTIONS.map(op => (
+                    <SelectItem key={op} value={op}>{op}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
 
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => setEditObra(null)}>Cancelar</Button>
-            <Button type="button" onClick={saveEdit}>Guardar cambios</Button>
+            <Button variant="outline" type="button" onClick={() => setEditObra(null)} disabled={saving}>Cancelar</Button>
+            <Button type="button" onClick={saveEdit} disabled={saving}>
+              {saving ? "Guardando…" : "Guardar cambios"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

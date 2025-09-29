@@ -5,16 +5,15 @@ import ObraForm from './ObraForm'
 import ObrasTable from './ObrasTable'
 
 export function ObrasList() {
-  const { obras, loading, error } = useObras()
+  const { obras, loading, error, refetch } = useObras() // ⬅️ usamos refetch del hook
   const [showForm, setShowForm] = useState(false)
-  const [reloading, setReloading] = useState(false)
 
-  const reload = async () => {
-    setReloading(true)
-    setTimeout(() => setReloading(false), 0)
+  // se llamará después de crear / editar / eliminar
+  const handleChanged = async () => {
+    await refetch()
   }
 
-  if (loading || reloading) return <div className="p-6 text-muted-foreground">Cargando obras…</div>
+  if (loading) return <div className="p-6 text-muted-foreground">Cargando obras…</div>
   if (error) return <div className="p-6 text-destructive">{error}</div>
 
   return (
@@ -26,14 +25,14 @@ export function ObrasList() {
         </Button>
       </div>
 
-      {showForm && <ObraForm onCreated={reload} />}
+      {showForm && <ObraForm onCreated={handleChanged} />}
 
       {!obras?.length ? (
         <div className="rounded-md border p-6 text-muted-foreground">
           No hay obras.
         </div>
       ) : (
-        <ObrasTable obras={obras} onChanged={reload} defaultPageSize={10} />
+        <ObrasTable obras={obras} onChanged={handleChanged} defaultPageSize={10} />
       )}
     </div>
   )
