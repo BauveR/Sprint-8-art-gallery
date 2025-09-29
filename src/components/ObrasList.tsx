@@ -1,78 +1,111 @@
-// src/components/ObrasList.tsx
-import { useState } from 'react';
-import { useObras } from '../hooks/useObras';
-import { obrasAPI } from '../services/api';
-import ObraForm from './ObraForm';
-import Relations from './Relations';
+import { useState } from 'react'
+import { useObras } from '../hooks/useObras'
+import { obrasAPI } from '../services/api'
+import ObraForm from './ObraForm'
+import Relations from './Relations'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { toast } from '@/components/ui/use-toast'
 
 export function ObrasList() {
-  const { obras, loading, error } = useObras();
-  const [showForm, setShowForm] = useState(false);
-  const [reloading, setReloading] = useState(false);
+  const { obras, loading, error } = useObras()
+  const [showForm, setShowForm] = useState(false)
+  const [reloading, setReloading] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<number | null>(null)
 
   const reload = async () => {
-    // Truco sin tocar el hook original: forzamos “remontar”
-    setReloading(true);
-    setTimeout(() => setReloading(false), 0);
-  };
+    setReloading(true)
+    setTimeout(() => setReloading(false), 0)
+  }
 
   const remove = async (id: number) => {
-    if (!confirm('¿Seguro que quieres borrar esta obra?')) return;
-    await obrasAPI.delete(id);
-    await reload();
-  };
+    await obrasAPI.delete(id)
+    toast({ title: 'Obra eliminada', description: `ID ${id}` })
+    await reload()
+  }
 
-  if (loading || reloading) return <div className="p-6 text-gray-500">Cargando obras…</div>;
-  if (error) return <div className="p-6 text-red-600">{error}</div>;
-  if (!obras.length) return (
-    <div className="max-w-5xl mx-auto p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Obras</h2>
-        <button onClick={() => setShowForm(s => !s)} className="px-3 py-2 rounded-xl bg-black text-white shadow">
-          {showForm ? 'Cerrar' : 'Nueva obra'}
-        </button>
-      </div>
-      {showForm && <ObraForm onCreated={reload} />}
-      <div className="p-6 text-gray-400">No hay obras.</div>
-    </div>
-  );
+  if (loading || reloading) return <div className="p-6 text-muted-foreground">Cargando obras…</div>
+  if (error) return <div className="p-6 text-destructive">{error}</div>
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Obras</h2>
-        <button onClick={() => setShowForm(s => !s)} className="px-3 py-2 rounded-xl bg-black text-white shadow">
+        <Button onClick={() => setShowForm(s => !s)} variant="default">
           {showForm ? 'Cerrar' : 'Nueva obra'}
-        </button>
+        </Button>
       </div>
 
       {showForm && <ObraForm onCreated={reload} />}
+
+      {!obras?.length && (
+        <Card>
+          <CardContent className="p-6 text-muted-foreground">No hay obras.</CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {obras.map((o) => (
-          <article key={o.id_obra} className="rounded-2xl shadow p-4 bg-slate-500">
-            <div className="flex items-start justify-between">
+          <Card key={o.id_obra} className="overflow-hidden">
+            <CardHeader className="flex-row items-start justify-between space-y-0">
               <div>
-                <h3 className="text-lg font-semibold">{o.titulo}</h3>
-                <p className="text-sm text-gray-600">{o.autor} · {o.tipo}</p>
+                <CardTitle className="text-lg">{o.titulo}</CardTitle>
+                <p className="text-sm text-muted-foreground">{o.autor} · {o.tipo}</p>
               </div>
-              <button onClick={() => remove(o.id_obra)} className="text-xs px-2 py-1 rounded bg-red-600 text-white">
-                Eliminar
-              </button>
-            </div>
 
-            <p className="mt-2 text-sm">Estado: <span className="font-medium">{o.disponibilidad}</span></p>
-            <p className="text-sm">Precio salida: €{Number(o.precio_salida).toLocaleString()}</p>
-            {o.ubicacion_actual && (
-              <p className="text-xs text-gray-200 mt-1">Ubicación: {o.ubicacion_actual}</p>
-            )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="destructive" onClick={() => setPendingDelete(o.id_obra)}>
+                    Eliminar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Borrar esta obra?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta acción no se puede deshacer.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        if (pendingDelete) {
+                          await remove(pendingDelete)
+                          setPendingDelete(null)
+                        }
+                      }}
+                    >
+                      Sí, borrar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardHeader>
 
-            <div className="mt-3 bg-white/10 rounded p-2">
-              <Relations obraId={o.id_obra} />
-            </div>
-          </article>
+            <CardContent className="space-y-2">
+              <p className="text-sm">
+                Estado: <Badge variant="secondary">{o.disponibilidad}</Badge>
+              </p>
+              <p className="text-sm">
+                Precio salida: €{Number(o.precio_salida).toLocaleString()}
+              </p>
+              {o.ubicacion_actual && (
+                <p className="text-xs text-muted-foreground">Ubicación: {o.ubicacion_actual}</p>
+              )}
+              <div className="mt-3 rounded-md border p-2">
+                <Relations obraId={o.id_obra} />
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
-  );
+  )
 }
