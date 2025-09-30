@@ -13,6 +13,11 @@ const emptyObra: ObraInput = {
   precio_salida: undefined,
 };
 
+type EditState = {
+  id: number;
+  form: ObraInput;
+} | null;
+
 export default function ObrasPage() {
   const [obras, setObras] = useState<Obra[]>([]);
   const [tiendas, setTiendas] = useState<Tienda[]>([]);
@@ -20,6 +25,10 @@ export default function ObrasPage() {
   const [form, setForm] = useState<ObraInput>(emptyObra);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // estado de edición
+  const [edit, setEdit] = useState<EditState>(null);
+  const isEditing = !!edit;
 
   const load = async () => {
     setLoading(true);
@@ -104,6 +113,43 @@ export default function ObrasPage() {
     if (!id_expo) return;
     try {
       await obrasService.quitarExpo(id_obra, id_expo);
+      await load();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // === Edición ===
+  const startEdit = (o: Obra) => {
+    setEdit({
+      id: o.id_obra,
+      form: {
+        autor: o.autor ?? "",
+        titulo: o.titulo ?? "",
+        anio: o.anio ?? undefined,
+        medidas: o.medidas ?? "",
+        tecnica: o.tecnica ?? "",
+        // precio_salida puede venir como string (DECIMAL), lo normalizamos a número si se puede
+        precio_salida: o.precio_salida != null ? Number(o.precio_salida as any) : undefined,
+      },
+    });
+  };
+
+  const cancelEdit = () => setEdit(null);
+
+  const saveEdit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    if (!edit) return;
+    const { id, form } = edit;
+    try {
+      await obrasService.update(id, {
+        ...form,
+        anio: form.anio ? Number(form.anio) : null,
+        precio_salida: form.precio_salida === undefined || form.precio_salida === null || form.precio_salida === ("" as any)
+          ? null
+          : Number(form.precio_salida),
+      });
+      setEdit(null);
       await load();
     } catch (e: any) {
       alert(e.message);
@@ -238,7 +284,10 @@ export default function ObrasPage() {
                     )}
                   </div>
                 </td>
-                <td className="p-2">
+                <td className="p-2 space-x-3">
+                  <button className="text-blue-700 underline" onClick={() => startEdit(o)}>
+                    editar
+                  </button>
                   <button className="text-red-600 underline" onClick={() => onDelete(o.id_obra)}>
                     eliminar
                   </button>
@@ -255,6 +304,77 @@ export default function ObrasPage() {
         {loading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
         {err && <div className="p-3 text-sm text-red-600">Error: {err}</div>}
       </div>
+
+      {/* Modal edición */}
+      {isEditing && edit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Editar obra #{edit.id}</h3>
+              <button onClick={cancelEdit} className="text-gray-500 hover:text-black">✕</button>
+            </div>
+            <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
+              <input
+                className="border rounded p-2"
+                placeholder="Autor"
+                value={edit.form.autor}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, autor: e.target.value } }) : s)}
+                required
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Título"
+                value={edit.form.titulo}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, titulo: e.target.value } }) : s)}
+                required
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Año"
+                type="number"
+                value={edit.form.anio ?? ""}
+                onChange={e => setEdit(s => s ? ({
+                  ...s, form: { ...s.form, anio: e.target.value === "" ? undefined : Number(e.target.value) }
+                }) : s)}
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Medidas"
+                value={edit.form.medidas ?? ""}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, medidas: e.target.value } }) : s)}
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Técnica"
+                value={edit.form.tecnica ?? ""}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, tecnica: e.target.value } }) : s)}
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Precio salida"
+                type="number"
+                step="0.01"
+                value={edit.form.precio_salida ?? ""}
+                onChange={e => setEdit(s => s ? ({
+                  ...s,
+                  form: {
+                    ...s.form,
+                    precio_salida: e.target.value === "" ? undefined : Number(e.target.value)
+                  }
+                }) : s)}
+              />
+              <div className="col-span-2 flex justify-end gap-2 mt-2">
+                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">
+                  Cancelar
+                </button>
+                <button className="px-4 py-2 rounded-lg bg-black text-white">
+                  Guardar cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
