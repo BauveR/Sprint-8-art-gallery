@@ -1,32 +1,35 @@
-import { useEffect, useState } from "react";
-import { Api, type Obra } from "./api";
-import ObraForm from "./components/ObraForm";
-import ObrasList from "./components/ObraList";
+import { useState } from "react";
+import ObrasPage from "./components/Obras/ObrasPage";
+import TiendasPage from "./components/Tiendas/TiendasPage";
+import ExposPage from "./components/Expos/ExposPage";
+
+type Tab = "obras" | "tiendas" | "expos";
 
 export default function App() {
-  const [obras, setObras] = useState<Obra[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  async function load() {
-    try {
-      setLoading(true);
-      setObras(await Api.listObras());
-      setError(null);
-    } catch (e: any) {
-      setError(e?.message ?? "Error");
-    } finally {
-      setLoading(false);
-    }
-  }
-  useEffect(() => { load(); }, []);
+  const [tab, setTab] = useState<Tab>("obras");
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-semibold">Galería — Obras</h1>
-      <ObraForm onCreated={load} />
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100">
+      <header className="sticky top-0 bg-white/70 backdrop-blur border-b">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-lg font-semibold">Art Gallery · Admin</h1>
+          <nav className="flex gap-2">
+            {(["obras","tiendas","expos"] as Tab[]).map(t => (
+              <button key={t}
+                onClick={() => setTab(t)}
+                className={`px-3 py-1.5 rounded-full text-sm ${tab===t ? "bg-black text-white" : "bg-gray-100"}`}>
+                {t}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
 
-      {loading ? <div>Cargando…</div> : error ? <div className="text-red-600">{error}</div> : <ObrasList data={obras} reload={load} />}
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        {tab === "obras" && <ObrasPage />}
+        {tab === "tiendas" && <TiendasPage />}
+        {tab === "expos" && <ExposPage />}
+      </main>
     </div>
   );
 }
