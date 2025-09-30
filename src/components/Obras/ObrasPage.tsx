@@ -3,7 +3,6 @@ import { obrasService } from "../../services/obrasService";
 import { exposService } from "../../services/expoService";
 import { tiendasService } from "../../services/tiendasService";
 import { Expo, Obra, ObraInput, Tienda } from "../../types";
-import { toast } from "sonner";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -27,6 +26,14 @@ export default function ObrasPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  // === Estado para selects controlados por obra ===
+  const [tiendaSelect, setTiendaSelect] = useState<Record<number, string>>({});
+  const [expoSelect, setExpoSelect] = useState<Record<number, string>>({});
+  // Flags para bloquear repetidos
+  const [submittingTienda, setSubmittingTienda] = useState<Record<number, boolean>>({});
+  const [submittingExpo, setSubmittingExpo] = useState<Record<number, boolean>>({});
+
+  // === Edición ===
   const [edit, setEdit] = useState<EditState>(null);
   const isEditing = !!edit;
 
@@ -44,7 +51,6 @@ export default function ObrasPage() {
       setExpos(e);
     } catch (e: any) {
       setErr(e.message);
-      toast.error("No se pudieron cargar los datos", { description: e.message });
     } finally {
       setLoading(false);
     }
@@ -52,14 +58,31 @@ export default function ObrasPage() {
 
   useEffect(() => { load(); }, []);
 
-  const canSubmit = useMemo(
-    () => form.autor.trim() !== "" && form.titulo.trim() !== "",
-    [form.autor, form.titulo]
-  );
+  // ====== Defensivo: deduplicar por id ======
+  const obrasUnique = useMemo(() => {
+    const m = new Map<number, Obra>();
+    for (const o of obras) if (!m.has(o.id_obra)) m.set(o.id_obra, o);
+    return Array.from(m.values());
+  }, [obras]);
+
+  const tiendasUnique = useMemo(() => {
+    const m = new Map<number, Tienda>();
+    for (const x of tiendas) if (!m.has(x.id_tienda)) m.set(x.id_tienda, x);
+    return Array.from(m.values());
+  }, [tiendas]);
+
+  const exposUnique = useMemo(() => {
+    const m = new Map<number, Expo>();
+    for (const x of expos) if (!m.has(x.id_expo)) m.set(x.id_expo, x);
+    return Array.from(m.values());
+  }, [expos]);
+
+  // ====== Crear ======
+  const canSubmitCreate = (form.autor.trim() !== "" && form.titulo.trim() !== "");
 
   const onCreate = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmitCreate) return;
     try {
       await obrasService.create({
         ...form,
@@ -67,66 +90,90 @@ export default function ObrasPage() {
         precio_salida: form.precio_salida ? Number(form.precio_salida) : null,
       });
       setForm(emptyObra);
-      toast.success("Obra creada");
       await load();
     } catch (e: any) {
-      toast.error("Error al crear obra", { description: e.message });
+      alert(e.message);
     }
   };
 
+  // ====== Delete ======
   const onDelete = async (id: number) => {
     if (!confirm("¿Eliminar la obra?")) return;
     try {
       await obrasService.remove(id);
-      toast.success("Obra eliminada");
       await load();
     } catch (e: any) {
-      toast.error("Error al eliminar", { description: e.message });
+      alert(e.message);
     }
   };
 
-  const onAsignarTienda = async (id_obra: number, id_tienda: number) => {
+  // ====== Asignaciones (selects controlados + bloqueo) ======
+  const onAsignarTienda = async (id_obra: number) => {
+    const raw = tiendaSelect[id_obra] ?? "";
+    const id_tienda = Number(raw);
+    if (!id_tienda || submittingTienda[id_obra]) return;
+
+    setSubmittingTienda(s => ({ ...s, [id_obra]: true }));
     try {
-      await obrasService.asignarTienda(id_obra, id_tienda, new Date().toISOString().slice(0,10));
-      toast.success("Asignada a tienda");
+      await obrasService.asignarTienda(
+        id_obra,
+        id_tienda,
+        new Date().toISOString().slice(0, 10)
+      );
+      // reset select de esa fila
+      setTiendaSelect(s => ({ ...s, [id_obra]: "" }));
       await load();
     } catch (e: any) {
-      toast.error("No se pudo asignar a tienda", { description: e.message });
+      alert(e.message);
+    } finally {
+      setSubmittingTienda(s => ({ ...s, [id_obra]: false }));
     }
   };
 
   const onSacarTienda = async (id_obra: number) => {
+    if (submittingTienda[id_obra]) return;
+    setSubmittingTienda(s => ({ ...s, [id_obra]: true }));
     try {
-      await obrasService.sacarTienda(id_obra, new Date().toISOString().slice(0,10));
-      toast.success("Sacada de tienda");
+      await obrasService.sacarTienda(id_obra, new Date().toISOString().slice(0, 10));
       await load();
     } catch (e: any) {
-      toast.error("No se pudo sacar de tienda", { description: e.message });
+      alert(e.message);
+    } finally {
+      setSubmittingTienda(s => ({ ...s, [id_obra]: false }));
     }
   };
 
-  const onAsignarExpo = async (id_obra: number, id_expo: number) => {
+  const onAsignarExpo = async (id_obra: number) => {
+    const raw = expoSelect[id_obra] ?? "";
+    const id_expo = Number(raw);
+    if (!id_expo || submittingExpo[id_obra]) return;
+
+    setSubmittingExpo(s => ({ ...s, [id_obra]: true }));
     try {
       await obrasService.asignarExpo(id_obra, id_expo);
-      toast.success("Asignada a exposición");
+      setExpoSelect(s => ({ ...s, [id_obra]: "" }));
       await load();
     } catch (e: any) {
-      toast.error("No se pudo asignar a expo", { description: e.message });
+      alert(e.message);
+    } finally {
+      setSubmittingExpo(s => ({ ...s, [id_obra]: false }));
     }
   };
 
   const onQuitarExpo = async (id_obra: number, id_expo?: number | null) => {
-    if (!id_expo) return;
+    if (!id_expo || submittingExpo[id_obra]) return;
+    setSubmittingExpo(s => ({ ...s, [id_obra]: true }));
     try {
       await obrasService.quitarExpo(id_obra, id_expo);
-      toast.success("Quitada de exposición");
       await load();
     } catch (e: any) {
-      toast.error("No se pudo quitar de expo", { description: e.message });
+      alert(e.message);
+    } finally {
+      setSubmittingExpo(s => ({ ...s, [id_obra]: false }));
     }
   };
 
-  // === Edición ===
+  // ====== Edición ======
   const startEdit = (o: Obra) => {
     setEdit({
       id: o.id_obra,
@@ -157,10 +204,9 @@ export default function ObrasPage() {
             : Number(form.precio_salida),
       });
       setEdit(null);
-      toast.success("Cambios guardados");
       await load();
     } catch (e: any) {
-      toast.error("No se pudo guardar", { description: e.message });
+      alert(e.message);
     }
   };
 
@@ -213,7 +259,7 @@ export default function ObrasPage() {
         />
         <div className="col-span-2">
           <button
-            disabled={!canSubmit}
+            disabled={!canSubmitCreate}
             className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
           >
             Crear obra
@@ -236,8 +282,8 @@ export default function ObrasPage() {
             </tr>
           </thead>
           <tbody>
-            {obras.map(o => (
-              <tr key={o.id_obra} className="border-t">
+            {obrasUnique.map(o => (
+              <tr key={`obra-${o.id_obra}`} className="border-t">
                 <td className="p-2">{o.id_obra}</td>
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
@@ -250,20 +296,30 @@ export default function ObrasPage() {
                   <div className="flex items-center gap-2">
                     <select
                       className="border rounded p-1"
-                      defaultValue=""
-                      onChange={e => {
-                        const id_tienda = Number(e.target.value);
-                        if (id_tienda) onAsignarTienda(o.id_obra, id_tienda);
-                        e.currentTarget.value = "";
-                      }}
+                      value={tiendaSelect[o.id_obra] ?? ""}
+                      onChange={e => setTiendaSelect(s => ({ ...s, [o.id_obra]: e.target.value }))}
+                      disabled={!!submittingTienda[o.id_obra]}
                     >
                       <option value="">Asignar a tienda…</option>
-                      {tiendas.map(t => (
-                        <option key={t.id_tienda} value={t.id_tienda}>{t.nombre}</option>
+                      {tiendasUnique.map(t => (
+                        <option key={`tiendaopt-${t.id_tienda}`} value={t.id_tienda}>
+                          {t.nombre}
+                        </option>
                       ))}
                     </select>
+                    <button
+                      className="text-blue-600 underline disabled:opacity-50"
+                      onClick={() => onAsignarTienda(o.id_obra)}
+                      disabled={!!submittingTienda[o.id_obra] || !(tiendaSelect[o.id_obra] ?? "")}
+                    >
+                      Guardar
+                    </button>
                     {o.id_tienda && (
-                      <button className="text-blue-600 underline" onClick={() => onSacarTienda(o.id_obra)}>
+                      <button
+                        className="text-blue-600 underline disabled:opacity-50"
+                        onClick={() => onSacarTienda(o.id_obra)}
+                        disabled={!!submittingTienda[o.id_obra]}
+                      >
                         Sacar de tienda
                       </button>
                     )}
@@ -273,20 +329,30 @@ export default function ObrasPage() {
                   <div className="flex items-center gap-2">
                     <select
                       className="border rounded p-1"
-                      defaultValue=""
-                      onChange={e => {
-                        const id_expo = Number(e.target.value);
-                        if (id_expo) onAsignarExpo(o.id_obra, id_expo);
-                        e.currentTarget.value = "";
-                      }}
+                      value={expoSelect[o.id_obra] ?? ""}
+                      onChange={e => setExpoSelect(s => ({ ...s, [o.id_obra]: e.target.value }))}
+                      disabled={!!submittingExpo[o.id_obra]}
                     >
                       <option value="">Asignar a expo…</option>
-                      {expos.map(x => (
-                        <option key={x.id_expo} value={x.id_expo}>{x.nombre}</option>
+                      {exposUnique.map(x => (
+                        <option key={`expoopt-${x.id_expo}`} value={x.id_expo}>
+                          {x.nombre}
+                        </option>
                       ))}
                     </select>
+                    <button
+                      className="text-blue-600 underline disabled:opacity-50"
+                      onClick={() => onAsignarExpo(o.id_obra)}
+                      disabled={!!submittingExpo[o.id_obra] || !(expoSelect[o.id_obra] ?? "")}
+                    >
+                      Guardar
+                    </button>
                     {o.id_expo && (
-                      <button className="text-blue-600 underline" onClick={() => onQuitarExpo(o.id_obra, o.id_expo)}>
+                      <button
+                        className="text-blue-600 underline disabled:opacity-50"
+                        onClick={() => onQuitarExpo(o.id_obra, o.id_expo)}
+                        disabled={!!submittingExpo[o.id_obra]}
+                      >
                         Quitar de expo
                       </button>
                     )}
@@ -302,7 +368,7 @@ export default function ObrasPage() {
                 </td>
               </tr>
             ))}
-            {(!loading && obras.length === 0) && (
+            {(!loading && obrasUnique.length === 0) && (
               <tr>
                 <td className="p-4 text-gray-500" colSpan={7}>Sin obras</td>
               </tr>
