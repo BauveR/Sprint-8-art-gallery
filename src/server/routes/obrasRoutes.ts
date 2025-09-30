@@ -1,12 +1,7 @@
-// src/server/routes/obrasRoutes.ts
 import { Router } from 'express'
 import {
-  getObras,
-  getObraById,
-  createObra,
-  getObrasConUbicacion,
-  deleteObra,
-  getRelaciones,
+  getObras, getObraById, createObra, getObrasConUbicacion,
+  deleteObra, getRelaciones,
   vincularTienda, desvincularTienda,
   vincularExposicion, desvincularExposicion,
   updateObra,
@@ -14,22 +9,16 @@ import {
 
 const router = Router()
 
-// PROBE 2: ¿entra al router bajo /api/obras?
+// PROBE dentro del router
 router.put('/__probe/:id', (req, res) => {
-  return res.json({
-    ok: true,
-    where: 'obrasRoutes.ts router PUT',
-    id: req.params.id,
-    body: req.body,
-  })
+  res.json({ ok: true, where: 'obrasRoutes.ts router PUT', id: req.params.id, body: req.body })
 })
 
-// Rutas reales
 router.get('/', getObras)
 router.get('/ubicacion', getObrasConUbicacion)
 router.get('/:id', getObraById)
 router.post('/', createObra)
-router.put('/:id', updateObra)      // ← PUT real
+router.put('/:id', (req, res) => updateObra(req, res))     // 👈 ESTA ES LA REAL
 router.delete('/:id', deleteObra)
 
 router.get('/:id/relaciones', getRelaciones)

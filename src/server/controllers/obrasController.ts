@@ -1,8 +1,9 @@
-import type { Request, Response } from 'express'
-import { pool } from '../config/database'
+import type { Request, Response } from 'express';
+import { pool } from '../config/database';
+// No usas ObraArte en este archivo, solo el DTO de entrada:
+import type { ObraArteCreate } from '../models/ObraArte';
 
-// ========== LISTAR ==========
-export const getObras = async (_req: Request, res: Response) => {
+export const getObras = async (_req: Request, res: Response) => {  // _req para evitar TS6133
   try {
     const result = await pool.query(`
       SELECT 
@@ -10,36 +11,37 @@ export const getObras = async (_req: Request, res: Response) => {
         precio_salida, ubicacion, tipo, links, descripcion, created_at, updated_at
       FROM obras_arte 
       ORDER BY created_at DESC
-    `)
-    res.json(result.rows)
+    `);
+    res.json(result.rows);
   } catch {
-    res.status(500).json({ error: 'Error obteniendo obras' })
+    res.status(500).json({ error: 'Error obteniendo obras' });
   }
-}
+};
 
-// ========== GET BY ID ==========
 export const getObraById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     const result = await pool.query(`
       SELECT 
         id_obra, autor, titulo, año AS anio, medidas, tecnica, disponibilidad,
         precio_salida, ubicacion, tipo, links, descripcion, created_at, updated_at
       FROM obras_arte
       WHERE id_obra = $1
-    `, [id])
-    if (!result.rows.length) return res.status(404).json({ error: 'Obra no encontrada' })
-    res.json(result.rows[0])
-  } catch {
-    res.status(500).json({ error: 'Error obteniendo obra' })
-  }
-}
+    `, [id]);
 
-// ========== CREAR ==========
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Obra no encontrada' });
+    res.json(result.rows[0]);
+  } catch {
+    res.status(500).json({ error: 'Error obteniendo obra' });
+  }
+};
+
 export const createObra = async (req: Request, res: Response) => {
   try {
-    const body: any = req.body
-    const anio = body.anio ?? body.año
+    const body: any = req.body as ObraArteCreate;
+    // Acepta anio o año desde el front
+    const anio = body.anio ?? body.año;
+
     const result = await pool.query(`
       INSERT INTO obras_arte 
       (autor, titulo, año, medidas, tecnica, disponibilidad, precio_salida, ubicacion, tipo, links, descripcion)
@@ -52,63 +54,14 @@ export const createObra = async (req: Request, res: Response) => {
       body.tecnica, body.disponibilidad ?? 'disponible',
       body.precio_salida, body.ubicacion, body.tipo ?? 'pintura',
       JSON.stringify(body.links ?? {}), body.descripcion
-    ])
-    res.status(201).json(result.rows[0])
+    ]);
+
+    res.status(201).json(result.rows[0]);
   } catch {
-    res.status(500).json({ error: 'Error creando obra' })
+    res.status(500).json({ error: 'Error creando obra' });
   }
-}
+};
 
-// ========== ACTUALIZAR (PUT) ==========
-export const updateObra = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-    const body: any = req.body
-    const anioRaw = body.anio ?? body.año
-    const anio = Number.isFinite(Number(anioRaw)) ? Number(anioRaw) : null
-
-    const r = await pool.query(
-      `UPDATE obras_arte
-       SET autor = COALESCE($1, autor),
-           titulo = COALESCE($2, titulo),
-           año = COALESCE($3, año),
-           medidas = COALESCE($4, medidas),
-           tecnica = COALESCE($5, tecnica),
-           disponibilidad = COALESCE($6, disponibilidad),
-           precio_salida = COALESCE($7, precio_salida),
-           ubicacion = COALESCE($8, ubicacion),
-           tipo = COALESCE($9, tipo),
-           links = COALESCE($10, links),
-           descripcion = COALESCE($11, descripcion),
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id_obra = $12
-       RETURNING id_obra, autor, titulo, año AS anio, medidas, tecnica, disponibilidad,
-                 precio_salida, ubicacion, tipo, links, descripcion, created_at, updated_at`,
-      [
-        body.autor ?? null,
-        body.titulo ?? null,
-        anio,
-        body.medidas ?? null,
-        body.tecnica ?? null,
-        body.disponibilidad ?? null,
-        body.precio_salida ?? null,
-        body.ubicacion ?? null,
-        body.tipo ?? null,
-        body.links ? JSON.stringify(body.links) : null,
-        body.descripcion ?? null,
-        id,
-      ]
-    )
-
-    if (r.rowCount === 0) return res.status(404).json({ error: 'Obra no encontrada' })
-    res.json(r.rows[0])
-  } catch (e: any) {
-    console.error("UPDATE error:", e?.message || e)
-    res.status(500).json({ error: e?.detail || e?.message || 'Error actualizando obra' })
-  }
-}
-
-// ========== UBICACION ==========
 export const getObrasConUbicacion = async (_req: Request, res: Response) => {
   try {
     const result = await pool.query(`
@@ -127,29 +80,34 @@ export const getObrasConUbicacion = async (_req: Request, res: Response) => {
         ) AS ubicacion_actual
       FROM obras_arte o
       ORDER BY o.created_at DESC
-    `)
-    res.json(result.rows)
+    `);
+    res.json(result.rows);
   } catch {
-    res.status(500).json({ error: 'Error obteniendo obras con ubicación' })
+    res.status(500).json({ error: 'Error obteniendo obras con ubicación' });
   }
-}
+};
 
-// ========== ELIMINAR ==========
+/* =========================
+   NUEVO: borrar y relaciones
+   ========================= */
+
 export const deleteObra = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const r = await pool.query('DELETE FROM obras_arte WHERE id_obra = $1 RETURNING id_obra', [id])
-    if (r.rowCount === 0) return res.status(404).json({ error: 'Obra no encontrada' })
-    res.json({ ok: true, id: r.rows[0].id_obra })
+    const { id } = req.params;
+    const r = await pool.query(
+      'DELETE FROM obras_arte WHERE id_obra = $1 RETURNING id_obra',
+      [id]
+    );
+    if (r.rowCount === 0) return res.status(404).json({ error: 'Obra no encontrada' });
+    res.json({ ok: true, id: r.rows[0].id_obra });
   } catch {
-    res.status(500).json({ error: 'Error borrando obra' })
+    res.status(500).json({ error: 'Error borrando obra' });
   }
-}
+};
 
-// ========== RELACIONES / VINCULOS ==========
 export const getRelaciones = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
+    const { id } = req.params; // id_obra
     const [tiendas, expos] = await Promise.all([
       pool.query(`
         SELECT ot.id_relacion, t.id_tienda, t.nombre, ot.stock, ot.precio_venta, ot.codigo_inventario, ot.fecha_ingreso
@@ -165,17 +123,17 @@ export const getRelaciones = async (req: Request, res: Response) => {
         WHERE oe.id_obra = $1
         ORDER BY e.fecha_inicio DESC
       `, [id]),
-    ])
-    res.json({ tiendas: tiendas.rows, exposiciones: expos.rows })
+    ]);
+    res.json({ tiendas: tiendas.rows, exposiciones: expos.rows });
   } catch {
-    res.status(500).json({ error: 'Error obteniendo relaciones' })
+    res.status(500).json({ error: 'Error obteniendo relaciones' });
   }
-}
+};
 
 export const vincularTienda = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const { id_tienda, stock = 1, precio_venta, codigo_inventario } = req.body
+    const { id } = req.params; // id_obra
+    const { id_tienda, stock = 1, precio_venta, codigo_inventario } = req.body;
     const r = await pool.query(`
       INSERT INTO obras_tiendas (id_obra, id_tienda, stock, precio_venta, codigo_inventario)
       VALUES ($1, $2, $3, $4, $5)
@@ -185,47 +143,107 @@ export const vincularTienda = async (req: Request, res: Response) => {
             codigo_inventario = COALESCE(EXCLUDED.codigo_inventario, obras_tiendas.codigo_inventario),
             updated_at = CURRENT_TIMESTAMP
       RETURNING *;
-    `, [id, id_tienda, stock, precio_venta, codigo_inventario])
-    res.status(201).json(r.rows[0])
+    `, [id, id_tienda, stock, precio_venta, codigo_inventario]);
+    res.status(201).json(r.rows[0]);
   } catch {
-    res.status(500).json({ error: 'Error vinculando tienda' })
+    res.status(500).json({ error: 'Error vinculando tienda' });
   }
-}
+};
 
 export const desvincularTienda = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const { id_tienda } = req.body
-    const r = await pool.query('DELETE FROM obras_tiendas WHERE id_obra = $1 AND id_tienda = $2', [id, id_tienda])
-    res.json({ ok: true, deleted: r.rowCount })
+    const { id } = req.params; // id_obra
+    const { id_tienda } = req.body;
+    const r = await pool.query(
+      'DELETE FROM obras_tiendas WHERE id_obra = $1 AND id_tienda = $2',
+      [id, id_tienda]
+    );
+    res.json({ ok: true, deleted: r.rowCount });
   } catch {
-    res.status(500).json({ error: 'Error desvinculando tienda' })
+    res.status(500).json({ error: 'Error desvinculando tienda' });
   }
-}
+};
 
 export const vincularExposicion = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const { id_exposicion, ubicacion_en_exposicion } = req.body
+    const { id } = req.params; // id_obra
+    const { id_exposicion, ubicacion_en_exposicion } = req.body;
     const r = await pool.query(`
       INSERT INTO obras_exposiciones (id_obra, id_exposicion, ubicacion_en_exposicion)
       VALUES ($1, $2, $3)
       ON CONFLICT (id_obra, id_exposicion) DO NOTHING
       RETURNING *;
-    `, [id, id_exposicion, ubicacion_en_exposicion])
-    res.status(201).json(r.rows[0] ?? { ok: true, conflict: true })
+    `, [id, id_exposicion, ubicacion_en_exposicion]);
+    res.status(201).json(r.rows[0] ?? { ok: true, conflict: true });
   } catch {
-    res.status(500).json({ error: 'Error vinculando exposición' })
+    res.status(500).json({ error: 'Error vinculando exposición' });
   }
-}
+};
 
 export const desvincularExposicion = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params
-    const { id_exposicion } = req.body
-    const r = await pool.query('DELETE FROM obras_exposiciones WHERE id_obra = $1 AND id_exposicion = $2', [id, id_exposicion])
-    res.json({ ok: true, deleted: r.rowCount })
+    const { id } = req.params; // id_obra
+    const { id_exposicion } = req.body;
+    const r = await pool.query(
+      'DELETE FROM obras_exposiciones WHERE id_obra = $1 AND id_exposicion = $2',
+      [id, id_exposicion]
+    );
+    res.json({ ok: true, deleted: r.rowCount });
   } catch {
-    res.status(500).json({ error: 'Error desvinculando exposición' })
+    res.status(500).json({ error: 'Error desvinculando exposición' });
+  }
+};
+
+export const updateObra = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const body: any = req.body
+    const anioRaw = body.anio ?? body.año
+    const anio = Number.isFinite(Number(anioRaw)) ? Number(anioRaw) : null
+
+    const values = [
+      body.autor ?? null,
+      body.titulo ?? null,
+      anio,
+      body.medidas ?? null,
+      body.tecnica ?? null,
+      body.disponibilidad ?? null,
+      body.precio_salida ?? null,
+      body.ubicacion ?? null,
+      body.tipo ?? null,
+      body.links ? JSON.stringify(body.links) : null,
+      body.descripcion ?? null,
+      id,
+    ]
+
+    const query = `
+      UPDATE obras_arte
+      SET autor = COALESCE($1, autor),
+          titulo = COALESCE($2, titulo),
+          año = COALESCE($3, año),
+          medidas = COALESCE($4, medidas),
+          tecnica = COALESCE($5, tecnica),
+          disponibilidad = COALESCE($6, disponibilidad),
+          precio_salida = COALESCE($7, precio_salida),
+          ubicacion = COALESCE($8, ubicacion),
+          tipo = COALESCE($9, tipo),
+          links = COALESCE($10, links),
+          descripcion = COALESCE($11, descripcion),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id_obra = $12
+      RETURNING id_obra, autor, titulo, año AS anio, medidas, tecnica, disponibilidad,
+                precio_salida, ubicacion, tipo, links, descripcion, created_at, updated_at
+    `
+
+    const result = await pool.query(query, values)
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Obra no encontrada' });
+    }
+
+    res.json(result.rows[0])
+  } catch (e: any) {
+    console.error("UPDATE error:", e?.message || e)
+    res.status(500).json({ error: e?.detail || e?.message || 'Error actualizando obra' })
   }
 }
