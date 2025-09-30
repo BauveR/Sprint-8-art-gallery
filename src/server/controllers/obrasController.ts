@@ -288,7 +288,7 @@ export const updateObra = async (
     const body = req.body
     const anio = toNumberOrNull(body.anio ?? body.año)
 
-    const values = [
+    const values: any[] = [
       body.autor ?? null,
       body.titulo ?? null,
       anio,
@@ -303,7 +303,7 @@ export const updateObra = async (
       body.lat ?? null,
       body.lng ?? null,
       id,
-    ] as const
+    ]
 
     const sql = `
       UPDATE obras_arte

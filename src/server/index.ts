@@ -32,7 +32,7 @@ app.use('/api/tiendas', tiendasRoutes)
 // Inspector de rutas
 app.get('/__routes', (_req, res) => {
   const routes: { method: string; path: string }[] = []
-  // @ts-ignore
+
   app._router.stack.forEach((m: any) => {
     if (m.route?.path) {
       const methods = Object.keys(m.route.methods)
