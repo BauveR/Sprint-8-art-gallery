@@ -1,35 +1,21 @@
-import { useEffect, useState } from "react";
-import { tiendasService } from "../../services/tiendasService";
-import { Tienda, TiendaInput } from "../../types";
-import { toast } from "sonner";
+import { useState } from "react";
+import { useTiendas, useCreateTienda } from "../../query/tiendas";
+import { TiendaInput } from "../../types";
 
 const empty: TiendaInput = { nombre: "", lat: 0, lng: 0, url_tienda: "" };
 
 export default function TiendasPage() {
-  const [list, setList] = useState<Tienda[]>([]);
+  const { data: list = [], isLoading, error } = useTiendas();
+  const createTienda = useCreateTienda();
+
   const [form, setForm] = useState<TiendaInput>(empty);
 
-  const load = async () => {
-    try {
-      const data = await tiendasService.list();
-      setList(data);
-    } catch (e: any) {
-      toast.error("No se pudieron cargar las tiendas", { description: e.message });
-    }
-  };
-
-  useEffect(() => { load(); }, []);
-
-  const onCreate = async (e: React.FormEvent) => {
+  const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await tiendasService.create({ ...form, lat: Number(form.lat), lng: Number(form.lng) });
-      setForm(empty);
-      toast.success("Tienda creada");
-      await load();
-    } catch (e: any) {
-      toast.error("Error al crear tienda", { description: e.message });
-    }
+    createTienda.mutate(
+      { ...form, lat: Number(form.lat), lng: Number(form.lng) },
+      { onSuccess: () => setForm(empty) }
+    );
   };
 
   return (
@@ -46,7 +32,12 @@ export default function TiendasPage() {
         <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={form.lng}
           onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))} required />
         <div className="col-span-2">
-          <button className="px-4 py-2 rounded-lg bg-black text-white">Crear tienda</button>
+          <button
+            className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
+            disabled={createTienda.isPending}
+          >
+            {createTienda.isPending ? "Creando..." : "Crear tienda"}
+          </button>
         </div>
       </form>
 
@@ -60,7 +51,7 @@ export default function TiendasPage() {
           </thead>
           <tbody>
             {list.map(t => (
-              <tr key={t.id_tienda} className="border-t">
+              <tr key={`ti-${t.id_tienda}`} className="border-t">
                 <td className="p-2">{t.id_tienda}</td>
                 <td className="p-2">{t.nombre}</td>
                 <td className="p-2">
@@ -69,11 +60,13 @@ export default function TiendasPage() {
                 <td className="p-2">{t.lat}, {t.lng}</td>
               </tr>
             ))}
-            {list.length === 0 && (
+            {(!isLoading && list.length === 0) && (
               <tr><td className="p-4 text-gray-500" colSpan={4}>Sin tiendas</td></tr>
             )}
           </tbody>
         </table>
+        {isLoading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
+        {error && <div className="p-3 text-sm text-red-600">Error: {(error as any).message}</div>}
       </div>
     </div>
   );

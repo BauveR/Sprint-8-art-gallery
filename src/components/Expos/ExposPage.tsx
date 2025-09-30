@@ -1,39 +1,23 @@
-import { useEffect, useState } from "react";
-import { exposService } from "../../services/expoService";
-import { Expo, ExpoInput } from "../../types";
-import { toast } from "sonner";
+import { useState } from "react";
+import { useExpos, useCreateExpo } from "../../query/expos";
+import { ExpoInput } from "../../types";
 
 const empty: ExpoInput = {
   nombre: "", lat: 0, lng: 0, fecha_inicio: "", fecha_fin: "", url_expo: ""
 };
 
 export default function ExposPage() {
-  const [list, setList] = useState<Expo[]>([]);
+  const { data: list = [], isLoading, error } = useExpos();
+  const createExpo = useCreateExpo();
+
   const [form, setForm] = useState<ExpoInput>(empty);
 
-  const load = async () => {
-    try {
-      setList(await exposService.list());
-    } catch (e: any) {
-      toast.error("No se pudieron cargar las expos", { description: e.message });
-    }
-  };
-  useEffect(() => { load(); }, []);
-
-  const onCreate = async (e: React.FormEvent) => {
+  const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await exposService.create({
-        ...form,
-        lat: Number(form.lat),
-        lng: Number(form.lng),
-      });
-      setForm(empty);
-      toast.success("Exposición creada");
-      await load();
-    } catch (e: any) {
-      toast.error("Error al crear exposición", { description: e.message });
-    }
+    createExpo.mutate(
+      { ...form, lat: Number(form.lat), lng: Number(form.lng) },
+      { onSuccess: () => setForm(empty) }
+    );
   };
 
   return (
@@ -54,7 +38,12 @@ export default function ExposPage() {
         <input className="border rounded p-2" placeholder="Fin (YYYY-MM-DD)" value={form.fecha_fin}
           onChange={e => setForm(f => ({ ...f, fecha_fin: e.target.value }))} required />
         <div className="col-span-2">
-          <button className="px-4 py-2 rounded-lg bg-black text-white">Crear exposición</button>
+          <button
+            className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
+            disabled={createExpo.isPending}
+          >
+            {createExpo.isPending ? "Creando..." : "Crear exposición"}
+          </button>
         </div>
       </form>
 
@@ -68,7 +57,7 @@ export default function ExposPage() {
           </thead>
           <tbody>
             {list.map(x => (
-              <tr key={x.id_expo} className="border-t">
+              <tr key={`expo-${x.id_expo}`} className="border-t">
                 <td className="p-2">{x.id_expo}</td>
                 <td className="p-2">{x.nombre}</td>
                 <td className="p-2">{x.fecha_inicio} → {x.fecha_fin}</td>
@@ -77,11 +66,13 @@ export default function ExposPage() {
                 </td>
               </tr>
             ))}
-            {list.length === 0 && (
+            {(!isLoading && list.length === 0) && (
               <tr><td className="p-4 text-gray-500" colSpan={4}>Sin expos</td></tr>
             )}
           </tbody>
         </table>
+        {isLoading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
+        {error && <div className="p-3 text-sm text-red-600">Error: {(error as any).message}</div>}
       </div>
     </div>
   );

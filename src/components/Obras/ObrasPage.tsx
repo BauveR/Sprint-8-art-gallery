@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { obrasService } from "../../services/obrasService";
-import { exposService } from "../../services/expoService";
-import { tiendasService } from "../../services/tiendasService";
-import { Expo, Obra, ObraInput, Tienda } from "../../types";
+import { useMemo, useState } from "react";
+import { Obra, ObraInput } from "../../types";
+import { useObras, useCreateObra, useRemoveObra, useUpdateObra,
+  useAsignarExpo, useAsignarTienda, useQuitarExpo, useSacarTienda } from "../../query/obras";
+import { useTiendas } from "../../query/tiendas";
+import { useExpos } from "../../query/expos";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -13,167 +14,66 @@ const emptyObra: ObraInput = {
   precio_salida: undefined,
 };
 
-type EditState = {
-  id: number;
-  form: ObraInput;
-} | null;
+type EditState = { id: number; form: ObraInput } | null;
 
 export default function ObrasPage() {
-  const [obras, setObras] = useState<Obra[]>([]);
-  const [tiendas, setTiendas] = useState<Tienda[]>([]);
-  const [expos, setExpos] = useState<Expo[]>([]);
+  const { data: obras = [], isLoading, error } = useObras();
+  const { data: tiendas = [] } = useTiendas();
+  const { data: expos = [] } = useExpos();
+
+  const createObra = useCreateObra();
+  const removeObra = useRemoveObra();
+  const updateObra = useUpdateObra();
+  const asignarTienda = useAsignarTienda();
+  const sacarTienda = useSacarTienda();
+  const asignarExpo = useAsignarExpo();
+  const quitarExpo = useQuitarExpo();
+
   const [form, setForm] = useState<ObraInput>(emptyObra);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  // === Estado para selects controlados por obra ===
-  const [tiendaSelect, setTiendaSelect] = useState<Record<number, string>>({});
-  const [expoSelect, setExpoSelect] = useState<Record<number, string>>({});
-  // Flags para bloquear repetidos
-  const [submittingTienda, setSubmittingTienda] = useState<Record<number, boolean>>({});
-  const [submittingExpo, setSubmittingExpo] = useState<Record<number, boolean>>({});
-
-  // === Edición ===
   const [edit, setEdit] = useState<EditState>(null);
-  const isEditing = !!edit;
 
-  const load = async () => {
-    setLoading(true);
-    setErr(null);
-    try {
-      const [o, t, e] = await Promise.all([
-        obrasService.list(),
-        tiendasService.list(),
-        exposService.list(),
-      ]);
-      setObras(o);
-      setTiendas(t);
-      setExpos(e);
-    } catch (e: any) {
-      setErr(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const canSubmit = useMemo(
+    () => form.autor.trim() !== "" && form.titulo.trim() !== "",
+    [form.autor, form.titulo]
+  );
 
-  useEffect(() => { load(); }, []);
-
-  // ====== Defensivo: deduplicar por id ======
-  const obrasUnique = useMemo(() => {
-    const m = new Map<number, Obra>();
-    for (const o of obras) if (!m.has(o.id_obra)) m.set(o.id_obra, o);
-    return Array.from(m.values());
-  }, [obras]);
-
-  const tiendasUnique = useMemo(() => {
-    const m = new Map<number, Tienda>();
-    for (const x of tiendas) if (!m.has(x.id_tienda)) m.set(x.id_tienda, x);
-    return Array.from(m.values());
-  }, [tiendas]);
-
-  const exposUnique = useMemo(() => {
-    const m = new Map<number, Expo>();
-    for (const x of expos) if (!m.has(x.id_expo)) m.set(x.id_expo, x);
-    return Array.from(m.values());
-  }, [expos]);
-
-  // ====== Crear ======
-  const canSubmitCreate = (form.autor.trim() !== "" && form.titulo.trim() !== "");
-
-  const onCreate = async (ev: React.FormEvent) => {
+  const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!canSubmitCreate) return;
-    try {
-      await obrasService.create({
-        ...form,
-        anio: form.anio ? Number(form.anio) : null,
-        precio_salida: form.precio_salida ? Number(form.precio_salida) : null,
-      });
-      setForm(emptyObra);
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    }
+    if (!canSubmit) return;
+    createObra.mutate({
+      ...form,
+      anio: form.anio ? Number(form.anio) : null,
+      precio_salida: form.precio_salida ? Number(form.precio_salida) : null,
+    }, {
+      onSuccess: () => setForm(emptyObra),
+    });
   };
 
-  // ====== Delete ======
-  const onDelete = async (id: number) => {
+  const onDelete = (id: number) => {
     if (!confirm("¿Eliminar la obra?")) return;
-    try {
-      await obrasService.remove(id);
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    }
+    removeObra.mutate(id);
   };
 
-  // ====== Asignaciones (selects controlados + bloqueo) ======
-  const onAsignarTienda = async (id_obra: number) => {
-    const raw = tiendaSelect[id_obra] ?? "";
-    const id_tienda = Number(raw);
-    if (!id_tienda || submittingTienda[id_obra]) return;
-
-    setSubmittingTienda(s => ({ ...s, [id_obra]: true }));
-    try {
-      await obrasService.asignarTienda(
-        id_obra,
-        id_tienda,
-        new Date().toISOString().slice(0, 10)
-      );
-      // reset select de esa fila
-      setTiendaSelect(s => ({ ...s, [id_obra]: "" }));
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setSubmittingTienda(s => ({ ...s, [id_obra]: false }));
-    }
+  const onAsignarTienda = (id_obra: number, id_tienda: number) => {
+    if (!id_tienda) return;
+    asignarTienda.mutate({ id_obra, id_tienda, fecha_entrada: new Date().toISOString().slice(0,10) });
   };
 
-  const onSacarTienda = async (id_obra: number) => {
-    if (submittingTienda[id_obra]) return;
-    setSubmittingTienda(s => ({ ...s, [id_obra]: true }));
-    try {
-      await obrasService.sacarTienda(id_obra, new Date().toISOString().slice(0, 10));
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setSubmittingTienda(s => ({ ...s, [id_obra]: false }));
-    }
+  const onSacarTienda = (id_obra: number) => {
+    sacarTienda.mutate({ id_obra, fecha_salida: new Date().toISOString().slice(0,10) });
   };
 
-  const onAsignarExpo = async (id_obra: number) => {
-    const raw = expoSelect[id_obra] ?? "";
-    const id_expo = Number(raw);
-    if (!id_expo || submittingExpo[id_obra]) return;
-
-    setSubmittingExpo(s => ({ ...s, [id_obra]: true }));
-    try {
-      await obrasService.asignarExpo(id_obra, id_expo);
-      setExpoSelect(s => ({ ...s, [id_obra]: "" }));
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setSubmittingExpo(s => ({ ...s, [id_obra]: false }));
-    }
+  const onAsignarExpo = (id_obra: number, id_expo: number) => {
+    if (!id_expo) return;
+    asignarExpo.mutate({ id_obra, id_expo });
   };
 
-  const onQuitarExpo = async (id_obra: number, id_expo?: number | null) => {
-    if (!id_expo || submittingExpo[id_obra]) return;
-    setSubmittingExpo(s => ({ ...s, [id_obra]: true }));
-    try {
-      await obrasService.quitarExpo(id_obra, id_expo);
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setSubmittingExpo(s => ({ ...s, [id_obra]: false }));
-    }
+  const onQuitarExpo = (id_obra: number, id_expo?: number | null) => {
+    if (!id_expo) return;
+    quitarExpo.mutate({ id_obra, id_expo });
   };
 
-  // ====== Edición ======
+  // edición
   const startEdit = (o: Obra) => {
     setEdit({
       id: o.id_obra,
@@ -190,24 +90,21 @@ export default function ObrasPage() {
 
   const cancelEdit = () => setEdit(null);
 
-  const saveEdit = async (ev: React.FormEvent) => {
+  const saveEdit = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!edit) return;
     const { id, form } = edit;
-    try {
-      await obrasService.update(id, {
+    updateObra.mutate({
+      id,
+      input: {
         ...form,
         anio: form.anio ? Number(form.anio) : null,
         precio_salida:
-          form.precio_salida === undefined || form.precio_salida === null || (form as any).precio_salida === ""
+          form.precio_salida === undefined || form.precio_salida === null || (form.precio_salida as any) === ""
             ? null
             : Number(form.precio_salida),
-      });
-      setEdit(null);
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    }
+      },
+    }, { onSuccess: () => setEdit(null) });
   };
 
   return (
@@ -216,53 +113,25 @@ export default function ObrasPage() {
 
       {/* Form alta obra */}
       <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-white/80 p-4 rounded-xl shadow">
-        <input
-          className="border rounded p-2"
-          placeholder="Autor"
-          value={form.autor}
-          onChange={e => setForm(f => ({ ...f, autor: e.target.value }))}
-          required
-        />
-        <input
-          className="border rounded p-2"
-          placeholder="Título"
-          value={form.titulo}
-          onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))}
-          required
-        />
-        <input
-          className="border rounded p-2"
-          placeholder="Año"
-          type="number"
-          value={form.anio ?? ""}
-          onChange={e => setForm(f => ({ ...f, anio: e.target.value === "" ? undefined : Number(e.target.value) }))}
-        />
-        <input
-          className="border rounded p-2"
-          placeholder="Medidas"
-          value={form.medidas ?? ""}
-          onChange={e => setForm(f => ({ ...f, medidas: e.target.value }))}
-        />
-        <input
-          className="border rounded p-2"
-          placeholder="Técnica"
-          value={form.tecnica ?? ""}
-          onChange={e => setForm(f => ({ ...f, tecnica: e.target.value }))}
-        />
-        <input
-          className="border rounded p-2"
-          placeholder="Precio salida"
-          type="number"
-          step="0.01"
+        <input className="border rounded p-2" placeholder="Autor" value={form.autor}
+          onChange={e => setForm(f => ({ ...f, autor: e.target.value }))} required />
+        <input className="border rounded p-2" placeholder="Título" value={form.titulo}
+          onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))} required />
+        <input className="border rounded p-2" placeholder="Año" type="number" value={form.anio ?? ""}
+          onChange={e => setForm(f => ({ ...f, anio: e.target.value === "" ? undefined : Number(e.target.value) }))} />
+        <input className="border rounded p-2" placeholder="Medidas" value={form.medidas ?? ""}
+          onChange={e => setForm(f => ({ ...f, medidas: e.target.value }))} />
+        <input className="border rounded p-2" placeholder="Técnica" value={form.tecnica ?? ""}
+          onChange={e => setForm(f => ({ ...f, tecnica: e.target.value }))} />
+        <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01"
           value={form.precio_salida ?? ""}
-          onChange={e => setForm(f => ({ ...f, precio_salida: e.target.value === "" ? undefined : Number(e.target.value) }))}
-        />
+          onChange={e => setForm(f => ({ ...f, precio_salida: e.target.value === "" ? undefined : Number(e.target.value) }))} />
         <div className="col-span-2">
           <button
-            disabled={!canSubmitCreate}
+            disabled={!canSubmit || createObra.isPending}
             className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
           >
-            Crear obra
+            {createObra.isPending ? "Creando..." : "Crear obra"}
           </button>
         </div>
       </form>
@@ -282,7 +151,7 @@ export default function ObrasPage() {
             </tr>
           </thead>
           <tbody>
-            {obrasUnique.map(o => (
+            {obras.map(o => (
               <tr key={`obra-${o.id_obra}`} className="border-t">
                 <td className="p-2">{o.id_obra}</td>
                 <td className="p-2">{o.autor}</td>
@@ -296,29 +165,26 @@ export default function ObrasPage() {
                   <div className="flex items-center gap-2">
                     <select
                       className="border rounded p-1"
-                      value={tiendaSelect[o.id_obra] ?? ""}
-                      onChange={e => setTiendaSelect(s => ({ ...s, [o.id_obra]: e.target.value }))}
-                      disabled={!!submittingTienda[o.id_obra]}
+                      defaultValue=""
+                      disabled={asignarTienda.isPending}
+                      onChange={e => {
+                        const id_tienda = Number(e.target.value);
+                        if (id_tienda) onAsignarTienda(o.id_obra, id_tienda);
+                        e.currentTarget.value = "";
+                      }}
                     >
                       <option value="">Asignar a tienda…</option>
-                      {tiendasUnique.map(t => (
-                        <option key={`tiendaopt-${t.id_tienda}`} value={t.id_tienda}>
+                      {tiendas.map((t) => (
+                        <option key={`tienda-opt-${t.id_tienda}`} value={t.id_tienda}>
                           {t.nombre}
                         </option>
                       ))}
                     </select>
-                    <button
-                      className="text-blue-600 underline disabled:opacity-50"
-                      onClick={() => onAsignarTienda(o.id_obra)}
-                      disabled={!!submittingTienda[o.id_obra] || !(tiendaSelect[o.id_obra] ?? "")}
-                    >
-                      Guardar
-                    </button>
                     {o.id_tienda && (
                       <button
+                        disabled={sacarTienda.isPending}
                         className="text-blue-600 underline disabled:opacity-50"
                         onClick={() => onSacarTienda(o.id_obra)}
-                        disabled={!!submittingTienda[o.id_obra]}
                       >
                         Sacar de tienda
                       </button>
@@ -329,29 +195,26 @@ export default function ObrasPage() {
                   <div className="flex items-center gap-2">
                     <select
                       className="border rounded p-1"
-                      value={expoSelect[o.id_obra] ?? ""}
-                      onChange={e => setExpoSelect(s => ({ ...s, [o.id_obra]: e.target.value }))}
-                      disabled={!!submittingExpo[o.id_obra]}
+                      defaultValue=""
+                      disabled={asignarExpo.isPending}
+                      onChange={e => {
+                        const id_expo = Number(e.target.value);
+                        if (id_expo) onAsignarExpo(o.id_obra, id_expo);
+                        e.currentTarget.value = "";
+                      }}
                     >
                       <option value="">Asignar a expo…</option>
-                      {exposUnique.map(x => (
-                        <option key={`expoopt-${x.id_expo}`} value={x.id_expo}>
+                      {expos.map((x) => (
+                        <option key={`expo-opt-${x.id_expo}`} value={x.id_expo}>
                           {x.nombre}
                         </option>
                       ))}
                     </select>
-                    <button
-                      className="text-blue-600 underline disabled:opacity-50"
-                      onClick={() => onAsignarExpo(o.id_obra)}
-                      disabled={!!submittingExpo[o.id_obra] || !(expoSelect[o.id_obra] ?? "")}
-                    >
-                      Guardar
-                    </button>
                     {o.id_expo && (
                       <button
+                        disabled={quitarExpo.isPending}
                         className="text-blue-600 underline disabled:opacity-50"
                         onClick={() => onQuitarExpo(o.id_obra, o.id_expo)}
-                        disabled={!!submittingExpo[o.id_obra]}
                       >
                         Quitar de expo
                       </button>
@@ -362,25 +225,27 @@ export default function ObrasPage() {
                   <button className="text-blue-700 underline" onClick={() => startEdit(o)}>
                     editar
                   </button>
-                  <button className="text-red-600 underline" onClick={() => onDelete(o.id_obra)}>
+                  <button
+                    className="text-red-600 underline"
+                    disabled={removeObra.isPending}
+                    onClick={() => onDelete(o.id_obra)}
+                  >
                     eliminar
                   </button>
                 </td>
               </tr>
             ))}
-            {(!loading && obrasUnique.length === 0) && (
-              <tr>
-                <td className="p-4 text-gray-500" colSpan={7}>Sin obras</td>
-              </tr>
+            {(!isLoading && obras.length === 0) && (
+              <tr><td className="p-4 text-gray-500" colSpan={7}>Sin obras</td></tr>
             )}
           </tbody>
         </table>
-        {loading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
-        {err && <div className="p-3 text-sm text-red-600">Error: {err}</div>}
+        {isLoading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
+        {error && <div className="p-3 text-sm text-red-600">Error: {(error as any).message}</div>}
       </div>
 
       {/* Modal edición */}
-      {isEditing && edit && (
+      {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
             <div className="flex items-center justify-between mb-4">
@@ -388,61 +253,32 @@ export default function ObrasPage() {
               <button onClick={cancelEdit} className="text-gray-500 hover:text-black">✕</button>
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
-              <input
-                className="border rounded p-2"
-                placeholder="Autor"
-                value={edit.form.autor}
-                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, autor: e.target.value } }) : s)}
-                required
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Título"
-                value={edit.form.titulo}
-                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, titulo: e.target.value } }) : s)}
-                required
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Año"
-                type="number"
-                value={edit.form.anio ?? ""}
+              <input className="border rounded p-2" placeholder="Autor" value={edit.form.autor}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, autor: e.target.value } }) : s)} required />
+              <input className="border rounded p-2" placeholder="Título" value={edit.form.titulo}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, titulo: e.target.value } }) : s)} required />
+              <input className="border rounded p-2" placeholder="Año" type="number" value={edit.form.anio ?? ""}
                 onChange={e => setEdit(s => s ? ({
                   ...s, form: { ...s.form, anio: e.target.value === "" ? undefined : Number(e.target.value) }
-                }) : s)}
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Medidas"
-                value={edit.form.medidas ?? ""}
-                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, medidas: e.target.value } }) : s)}
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Técnica"
-                value={edit.form.tecnica ?? ""}
-                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, tecnica: e.target.value } }) : s)}
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Precio salida"
-                type="number"
-                step="0.01"
+                }) : s)} />
+              <input className="border rounded p-2" placeholder="Medidas" value={edit.form.medidas ?? ""}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, medidas: e.target.value } }) : s)} />
+              <input className="border rounded p-2" placeholder="Técnica" value={edit.form.tecnica ?? ""}
+                onChange={e => setEdit(s => s ? ({ ...s, form: { ...s.form, tecnica: e.target.value } }) : s)} />
+              <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01"
                 value={edit.form.precio_salida ?? ""}
                 onChange={e => setEdit(s => s ? ({
-                  ...s,
-                  form: {
-                    ...s.form,
-                    precio_salida: e.target.value === "" ? undefined : Number(e.target.value)
-                  }
-                }) : s)}
-              />
+                  ...s, form: { ...s.form, precio_salida: e.target.value === "" ? undefined : Number(e.target.value) }
+                }) : s)} />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">
                   Cancelar
                 </button>
-                <button className="px-4 py-2 rounded-lg bg-black text-white">
-                  Guardar cambios
+                <button
+                  className="px-4 py-2 rounded-lg bg-black text-white"
+                  disabled={updateObra.isPending}
+                >
+                  {updateObra.isPending ? "Guardando..." : "Guardar cambios"}
                 </button>
               </div>
             </form>

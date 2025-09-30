@@ -1,58 +1,29 @@
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+const BASE = "/api";
 
-async function http<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${url}`, {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
   if (!res.ok) {
-    let msg = res.statusText;
+    let message = `HTTP ${res.status}`;
     try {
-      const j = await res.json();
-      msg = j?.error ?? msg;
+      const data = await res.json();
+      if (data?.error) message = data.error;
     } catch {}
-    throw new Error(`${res.status} ${msg}`);
+    throw new Error(message);
   }
-  if (res.status === 204) return undefined as unknown as T;
-  return res.json();
+  // 204 No Content
+  if (res.status === 204) return undefined as T;
+  return res.json() as Promise<T>;
 }
 
 export const api = {
-  async get<T>(path: string): Promise<T> {
-    const r = await fetch(`/api${path}`);
-    if (!r.ok) throw await parseError(r);
-    return (await r.json()) as T;
-  },
-  async post<T>(path: string, body?: unknown): Promise<T> {
-    const r = await fetch(`/api${path}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!r.ok) throw await parseError(r);
-    return (await r.json()) as T;
-  },
-  async put<T>(path: string, body?: unknown): Promise<T> {
-    const r = await fetch(`/api${path}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!r.ok) throw await parseError(r);
-    return (await r.json()) as T;
-  },
-  async del(path: string): Promise<void> {
-    const r = await fetch(`/api${path}`, { method: "DELETE" });
-    if (!r.ok) throw await parseError(r);
-  },
+  get: <T>(path: string) => request<T>(path),
+  post: <T>(path: string, body?: any) =>
+    request<T>(path, { method: "POST", body: JSON.stringify(body ?? {}) }),
+  put:  <T>(path: string, body?: any) =>
+    request<T>(path, { method: "PUT", body: JSON.stringify(body ?? {}) }),
+  del:  <T = void>(path: string) =>
+    request<T>(path, { method: "DELETE" }),
 };
-
-async function parseError(r: Response) {
-  const t = await r.text().catch(() => "");
-  try {
-    const j = JSON.parse(t);
-    return new Error(j?.error || j?.message || `HTTP ${r.status}`);
-  } catch {
-    return new Error(t || `HTTP ${r.status}`);
-  }
-}
