@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { tiendasService } from "../../services/tiendasService";
 import { Tienda, TiendaInput } from "../../types";
+import { toast } from "sonner";
 
 const empty: TiendaInput = { nombre: "", lat: 0, lng: 0, url_tienda: "" };
 
@@ -8,14 +9,27 @@ export default function TiendasPage() {
   const [list, setList] = useState<Tienda[]>([]);
   const [form, setForm] = useState<TiendaInput>(empty);
 
-  const load = async () => setList(await tiendasService.list());
+  const load = async () => {
+    try {
+      const data = await tiendasService.list();
+      setList(data);
+    } catch (e: any) {
+      toast.error("No se pudieron cargar las tiendas", { description: e.message });
+    }
+  };
+
   useEffect(() => { load(); }, []);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await tiendasService.create({ ...form, lat: Number(form.lat), lng: Number(form.lng) });
-    setForm(empty);
-    await load();
+    try {
+      await tiendasService.create({ ...form, lat: Number(form.lat), lng: Number(form.lng) });
+      setForm(empty);
+      toast.success("Tienda creada");
+      await load();
+    } catch (e: any) {
+      toast.error("Error al crear tienda", { description: e.message });
+    }
   };
 
   return (

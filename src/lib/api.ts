@@ -18,10 +18,41 @@ async function http<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get: <T>(u: string) => http<T>(u),
-  post: <T>(u: string, body?: any) =>
-    http<T>(u, { method: "POST", body: JSON.stringify(body ?? {}) }),
-  put: <T>(u: string, body?: any) =>
-    http<T>(u, { method: "PUT", body: JSON.stringify(body ?? {}) }),
-  del: (u: string) => http<void>(u, { method: "DELETE" }),
+  async get<T>(path: string): Promise<T> {
+    const r = await fetch(`/api${path}`);
+    if (!r.ok) throw await parseError(r);
+    return (await r.json()) as T;
+  },
+  async post<T>(path: string, body?: unknown): Promise<T> {
+    const r = await fetch(`/api${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!r.ok) throw await parseError(r);
+    return (await r.json()) as T;
+  },
+  async put<T>(path: string, body?: unknown): Promise<T> {
+    const r = await fetch(`/api${path}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!r.ok) throw await parseError(r);
+    return (await r.json()) as T;
+  },
+  async del(path: string): Promise<void> {
+    const r = await fetch(`/api${path}`, { method: "DELETE" });
+    if (!r.ok) throw await parseError(r);
+  },
 };
+
+async function parseError(r: Response) {
+  const t = await r.text().catch(() => "");
+  try {
+    const j = JSON.parse(t);
+    return new Error(j?.error || j?.message || `HTTP ${r.status}`);
+  } catch {
+    return new Error(t || `HTTP ${r.status}`);
+  }
+}

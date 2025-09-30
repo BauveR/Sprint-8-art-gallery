@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { exposService } from "../../services/expoService";
 import { Expo, ExpoInput } from "../../types";
+import { toast } from "sonner";
 
 const empty: ExpoInput = {
   nombre: "", lat: 0, lng: 0, fecha_inicio: "", fecha_fin: "", url_expo: ""
@@ -10,18 +11,29 @@ export default function ExposPage() {
   const [list, setList] = useState<Expo[]>([]);
   const [form, setForm] = useState<ExpoInput>(empty);
 
-  const load = async () => setList(await exposService.list());
+  const load = async () => {
+    try {
+      setList(await exposService.list());
+    } catch (e: any) {
+      toast.error("No se pudieron cargar las expos", { description: e.message });
+    }
+  };
   useEffect(() => { load(); }, []);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await exposService.create({
-      ...form,
-      lat: Number(form.lat),
-      lng: Number(form.lng),
-    });
-    setForm(empty);
-    await load();
+    try {
+      await exposService.create({
+        ...form,
+        lat: Number(form.lat),
+        lng: Number(form.lng),
+      });
+      setForm(empty);
+      toast.success("Exposición creada");
+      await load();
+    } catch (e: any) {
+      toast.error("Error al crear exposición", { description: e.message });
+    }
   };
 
   return (

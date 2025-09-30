@@ -3,6 +3,7 @@ import { obrasService } from "../../services/obrasService";
 import { exposService } from "../../services/expoService";
 import { tiendasService } from "../../services/tiendasService";
 import { Expo, Obra, ObraInput, Tienda } from "../../types";
+import { toast } from "sonner";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -26,7 +27,6 @@ export default function ObrasPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  // estado de edición
   const [edit, setEdit] = useState<EditState>(null);
   const isEditing = !!edit;
 
@@ -44,6 +44,7 @@ export default function ObrasPage() {
       setExpos(e);
     } catch (e: any) {
       setErr(e.message);
+      toast.error("No se pudieron cargar los datos", { description: e.message });
     } finally {
       setLoading(false);
     }
@@ -66,9 +67,10 @@ export default function ObrasPage() {
         precio_salida: form.precio_salida ? Number(form.precio_salida) : null,
       });
       setForm(emptyObra);
+      toast.success("Obra creada");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("Error al crear obra", { description: e.message });
     }
   };
 
@@ -76,36 +78,40 @@ export default function ObrasPage() {
     if (!confirm("¿Eliminar la obra?")) return;
     try {
       await obrasService.remove(id);
+      toast.success("Obra eliminada");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("Error al eliminar", { description: e.message });
     }
   };
 
   const onAsignarTienda = async (id_obra: number, id_tienda: number) => {
     try {
       await obrasService.asignarTienda(id_obra, id_tienda, new Date().toISOString().slice(0,10));
+      toast.success("Asignada a tienda");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("No se pudo asignar a tienda", { description: e.message });
     }
   };
 
   const onSacarTienda = async (id_obra: number) => {
     try {
       await obrasService.sacarTienda(id_obra, new Date().toISOString().slice(0,10));
+      toast.success("Sacada de tienda");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("No se pudo sacar de tienda", { description: e.message });
     }
   };
 
   const onAsignarExpo = async (id_obra: number, id_expo: number) => {
     try {
       await obrasService.asignarExpo(id_obra, id_expo);
+      toast.success("Asignada a exposición");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("No se pudo asignar a expo", { description: e.message });
     }
   };
 
@@ -113,9 +119,10 @@ export default function ObrasPage() {
     if (!id_expo) return;
     try {
       await obrasService.quitarExpo(id_obra, id_expo);
+      toast.success("Quitada de exposición");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("No se pudo quitar de expo", { description: e.message });
     }
   };
 
@@ -129,7 +136,6 @@ export default function ObrasPage() {
         anio: o.anio ?? undefined,
         medidas: o.medidas ?? "",
         tecnica: o.tecnica ?? "",
-        // precio_salida puede venir como string (DECIMAL), lo normalizamos a número si se puede
         precio_salida: o.precio_salida != null ? Number(o.precio_salida as any) : undefined,
       },
     });
@@ -145,14 +151,16 @@ export default function ObrasPage() {
       await obrasService.update(id, {
         ...form,
         anio: form.anio ? Number(form.anio) : null,
-        precio_salida: form.precio_salida === undefined || form.precio_salida === null || form.precio_salida === ("" as any)
-          ? null
-          : Number(form.precio_salida),
+        precio_salida:
+          form.precio_salida === undefined || form.precio_salida === null || (form as any).precio_salida === ""
+            ? null
+            : Number(form.precio_salida),
       });
       setEdit(null);
+      toast.success("Cambios guardados");
       await load();
     } catch (e: any) {
-      alert(e.message);
+      toast.error("No se pudo guardar", { description: e.message });
     }
   };
 

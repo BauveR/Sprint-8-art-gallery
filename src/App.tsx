@@ -33,4 +33,3 @@ export default function App() {
     </div>
   );
 }
- //Versión actual funciona el front es minimo y es antes de aaegar  el boton de  editar los datos de la obra //
