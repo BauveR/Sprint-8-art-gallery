@@ -1,3 +1,4 @@
+// src/routes/obrasRoutes.ts
 import { Router } from 'express'
 import {
   getObras, getObraById, createObra, getObrasConUbicacion,
@@ -9,16 +10,11 @@ import {
 
 const router = Router()
 
-// PROBE dentro del router
-router.put('/__probe/:id', (req, res) => {
-  res.json({ ok: true, where: 'obrasRoutes.ts router PUT', id: req.params.id, body: req.body })
-})
-
 router.get('/', getObras)
 router.get('/ubicacion', getObrasConUbicacion)
 router.get('/:id', getObraById)
 router.post('/', createObra)
-router.put('/:id', (req, res) => updateObra(req, res))     // 👈 ESTA ES LA REAL
+router.put('/:id', updateObra)
 router.delete('/:id', deleteObra)
 
 router.get('/:id/relaciones', getRelaciones)

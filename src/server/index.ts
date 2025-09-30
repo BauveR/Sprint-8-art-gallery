@@ -7,9 +7,6 @@ import { testConnection } from './config/database'
 import obrasRoutes from './routes/obrasRoutes'
 import tiendasRoutes from './routes/tiendaRoutes'
 
-// ⬇️ IMPORTA DIRECTO EL CONTROLADOR PARA BYPASS TEMPORAL
-import { updateObra } from './controllers/obrasController'
-
 dotenv.config()
 
 const app = express()
@@ -23,21 +20,14 @@ app.use((req, _res, next) => {
   next()
 })
 
-// PROBE A (sigue de ayuda)
-app.put('/api/obras/__probe/:id', (req, res) => {
-  res.json({ ok: true, where: 'index.ts direct PUT', id: req.params.id, body: req.body })
-})
-
-// ⬇️ BYPASS: REGISTRAMOS AQUÍ EL PUT REAL (sin router)
-app.put('/api/obras/:id', updateObra)
-
-// Resto de routers
-app.use('/api/obras', obrasRoutes)
-app.use('/api/tiendas', tiendasRoutes)
-
+// Health
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', message: 'API Galería de Arte funcionando' })
 })
+
+// Rutas
+app.use('/api/obras', obrasRoutes)
+app.use('/api/tiendas', tiendasRoutes)
 
 // Inspector de rutas
 app.get('/__routes', (_req, res) => {

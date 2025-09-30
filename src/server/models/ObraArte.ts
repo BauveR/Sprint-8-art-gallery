@@ -2,7 +2,7 @@ export interface ObraArte {
     id_obra: number;
     autor: string;
     titulo: string;
-    año: number;
+    anio: number;
     medidas: string;
     tecnica: string;
     disponibilidad: 'disponible' | 'vendido' | 'reservado' | 'no disponible' | 'en_exposicion' | 'en_tienda';
@@ -18,7 +18,7 @@ export interface ObraArte {
   export interface ObraArteCreate {
     autor: string;
     titulo: string;
-    año: number;
+    anio: number;
     medidas?: string;
     tecnica?: string;
     disponibilidad?: ObraArte['disponibilidad'];

@@ -2,7 +2,6 @@
 import axios from 'axios'
 import type { ObraArte, ObraCreate, Tienda } from '../types/ObraArte'
 
-// Usa .env si existe, si no fallback al localhost
 const API_BASE_URL =
   (import.meta as any)?.env?.VITE_API_URL?.toString() ||
   'http://localhost:3001/api'
@@ -12,12 +11,8 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-/* ============================
-   Interceptors (debug/diagnóstico)
-   ============================ */
 api.interceptors.request.use((config) => {
   const fullUrl = `${config.baseURL ?? ''}${config.url ?? ''}`
-  // eslint-disable-next-line no-console
   console.log('[API-REQ]', (config.method || 'get').toUpperCase(), fullUrl, {
     data: config.data,
   })
@@ -26,7 +21,6 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => {
-    // eslint-disable-next-line no-console
     console.log('[API-RES]', res.status, res.config?.url)
     return res
   },
@@ -34,15 +28,11 @@ api.interceptors.response.use(
     const status = err?.response?.status
     const url = err?.config?.url
     const payload = err?.response?.data || err?.message
-    // eslint-disable-next-line no-console
     console.warn('[API-ERR]', status, url, payload)
     return Promise.reject(err)
   }
 )
 
-/* ============================
-   Recursos: Obras
-   ============================ */
 export const obrasAPI = {
   getAll: () => api.get<ObraArte[]>('/obras'),
   getById: (id: number) => api.get<ObraArte>(`/obras/${id}`),
@@ -50,8 +40,8 @@ export const obrasAPI = {
 
   create: (obra: ObraCreate) => api.post<ObraArte>('/obras', obra),
 
-  // ⚠️ IMPORTANTE: ruta correcta con el id interpolado
-  update: (id: number, obra: Partial<ObraCreate>) =>
+  // ahora acepta lat/lng
+  update: (id: number, obra: Partial<ObraCreate> & { lat?: number; lng?: number }) =>
     api.put<ObraArte>(`/obras/${id}`, obra),
 
   delete: (id: number) =>
@@ -82,9 +72,6 @@ export const obrasAPI = {
     api.delete(`/obras/${id}/vincular/exposicion`, { data: payload }),
 }
 
-/* ============================
-   Recursos: Tiendas
-   ============================ */
 export const tiendasAPI = {
   getAll: () => api.get<Tienda[]>('/tiendas'),
   getOnline: () => api.get<Tienda[]>('/tiendas/online'),
