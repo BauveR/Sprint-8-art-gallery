@@ -1,106 +1,76 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { obrasService } from "../services/obrasService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "../lib/api";
 import { Obra, ObraInput } from "../types";
-import { toast } from "sonner";
 
-export const obrasKeys = {
-  all: ["obras"] as const,
-};
-
-export function useObras() {
-  return useQuery<Obra[]>({
-    queryKey: obrasKeys.all,
-    queryFn: obrasService.list,
+// ===== List con sort =====
+export function useObras(sort?: { key: string; dir: "asc" | "desc" }) {
+  return useQuery({
+    queryKey: ["obras", sort?.key ?? "id_obra", sort?.dir ?? "asc"],
+    queryFn: () => api.get<Obra[]>("/obras", {
+      sort: sort?.key,
+      dir: sort?.dir,
+    }),
   });
 }
 
+// ===== Mutaciones (igual que ya tenías) =====
 export function useCreateObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: obrasService.create,
-    onSuccess: () => {
-      toast.success("Obra creada");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al crear obra"),
+    mutationFn: (input: ObraInput) => api.post<{ id_obra: number }>("/obras", input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useUpdateObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: number; input: ObraInput }) =>
-      obrasService.update(id, input),
-    onSuccess: () => {
-      toast.success("Obra actualizada");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al actualizar"),
+    mutationFn: (p: { id: number; input: ObraInput }) =>
+      api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useRemoveObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => obrasService.remove(id),
-    onSuccess: () => {
-      toast.success("Obra eliminada");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al eliminar"),
+    mutationFn: (id: number) => api.del(`/obras/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useAsignarTienda() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id_obra, id_tienda, fecha_entrada }:
-      { id_obra: number; id_tienda: number; fecha_entrada?: string | null }) =>
-      obrasService.asignarTienda(id_obra, id_tienda, fecha_entrada),
-    onSuccess: () => {
-      toast.success("Asignada a tienda");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al asignar tienda"),
+    mutationFn: (p: { id_obra: number; id_tienda: number; fecha_entrada?: string | null }) =>
+      api.post<{ ok: true }>(`/obras/${p.id_obra}/asignar-tienda`, p),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useSacarTienda() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id_obra, fecha_salida }:
-      { id_obra: number; fecha_salida?: string | null }) =>
-      obrasService.sacarTienda(id_obra, fecha_salida),
-    onSuccess: () => {
-      toast.success("Sacada de tienda");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al sacar de tienda"),
+    mutationFn: (p: { id_obra: number; fecha_salida?: string | null }) =>
+      api.post<{ ok: true }>(`/obras/${p.id_obra}/sacar-tienda`, p),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useAsignarExpo() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id_obra, id_expo }:{ id_obra: number; id_expo: number }) =>
-      obrasService.asignarExpo(id_obra, id_expo),
-    onSuccess: () => {
-      toast.success("Asignada a exposición");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al asignar expo"),
+    mutationFn: (p: { id_obra: number; id_expo: number }) =>
+      api.post<{ ok: true }>(`/obras/${p.id_obra}/asignar-expo`, p),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
 
 export function useQuitarExpo() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id_obra, id_expo }:{ id_obra: number; id_expo: number }) =>
-      obrasService.quitarExpo(id_obra, id_expo),
-    onSuccess: () => {
-      toast.success("Quitada de exposición");
-      qc.invalidateQueries({ queryKey: obrasKeys.all });
-    },
-    onError: (e: any) => toast.error(e.message ?? "Error al quitar expo"),
+    mutationFn: (p: { id_obra: number; id_expo: number }) =>
+      api.post<{ ok: true }>(`/obras/${p.id_obra}/quitar-expo`, p),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }

@@ -2,6 +2,11 @@ import * as repo from "../respositories/obrasRepo";
 import * as tiendasRepo from "../respositories/tiendasRepo";
 import * as exposRepo from "../respositories/expos.Repo";
 import { ObraInput } from "../domain/types";
+import type { SortKey, SortDir } from "../respositories/obrasRepo";
+
+export function getObrasSorted(sort?: SortKey, dir?: SortDir) {
+  return repo.listObrasEstadoActualSorted(sort, dir);
+}
 
 export function getObras() {
   return repo.listObrasEstadoActual();
