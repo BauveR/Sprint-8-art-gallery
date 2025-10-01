@@ -2,7 +2,6 @@ import { pool } from "../db/pool";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import type { ObraInput } from "../domain/types";
 
-/** Claves válidas para ordenar sobre la vista `obras_estado_actual` */
 export type SortKey =
   | "id_obra"
   | "autor"
@@ -17,7 +16,6 @@ export type SortKey =
 
 export type SortDir = "asc" | "desc";
 
-/** Fila de la tabla `obras` */
 export interface ObraRow extends RowDataPacket {
   id_obra: number;
   autor: string;
@@ -25,10 +23,9 @@ export interface ObraRow extends RowDataPacket {
   anio: number | null;
   medidas: string | null;
   tecnica: string | null;
-  precio_salida: string | null; // DECIMAL llega como string
+  precio_salida: string | null; // DECIMAL como string
 }
 
-/** Fila de la vista `obras_estado_actual` */
 export interface ObraEstadoActualRow extends RowDataPacket {
   id_obra: number;
   autor: string;
@@ -50,7 +47,6 @@ export interface ObraEstadoActualRow extends RowDataPacket {
   tienda_url: string | null;
 }
 
-/** Mapa de columnas seguras para ORDER BY */
 const SORTABLE: Record<SortKey, string> = {
   id_obra: "id_obra",
   autor: "autor",
@@ -64,7 +60,6 @@ const SORTABLE: Record<SortKey, string> = {
   tienda_nombre: "tienda_nombre",
 };
 
-/** Listado simple (sin ordenar) */
 export async function listObrasEstadoActual() {
   const [rows] = await pool.query<ObraEstadoActualRow[]>(
     "SELECT * FROM obras_estado_actual"
@@ -72,7 +67,6 @@ export async function listObrasEstadoActual() {
   return rows;
 }
 
-/** Conteo total para paginación */
 export async function countObrasEstadoActual(): Promise<number> {
   const [rows] = await pool.query<Array<{ total: number } & RowDataPacket>>(
     "SELECT COUNT(*) AS total FROM obras_estado_actual"
@@ -80,7 +74,6 @@ export async function countObrasEstadoActual(): Promise<number> {
   return Number(rows[0]?.total ?? 0);
 }
 
-/** Listado con orden + paginación */
 export async function listObrasEstadoActualPagedSorted(
   sort: SortKey | undefined,
   dir: SortDir | undefined,
@@ -97,7 +90,6 @@ export async function listObrasEstadoActualPagedSorted(
   return rows;
 }
 
-/** Listado con orden (sin paginación, legacy) */
 export async function listObrasEstadoActualSorted(sort?: SortKey, dir?: SortDir) {
   const col = sort ? SORTABLE[sort] : "id_obra";
   const direction = dir === "desc" ? "DESC" : "ASC";
@@ -106,7 +98,6 @@ export async function listObrasEstadoActualSorted(sort?: SortKey, dir?: SortDir)
   return rows;
 }
 
-/** Busca obra por id */
 export async function findObraById(id_obra: number) {
   const [rows] = await pool.query<ObraRow[]>(
     "SELECT * FROM obras WHERE id_obra = ?",
@@ -115,7 +106,6 @@ export async function findObraById(id_obra: number) {
   return rows[0] ?? null;
 }
 
-/** Inserta obra y devuelve id */
 export async function insertObra(input: ObraInput) {
   const [res] = await pool.query<ResultSetHeader>(
     `INSERT INTO obras (autor, titulo, anio, medidas, tecnica, precio_salida)
@@ -132,7 +122,6 @@ export async function insertObra(input: ObraInput) {
   return res.insertId;
 }
 
-/** Actualiza obra */
 export async function updateObra(id_obra: number, input: ObraInput) {
   await pool.query(
     `UPDATE obras
@@ -150,44 +139,69 @@ export async function updateObra(id_obra: number, input: ObraInput) {
   );
 }
 
-/** Elimina obra */
 export async function deleteObra(id_obra: number) {
   await pool.query("DELETE FROM obras WHERE id_obra = ?", [id_obra]);
 }
 
-/** Asigna obra a tienda (garantiza 1 abierta) */
-export async function asignarTienda(
+export async function asignarTiendaTx(
   id_obra: number,
   id_tienda: number,
   fecha_entrada?: string | null
 ) {
-  await pool.query(
-    "UPDATE obra_tienda SET fecha_salida = COALESCE(?, CURRENT_DATE()) WHERE id_obra = ? AND fecha_salida IS NULL",
-    [fecha_entrada ?? null, id_obra]
-  );
-  await pool.query(
-    "INSERT INTO obra_tienda (id_obra, id_tienda, fecha_entrada) VALUES (?,?,?)",
-    [id_obra, id_tienda, fecha_entrada ?? null]
-  );
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    await conn.query(
+      `UPDATE obra_tienda
+       SET fecha_salida = COALESCE(?, CURRENT_DATE())
+       WHERE id_obra = ? AND fecha_salida IS NULL`,
+      [fecha_entrada ?? null, id_obra]
+    );
+
+    await conn.query(
+      `INSERT INTO obra_tienda (id_obra, id_tienda, fecha_entrada)
+       VALUES (?,?,?)`,
+      [id_obra, id_tienda, fecha_entrada ?? null]
+    );
+
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
-/** Cierra la estancia en tienda */
-export async function sacarDeTienda(id_obra: number, fecha_salida?: string | null) {
-  await pool.query(
-    "UPDATE obra_tienda SET fecha_salida = ? WHERE id_obra = ? AND fecha_salida IS NULL",
-    [fecha_salida ?? null, id_obra]
-  );
+export async function sacarDeTiendaTx(id_obra: number, fecha_salida?: string | null) {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    await conn.query(
+      `UPDATE obra_tienda
+       SET fecha_salida = COALESCE(?, CURRENT_DATE())
+       WHERE id_obra = ? AND fecha_salida IS NULL`,
+      [fecha_salida ?? null, id_obra]
+    );
+
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
-/** Relaciona obra con expo */
 export async function asignarExpo(id_obra: number, id_expo: number) {
   await pool.query(
-    "INSERT INTO obra_exposicion (id_obra, id_expo) VALUES (?,?)",
+    `INSERT IGNORE INTO obra_exposicion (id_obra, id_expo) VALUES (?,?)`,
     [id_obra, id_expo]
   );
 }
 
-/** Quita relación obra—expo */
 export async function quitarExpo(id_obra: number, id_expo: number) {
   await pool.query(
     "DELETE FROM obra_exposicion WHERE id_obra = ? AND id_expo = ?",

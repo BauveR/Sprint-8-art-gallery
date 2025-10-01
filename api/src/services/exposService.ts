@@ -1,13 +1,12 @@
 import * as repo from "../repositories/expos.Repo";
-import { ExpoInput } from "../domain/types";
+import { expoInputSchema } from "../domain/validation";
+import type { ExpoInput } from "../domain/types";
 
-export function listExpos() {
+export async function listExpos() {
   return repo.listExpos();
 }
 
-export async function createExpo(input: ExpoInput) {
-  if (!input.nombre || !input.fecha_inicio || !input.fecha_fin) {
-    throw new Error("nombre, fecha_inicio y fecha_fin son obligatorios");
-  }
+export async function createExpo(body: unknown) {
+  const input = expoInputSchema.parse(body) as ExpoInput;
   return repo.insertExpo(input);
 }

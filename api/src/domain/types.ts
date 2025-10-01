@@ -5,7 +5,7 @@ export interface ObraInput {
   anio?: number | null;
   medidas?: string | null;
   tecnica?: string | null;
-  precio_salida?: number | null;
+  precio_salida?: number | null; // number en dominio
 }
 
 export interface ObraState {
@@ -15,7 +15,7 @@ export interface ObraState {
   anio: number | null;
   medidas: string | null;
   tecnica: string | null;
-  precio_salida: string | number | null; // MySQL puede devolver string en DECIMAL
+  precio_salida: string | number | null; // MySQL DECIMAL puede venir string
   disponibilidad: "en_exposicion" | "en_tienda" | "almacen";
   id_expo: number | null;
   expo_nombre: string | null;
@@ -45,4 +45,12 @@ export interface ExpoInput {
   fecha_inicio: string; // 'YYYY-MM-DD'
   fecha_fin: string;    // 'YYYY-MM-DD'
   url_expo?: string | null;
+}
+
+// ----------- Imágenes -----------
+export interface ObraImagen {
+  id: number;
+  id_obra: number;
+  url: string;
+  created_at: string;
 }
