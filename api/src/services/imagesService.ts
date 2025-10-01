@@ -6,9 +6,13 @@ export async function getByObra(id_obra: number) {
 
 export async function addImagen(id_obra: number, url: string) {
   const id = await repo.insertImagen(id_obra, url);
-  return { id };
+  return { id, url };
 }
 
 export async function deleteImagen(id: number) {
-  await repo.deleteImagen(id);
+  const row = await repo.getImageById(id);
+  if (row?.url) {
+    return { id, url: row.url };
+  }
+  return { id, url: null };
 }

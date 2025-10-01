@@ -9,4 +9,5 @@ export const pool = mysql.createPool({
   database: process.env.DB_NAME || "arte_db",
   waitForConnections: true,
   connectionLimit: 10,
+  dateStrings: true, // fechas/decimals como strings
 });
