@@ -1,31 +1,44 @@
-export const apiBase = "/api";
+const BASE = "/api";
 
-async function r(input: RequestInfo, init?: RequestInit) {
-  const res = await fetch(input, {
-    headers: { "Content-Type": "application/json" },
-    ...init,
-  });
+async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(txt || res.statusText);
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || `HTTP ${res.status}`);
   }
-  return res.headers.get("content-type")?.includes("application/json")
-    ? res.json()
-    : res.text();
+  return res.status === 204 ? (undefined as any) : await res.json();
 }
 
 export const api = {
-  get: <T>(path: string, params?: Record<string, string | number | undefined>) => {
-    const url = new URL(apiBase + path, window.location.origin);
-    Object.entries(params ?? {}).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
-    });
-    return r(url.toString()) as Promise<T>;
+  async get<T>(url: string): Promise<T> {
+    const res = await fetch(`${BASE}${url}`);
+    return handle<T>(res);
   },
-  post: <T>(path: string, body?: any) =>
-    r(apiBase + path, { method: "POST", body: JSON.stringify(body ?? {}) }) as Promise<T>,
-  put:  <T>(path: string, body?: any) =>
-    r(apiBase + path, { method: "PUT", body: JSON.stringify(body ?? {}) }) as Promise<T>,
-  del:  (path: string) =>
-    r(apiBase + path, { method: "DELETE" }),
+  async post<T>(url: string, body: any): Promise<T> {
+    const res = await fetch(`${BASE}${url}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return handle<T>(res);
+  },
+  async put<T>(url: string, body: any): Promise<T> {
+    const res = await fetch(`${BASE}${url}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return handle<T>(res);
+  },
+  async del(url: string): Promise<void> {
+    const res = await fetch(`${BASE}${url}`, { method: "DELETE" });
+    return handle<void>(res);
+  },
+  // === NUEVO: multipart ===
+  async postForm<T>(url: string, form: FormData): Promise<T> {
+    const res = await fetch(`${BASE}${url}`, {
+      method: "POST",
+      body: form, // NO setear Content-Type: el navegador lo hace con boundary
+    });
+    return handle<T>(res);
+  },
 };

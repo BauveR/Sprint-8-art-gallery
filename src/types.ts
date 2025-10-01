@@ -1,3 +1,10 @@
+export type ObraImagen = {
+  id: number;
+  id_obra: number;
+  url: string;
+  created_at: string;
+};
+
 // ---------- Tiendas ----------
 export type Tienda = {
   id_tienda: number;

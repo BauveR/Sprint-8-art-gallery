@@ -1,4 +1,4 @@
-import * as repo from "../respositories/tiendasRepo";
+import * as repo from "../repositories/tiendasRepo";
 import { TiendaInput } from "../domain/types";
 
 export function listTiendas() {

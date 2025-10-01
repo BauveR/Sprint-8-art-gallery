@@ -1,4 +1,4 @@
-import * as repo from "../respositories/expos.Repo";
+import * as repo from "../repositories/expos.Repo";
 import { ExpoInput } from "../domain/types";
 
 export function listExpos() {

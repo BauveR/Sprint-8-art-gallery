@@ -1,9 +1,11 @@
 import { pool } from "../db/pool";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { TiendaInput } from "../domain/types";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type { TiendaInput } from "../domain/types";
 
 export async function listTiendas() {
-  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM tiendas ORDER BY id_tienda DESC");
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM tiendas ORDER BY id_tienda DESC"
+  );
   return rows;
 }
 
