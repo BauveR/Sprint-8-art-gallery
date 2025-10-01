@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import * as svc from "../services/obrasService";
+import type { SortKey, SortDir } from "../respositories/obrasRepo";
 
-export async function list(_req: Request, res: Response) {
-  const data = await svc.getObras();
+export async function list(req: Request, res: Response) {
+  const sort = (req.query.sort as SortKey | undefined) ?? undefined;
+  const dir = (req.query.dir as SortDir | undefined) ?? undefined;
+  const data = await svc.getObrasSorted(sort, dir);
   res.json(data);
 }
 

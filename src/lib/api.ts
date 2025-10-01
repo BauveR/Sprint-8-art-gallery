@@ -1,29 +1,31 @@
-const BASE = "/api";
+export const apiBase = "/api";
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+async function r(input: RequestInfo, init?: RequestInit) {
+  const res = await fetch(input, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
   if (!res.ok) {
-    let message = `HTTP ${res.status}`;
-    try {
-      const data = await res.json();
-      if (data?.error) message = data.error;
-    } catch {}
-    throw new Error(message);
+    const txt = await res.text().catch(() => "");
+    throw new Error(txt || res.statusText);
   }
-  // 204 No Content
-  if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  return res.headers.get("content-type")?.includes("application/json")
+    ? res.json()
+    : res.text();
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
+  get: <T>(path: string, params?: Record<string, string | number | undefined>) => {
+    const url = new URL(apiBase + path, window.location.origin);
+    Object.entries(params ?? {}).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
+    });
+    return r(url.toString()) as Promise<T>;
+  },
   post: <T>(path: string, body?: any) =>
-    request<T>(path, { method: "POST", body: JSON.stringify(body ?? {}) }),
+    r(apiBase + path, { method: "POST", body: JSON.stringify(body ?? {}) }) as Promise<T>,
   put:  <T>(path: string, body?: any) =>
-    request<T>(path, { method: "PUT", body: JSON.stringify(body ?? {}) }),
-  del:  <T = void>(path: string) =>
-    request<T>(path, { method: "DELETE" }),
+    r(apiBase + path, { method: "PUT", body: JSON.stringify(body ?? {}) }) as Promise<T>,
+  del:  (path: string) =>
+    r(apiBase + path, { method: "DELETE" }),
 };
