@@ -5,8 +5,19 @@ import type { SortKey, SortDir } from "../repositories/obrasRepo";
 export async function list(req: Request, res: Response) {
   const sort = (req.query.sort as SortKey | undefined) ?? undefined;
   const dir = (req.query.dir as SortDir | undefined) ?? undefined;
-  const data = await svc.getObrasSorted(sort, dir);
-  res.json(data);
+
+  // Si NO hay page/pageSize -> modo legacy (array plano)
+  const hasPage = typeof req.query.page !== "undefined" || typeof req.query.pageSize !== "undefined";
+  if (!hasPage) {
+    const data = await svc.getObrasSorted(sort, dir);
+    return res.json(data); // ← array
+  }
+
+  // Si HAY page/pageSize -> modo paginado (objeto)
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 10;
+  const result = await svc.getObrasPaged(sort, dir, page, pageSize);
+  return res.json(result); // ← { data, total, page, pageSize }
 }
 
 export async function create(req: Request, res: Response) {
