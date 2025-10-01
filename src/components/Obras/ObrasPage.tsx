@@ -54,6 +54,19 @@ export default function ObrasPage() {
     [form.autor, form.titulo]
   );
 
+  // 🔐 DEDUPE DEFENSIVO: elimina duplicados por id_obra si el backend mandara repetidos
+  const obrasUnique = useMemo(() => {
+    const seen = new Set<number>();
+    const arr: typeof obras = [];
+    for (const it of obras) {
+      if (!seen.has(it.id_obra)) {
+        seen.add(it.id_obra);
+        arr.push(it);
+      }
+    }
+    return arr;
+  }, [obras]);
+
   const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
@@ -228,7 +241,7 @@ export default function ObrasPage() {
             </tr>
           </thead>
           <tbody>
-            {obras.map((o) => (
+            {obrasUnique.map((o) => (
               <tr key={`obra-${o.id_obra}`} className="border-t align-top">
                 <td className="p-2">{o.id_obra}</td>
 
@@ -331,7 +344,7 @@ export default function ObrasPage() {
                 </td>
               </tr>
             ))}
-            {!isLoading && obras.length === 0 && (
+            {!isLoading && obrasUnique.length === 0 && (
               <tr>
                 <td className="p-4 text-gray-500" colSpan={8}>
                   Sin obras
@@ -348,6 +361,7 @@ export default function ObrasPage() {
         )}
       </div>
 
+      {/* Dialog imágenes */}
       <ObraImagesDialog
         obra={imgState}
         open={imgOpen}
@@ -357,6 +371,7 @@ export default function ObrasPage() {
         }}
       />
 
+      {/* Modal edición */}
       {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
@@ -369,8 +384,96 @@ export default function ObrasPage() {
                 ✕
               </button>
             </div>
+
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
-              {/* ...campos... */}
+              <input
+                className="border rounded p-2"
+                placeholder="Autor"
+                value={edit.form.autor}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s ? { ...s, form: { ...s.form, autor: e.target.value } } : s
+                  )
+                }
+                required
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Título"
+                value={edit.form.titulo}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s ? { ...s, form: { ...s.form, titulo: e.target.value } } : s
+                  )
+                }
+                required
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Año"
+                type="number"
+                value={edit.form.anio ?? ""}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s
+                      ? {
+                          ...s,
+                          form: {
+                            ...s.form,
+                            anio:
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value),
+                          },
+                        }
+                      : s
+                  )
+                }
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Medidas"
+                value={edit.form.medidas ?? ""}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s ? { ...s, form: { ...s.form, medidas: e.target.value } } : s
+                  )
+                }
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Técnica"
+                value={edit.form.tecnica ?? ""}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s ? { ...s, form: { ...s.form, tecnica: e.target.value } } : s
+                  )
+                }
+              />
+              <input
+                className="border rounded p-2"
+                placeholder="Precio salida"
+                type="number"
+                step="0.01"
+                value={edit.form.precio_salida ?? ""}
+                onChange={(e) =>
+                  setEdit((s) =>
+                    s
+                      ? {
+                          ...s,
+                          form: {
+                            ...s.form,
+                            precio_salida:
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value),
+                          },
+                        }
+                      : s
+                  )
+                }
+              />
+
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button
                   type="button"
