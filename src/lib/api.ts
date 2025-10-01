@@ -1,26 +1,22 @@
 const BASE = "/api";
 
-function toQuery(params?: Record<string, any>) {
-  if (!params) return "";
-  const usp = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && v !== "") usp.set(k, String(v));
-  });
-  const s = usp.toString();
-  return s ? `?${s}` : "";
-}
-
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const msg = await res.text().catch(() => "");
-    // intenta parsear JSON con {error: "..."} por si tu API lo envía
-    try {
-      const maybe = JSON.parse(msg);
-      if (maybe?.error) throw new Error(maybe.error);
-    } catch {}
     throw new Error(msg || `HTTP ${res.status}`);
   }
   return res.status === 204 ? (undefined as any) : await res.json();
+}
+
+function toQuery(params?: Record<string, any>): string {
+  if (!params) return "";
+  const entries = Object.entries(params).filter(
+    ([, v]) => v !== undefined && v !== null && v !== ""
+  );
+  if (entries.length === 0) return "";
+  const sp = new URLSearchParams();
+  for (const [k, v] of entries) sp.set(k, String(v));
+  return `?${sp.toString()}`;
 }
 
 export const api = {
@@ -49,7 +45,10 @@ export const api = {
     return handle<void>(res);
   },
   async postForm<T>(url: string, form: FormData): Promise<T> {
-    const res = await fetch(`${BASE}${url}`, { method: "POST", body: form });
+    const res = await fetch(`${BASE}${url}`, {
+      method: "POST",
+      body: form,
+    });
     return handle<T>(res);
   },
 };

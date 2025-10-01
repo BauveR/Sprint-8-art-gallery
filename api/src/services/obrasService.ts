@@ -8,6 +8,12 @@ export function getObrasSorted(sort?: SortKey, dir?: SortDir) {
   return repo.listObrasEstadoActualSorted(sort, dir);
 }
 
+export async function getObrasPaged(sort: SortKey | undefined, dir: SortDir | undefined, page: number, pageSize: number) {
+  const total = await repo.countObrasEstadoActual();
+  const rows = await repo.listObrasEstadoActualPagedSorted(sort, dir, page, pageSize);
+  return { data: rows, total, page, pageSize };
+}
+
 export function getObras() {
   return repo.listObrasEstadoActual();
 }
