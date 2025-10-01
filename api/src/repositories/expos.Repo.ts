@@ -1,6 +1,6 @@
 import { pool } from "../db/pool";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ExpoInput } from "../domain/types";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type { ExpoInput } from "../domain/types";
 
 export async function listExpos() {
   const [rows] = await pool.query<RowDataPacket[]>(
@@ -19,7 +19,8 @@ export async function findExpoById(id_expo: number) {
 
 export async function insertExpo(input: ExpoInput): Promise<number> {
   const [res] = await pool.query<ResultSetHeader>(
-    "INSERT INTO exposiciones (nombre, lat, lng, fecha_inicio, fecha_fin, url_expo) VALUES (?,?,?,?,?,?)",
+    `INSERT INTO exposiciones (nombre, lat, lng, fecha_inicio, fecha_fin, url_expo)
+     VALUES (?,?,?,?,?,?)`,
     [
       input.nombre,
       input.lat,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as svc from "../services/obrasService";
-import type { SortKey, SortDir } from "../respositories/obrasRepo";
+import type { SortKey, SortDir } from "../repositories/obrasRepo";
 
 export async function list(req: Request, res: Response) {
   const sort = (req.query.sort as SortKey | undefined) ?? undefined;
