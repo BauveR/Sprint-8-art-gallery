@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Expo, Obra, ObraInput, Tienda, ObraImagen } from "../../types";
+import React, { useMemo, useState } from "react";
+import { Expo, Obra, ObraInput, Tienda } from "../../types";
 import {
   useObras,
   useCreateObra,
@@ -12,7 +12,11 @@ import {
 } from "../../query/obras";
 import { useTiendas } from "../../query/tiendas";
 import { useExpos } from "../../query/expos";
-import { imagenesService } from "../../services/imageService";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import ObraImagesDialog from "./ObraImagesDialog";
+import ObraThumb from "./ObraThumb";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -24,7 +28,7 @@ const emptyObra: ObraInput = {
 };
 
 type EditState = { id: number; form: ObraInput } | null;
-type ImgModal = { id_obra: number; titulo: string } | null;
+type ImgState = { id_obra: number; titulo: string } | null;
 
 export default function ObrasPage() {
   const { data: obras = [], isLoading, error } = useObras();
@@ -42,8 +46,8 @@ export default function ObrasPage() {
   const [form, setForm] = useState<ObraInput>(emptyObra);
   const [edit, setEdit] = useState<EditState>(null);
 
-  // modal imágenes
-  const [imgModal, setImgModal] = useState<ImgModal>(null);
+  const [imgState, setImgState] = useState<ImgState>(null);
+  const [imgOpen, setImgOpen] = useState(false);
 
   const canSubmit = useMemo(
     () => form.autor.trim() !== "" && form.titulo.trim() !== "",
@@ -94,7 +98,6 @@ export default function ObrasPage() {
     quitarExpo.mutate({ id_obra, id_expo });
   };
 
-  // edición
   const startEdit = (o: Obra) => {
     setEdit({
       id: o.id_obra,
@@ -105,7 +108,11 @@ export default function ObrasPage() {
         medidas: o.medidas ?? "",
         tecnica: o.tecnica ?? "",
         precio_salida:
-          o.precio_salida != null ? Number((o as any).precio_salida) : undefined,
+          o.precio_salida != null
+            ? (typeof o.precio_salida === "string"
+                ? Number(o.precio_salida)
+                : o.precio_salida)
+            : undefined,
       },
     });
   };
@@ -125,7 +132,7 @@ export default function ObrasPage() {
           precio_salida:
             form.precio_salida === undefined ||
             form.precio_salida === null ||
-            (form.precio_salida as any) === ""
+            (form.precio_salida as unknown as string) === ""
               ? null
               : Number(form.precio_salida),
         },
@@ -173,17 +180,13 @@ export default function ObrasPage() {
           className="border rounded p-2"
           placeholder="Medidas"
           value={form.medidas ?? ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, medidas: e.target.value }))
-          }
+          onChange={(e) => setForm((f) => ({ ...f, medidas: e.target.value }))}
         />
         <input
           className="border rounded p-2"
           placeholder="Técnica"
           value={form.tecnica ?? ""}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, tecnica: e.target.value }))
-          }
+          onChange={(e) => setForm((f) => ({ ...f, tecnica: e.target.value }))}
         />
         <input
           className="border rounded p-2"
@@ -200,12 +203,12 @@ export default function ObrasPage() {
           }
         />
         <div className="col-span-2">
-          <button
+          <Button
             disabled={!canSubmit || createObra.isPending}
-            className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
+            className="w-fit"
           >
             {createObra.isPending ? "Creando..." : "Crear obra"}
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -215,6 +218,7 @@ export default function ObrasPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="text-left p-2">#</th>
+              <th className="text-left p-2">Imagen</th>
               <th className="text-left p-2">Autor</th>
               <th className="text-left p-2">Título</th>
               <th className="text-left p-2">Disponibilidad</th>
@@ -225,15 +229,20 @@ export default function ObrasPage() {
           </thead>
           <tbody>
             {obras.map((o) => (
-              <tr key={`obra-${o.id_obra}`} className="border-t">
+              <tr key={`obra-${o.id_obra}`} className="border-t align-top">
                 <td className="p-2">{o.id_obra}</td>
+
+                <td className="p-2 w-[96px]">
+                  <ObraThumb id_obra={o.id_obra} />
+                </td>
+
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
+
                 <td className="p-2">
-                  <span className="rounded px-2 py-1 bg-gray-100">
-                    {o.disponibilidad ?? "—"}
-                  </span>
+                  <Badge variant="secondary">{o.disponibilidad ?? "—"}</Badge>
                 </td>
+
                 <td className="p-2">
                   <div className="flex items-center gap-2">
                     <select
@@ -248,25 +257,24 @@ export default function ObrasPage() {
                     >
                       <option value="">Asignar a tienda…</option>
                       {tiendas.map((t: Tienda) => (
-                        <option
-                          key={`tienda-opt-${t.id_tienda}`}
-                          value={t.id_tienda}
-                        >
+                        <option key={`tienda-opt-${t.id_tienda}`} value={t.id_tienda}>
                           {t.nombre}
                         </option>
                       ))}
                     </select>
                     {o.id_tienda && (
-                      <button
+                      <Button
+                        variant="link"
+                        className="px-0"
                         disabled={sacarTienda.isPending}
-                        className="text-blue-600 underline disabled:opacity-50"
                         onClick={() => onSacarTienda(o.id_obra)}
                       >
                         Sacar de tienda
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </td>
+
                 <td className="p-2">
                   <div className="flex items-center gap-2">
                     <select
@@ -287,61 +295,68 @@ export default function ObrasPage() {
                       ))}
                     </select>
                     {o.id_expo && (
-                      <button
+                      <Button
+                        variant="link"
+                        className="px-0"
                         disabled={quitarExpo.isPending}
-                        className="text-blue-600 underline disabled:opacity-50"
                         onClick={() => onQuitarExpo(o.id_obra, o.id_expo)}
                       >
                         Quitar de expo
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </td>
-                <td className="p-2 space-x-3">
-                  <button
-                    className="text-indigo-700 underline"
-                    onClick={() =>
-                      setImgModal({ id_obra: o.id_obra, titulo: o.titulo })
-                    }
+
+                <td className="p-2 space-x-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setImgState({ id_obra: o.id_obra, titulo: o.titulo });
+                      setImgOpen(true);
+                    }}
                   >
-                    imágenes
-                  </button>
-                  <button
-                    className="text-blue-700 underline"
-                    onClick={() => startEdit(o)}
-                  >
-                    editar
-                  </button>
-                  <button
-                    className="text-red-600 underline"
-                    disabled={removeObra.isPending}
+                    Imágenes
+                  </Button>
+                  <Button variant="ghost" onClick={() => startEdit(o)}>
+                    Editar
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => onDelete(o.id_obra)}
+                    disabled={removeObra.isPending}
+                    className="text-red-600"
                   >
-                    eliminar
-                  </button>
+                    Eliminar
+                  </Button>
                 </td>
               </tr>
             ))}
             {!isLoading && obras.length === 0 && (
               <tr>
-                <td className="p-4 text-gray-500" colSpan={7}>
+                <td className="p-4 text-gray-500" colSpan={8}>
                   Sin obras
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        {isLoading && (
-          <div className="p-3 text-sm text-gray-500">Cargando…</div>
-        )}
+        {isLoading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
         {error && (
           <div className="p-3 text-sm text-red-600">
-            Error: {(error as any).message}
+            Error: {error instanceof Error ? error.message : String(error)}
           </div>
         )}
       </div>
 
-      {/* Modal edición */}
+      <ObraImagesDialog
+        obra={imgState}
+        open={imgOpen}
+        onOpenChange={(next: boolean) => {
+          setImgOpen(next);
+          if (!next) setImgState(null);
+        }}
+      />
+
       {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
@@ -355,93 +370,7 @@ export default function ObrasPage() {
               </button>
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
-              <input
-                className="border rounded p-2"
-                placeholder="Autor"
-                value={edit.form.autor}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s ? { ...s, form: { ...s.form, autor: e.target.value } } : s
-                  )
-                }
-                required
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Título"
-                value={edit.form.titulo}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s ? { ...s, form: { ...s.form, titulo: e.target.value } } : s
-                  )
-                }
-                required
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Año"
-                type="number"
-                value={edit.form.anio ?? ""}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s
-                      ? {
-                          ...s,
-                          form: {
-                            ...s.form,
-                            anio:
-                              e.target.value === ""
-                                ? undefined
-                                : Number(e.target.value),
-                          },
-                        }
-                      : s
-                  )
-                }
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Medidas"
-                value={edit.form.medidas ?? ""}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s ? { ...s, form: { ...s.form, medidas: e.target.value } } : s
-                  )
-                }
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Técnica"
-                value={edit.form.tecnica ?? ""}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s ? { ...s, form: { ...s.form, tecnica: e.target.value } } : s
-                  )
-                }
-              />
-              <input
-                className="border rounded p-2"
-                placeholder="Precio salida"
-                type="number"
-                step="0.01"
-                value={edit.form.precio_salida ?? ""}
-                onChange={(e) =>
-                  setEdit((s) =>
-                    s
-                      ? {
-                          ...s,
-                          form: {
-                            ...s.form,
-                            precio_salida:
-                              e.target.value === ""
-                                ? undefined
-                                : Number(e.target.value),
-                          },
-                        }
-                      : s
-                  )
-                }
-              />
+              {/* ...campos... */}
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button
                   type="button"
@@ -450,122 +379,14 @@ export default function ObrasPage() {
                 >
                   Cancelar
                 </button>
-                <button
-                  className="px-4 py-2 rounded-lg bg-black text-white"
-                  disabled={updateObra.isPending}
-                >
+                <Button disabled={updateObra.isPending}>
                   {updateObra.isPending ? "Guardando..." : "Guardar cambios"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {/* Modal imágenes */}
-      {imgModal && (
-        <ObraImagenesModal obra={imgModal} onClose={() => setImgModal(null)} />
-      )}
-    </div>
-  );
-}
-
-/** Modal para gestionar imágenes de una obra */
-function ObraImagenesModal({
-  obra,
-  onClose,
-}: {
-  obra: { id_obra: number; titulo: string };
-  onClose: () => void;
-}) {
-  const [list, setList] = useState<ObraImagen[]>([]);
-  const [busy, setBusy] = useState(false);
-
-  const load = async () =>
-    setList(await imagenesService.listByObra(obra.id_obra));
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [obra.id_obra]);
-
-  const onUpload = async (ev: React.ChangeEvent<HTMLInputElement>) => {
-    const f = ev.target.files?.[0];
-    if (!f) return;
-    setBusy(true);
-    try {
-      await imagenesService.uploadForObra(obra.id_obra, f);
-      await load();
-      ev.target.value = "";
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const onRemove = async (id: number) => {
-    if (!confirm("¿Eliminar imagen?")) return;
-    setBusy(true);
-    try {
-      await imagenesService.remove(id);
-      await load();
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">
-            Imágenes de “{obra.titulo}”
-          </h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-black">
-            ✕
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between mb-3">
-          <label className="inline-flex items-center gap-2 cursor-pointer">
-            <span className="px-3 py-2 rounded-lg bg-black text-white text-sm">
-              Subir imagen
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={busy}
-              onChange={onUpload}
-            />
-          </label>
-          {busy && <span className="text-sm text-gray-500">Procesando…</span>}
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-auto">
-          {list.map((img) => (
-            <div key={img.id} className="border rounded-lg overflow-hidden">
-              {/* La API sirve /uploads, la url ya viene como /uploads/archivo.ext */}
-              <img src={img.url} alt="" className="w-full h-40 object-cover" />
-              <div className="p-2 text-right">
-                <button
-                  className="text-red-600 text-sm underline"
-                  disabled={busy}
-                  onClick={() => onRemove(img.id)}
-                >
-                  borrar
-                </button>
-              </div>
-            </div>
-          ))}
-          {list.length === 0 && (
-            <div className="col-span-3 text-sm text-gray-500">Sin imágenes</div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

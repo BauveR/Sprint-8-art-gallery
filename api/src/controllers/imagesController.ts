@@ -28,10 +28,12 @@ export async function listByObra(req: Request, res: Response) {
   res.json(imgs);
 }
 
+type MulterReq = Request & { file?: Express.Multer.File };
+
 // POST /api/obras/:id/imagenes (multipart/form-data, field: "file")
-export async function uploadForObra(req: Request, res: Response) {
+export async function uploadForObra(req: MulterReq, res: Response) {
   const id_obra = Number(req.params.id);
-  const file = (req as any).file as Express.Multer.File | undefined;
+  const file = req.file;
   if (!file) return res.status(400).json({ error: "Archivo requerido (campo 'file')" });
 
   // URL pública

@@ -6,14 +6,15 @@ import { Obra, ObraInput } from "../types";
 export function useObras(sort?: { key: string; dir: "asc" | "desc" }) {
   return useQuery({
     queryKey: ["obras", sort?.key ?? "id_obra", sort?.dir ?? "asc"],
-    queryFn: () => api.get<Obra[]>("/obras", {
-      sort: sort?.key,
-      dir: sort?.dir,
-    }),
+    queryFn: () =>
+      api.get<Obra[]>("/obras", {
+        sort: sort?.key,
+        dir: sort?.dir,
+      }),
   });
 }
 
-// ===== Mutaciones (igual que ya tenías) =====
+// ===== Mutaciones =====
 export function useCreateObra() {
   const qc = useQueryClient();
   return useMutation({
