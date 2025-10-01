@@ -133,12 +133,19 @@ export async function deleteObra(id_obra: number) {
   await pool.query("DELETE FROM obras WHERE id_obra = ?", [id_obra]);
 }
 
-/** Asigna obra a tienda (abre estancia) */
+/** Asigna obra a tienda (abre estancia) — garantiza 1 sola estancia abierta */
 export async function asignarTienda(
   id_obra: number,
   id_tienda: number,
   fecha_entrada?: string | null
 ) {
+  // Cierra cualquier estancia abierta previa para esa obra
+  await pool.query(
+    "UPDATE obra_tienda SET fecha_salida = COALESCE(?, CURRENT_DATE()) WHERE id_obra = ? AND fecha_salida IS NULL",
+    [fecha_entrada ?? null, id_obra]
+  );
+
+  // Abre la nueva estancia
   await pool.query(
     "INSERT INTO obra_tienda (id_obra, id_tienda, fecha_entrada) VALUES (?,?,?)",
     [id_obra, id_tienda, fecha_entrada ?? null]
