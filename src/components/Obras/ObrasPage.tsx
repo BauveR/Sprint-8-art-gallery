@@ -74,7 +74,16 @@ export default function ObrasPage() {
   const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
-    createObra.mutate(form, { onSuccess: () => setForm(emptyObra) });
+    console.log("Creando obra con:", form);
+    createObra.mutate(form, {
+      onSuccess: (data) => {
+        console.log("Obra creada exitosamente:", data);
+        setForm(emptyObra);
+      },
+      onError: (error) => {
+        console.error("Error al crear obra:", error);
+      }
+    });
   };
 
   const onDelete = (id: number) => {
@@ -103,14 +112,17 @@ export default function ObrasPage() {
 
   const cancelEdit = () => setEdit(null);
 
-  const saveEdit = (ev: React.FormEvent) => {
+  const saveEdit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!edit) return;
     const { id, form } = edit;
     console.log("Guardando obra:", { id, input: form });
+
     updateObra.mutate({ id, input: form }, {
-      onSuccess: () => {
-        console.log("Obra actualizada exitosamente");
+      onSuccess: async () => {
+        console.log("Obra actualizada exitosamente, esperando refresh...");
+        // Esperar un momento para que las queries se actualicen
+        await new Promise(resolve => setTimeout(resolve, 500));
         setEdit(null);
       },
       onError: (error) => {
@@ -314,7 +326,7 @@ export default function ObrasPage() {
               </select>
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
-                <Button disabled={updateObra.isPending}>
+                <Button type="submit" disabled={updateObra.isPending}>
                   {updateObra.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>
               </div>

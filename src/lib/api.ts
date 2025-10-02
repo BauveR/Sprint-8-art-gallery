@@ -25,19 +25,23 @@ export const api = {
     return handle<T>(res);
   },
   async post<T>(url: string, body: any): Promise<T> {
+    console.log(`[API POST] ${BASE}${url}`, body);
     const res = await fetch(`${BASE}${url}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+    console.log(`[API POST] Response status:`, res.status);
     return handle<T>(res);
   },
   async put<T>(url: string, body: any): Promise<T> {
+    console.log(`[API PUT] ${BASE}${url}`, body);
     const res = await fetch(`${BASE}${url}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+    console.log(`[API PUT] Response status:`, res.status);
     return handle<T>(res);
   },
   async del(url: string): Promise<void> {
