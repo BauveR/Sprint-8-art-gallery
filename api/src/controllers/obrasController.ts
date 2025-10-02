@@ -43,6 +43,7 @@ export async function update(req: Request, res: Response, next: NextFunction) {
     console.log(`[UPDATE] Obra ${id} actualizada exitosamente`);
     res.json({ ok: true });
   } catch (e) {
+    const id = Number(req.params.id);
     console.error(`[UPDATE] Error actualizando obra ${id}:`, e);
     next(e);
   }

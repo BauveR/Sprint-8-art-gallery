@@ -51,11 +51,14 @@ export function useUpdateObra() {
   return useMutation({
     mutationFn: (p: { id: number; input: ObraInput }) =>
       api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["obras"] });
+    onSuccess: async () => {
+      console.log("[useUpdateObra] Invalidando queries...");
+      await qc.invalidateQueries({ queryKey: ["obras"] });
+      await qc.refetchQueries({ queryKey: ["obras"] });
+      console.log("[useUpdateObra] Queries actualizadas");
     },
     onError: (error: any) => {
-      console.error("Error updating obra:", error);
+      console.error("[useUpdateObra] Error updating obra:", error);
     },
   });
 }
