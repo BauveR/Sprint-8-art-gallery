@@ -1,12 +1,12 @@
+// src/db/pool.ts
 import mysql from "mysql2/promise";
-import dotenv from "dotenv";
-dotenv.config();
+import { env } from "../config/env";
 
 export const pool = mysql.createPool({
-  host: process.env.DB_HOST || "127.0.0.1",
-  user: process.env.DB_USER || "arte_user",
-  password: process.env.DB_PASS || "arte_pass",
-  database: process.env.DB_NAME || "arte_db",
+  host: env.DB_HOST,
+  user: env.DB_USER,
+  password: env.DB_PASS,
+  database: env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   dateStrings: true, // fechas/decimals como strings
