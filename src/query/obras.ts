@@ -1,40 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../lib/api";
-import { Obra, ObraInput } from "../types";
+import { api } from "@/lib/api";
+import { Obra, ObraInput } from "@/types";
 
 type Sort = { key: string; dir: "asc" | "desc" };
 type Paged<T> = { data: T[]; total: number; page: number; pageSize: number };
 
 function normalizePaged<T>(raw: any): Paged<T> {
-  // Caso 1: el backend devuelve array plano (legacy)
-  if (Array.isArray(raw)) {
-    const data = raw as T[];
-    return { data, total: data.length, page: 1, pageSize: data.length || 10 };
-  }
-  // Caso 2: objeto paginado
-  if (raw && Array.isArray(raw.data)) {
-    return raw as Paged<T>;
-  }
-  // Caso inesperado
+  if (Array.isArray(raw)) return { data: raw as T[], total: raw.length, page: 1, pageSize: raw.length || 10 };
+  if (raw && Array.isArray(raw.data)) return raw as Paged<T>;
   return { data: [], total: 0, page: 1, pageSize: 10 };
 }
 
 export function useObras(opts?: { sort?: Sort; page?: number; pageSize?: number }) {
-  const sort = opts?.sort;
-  const page = opts?.page ?? 1;
-  const pageSize = opts?.pageSize ?? 10;
-
+  const sort = opts?.sort; const page = opts?.page ?? 1; const pageSize = opts?.pageSize ?? 10;
   return useQuery({
     queryKey: ["obras", sort?.key ?? "id_obra", sort?.dir ?? "asc", page, pageSize],
-    queryFn: async () => {
-      const res = await api.get<any>("/obras", {
-        sort: sort?.key,
-        dir: sort?.dir,
-        page,
-        pageSize,
-      });
-      return normalizePaged<Obra>(res);
-    },
+    queryFn: async () => normalizePaged<Obra>(await api.get("/obras", { sort: sort?.key, dir: sort?.dir, page, pageSize })),
   });
 }
 
@@ -45,16 +26,13 @@ export function useCreateObra() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useUpdateObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (p: { id: number; input: ObraInput }) =>
-      api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
+    mutationFn: (p: { id: number; input: ObraInput }) => api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useRemoveObra() {
   const qc = useQueryClient();
   return useMutation({
@@ -62,7 +40,6 @@ export function useRemoveObra() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useAsignarTienda() {
   const qc = useQueryClient();
   return useMutation({
@@ -71,7 +48,6 @@ export function useAsignarTienda() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useSacarTienda() {
   const qc = useQueryClient();
   return useMutation({
@@ -80,7 +56,6 @@ export function useSacarTienda() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useAsignarExpo() {
   const qc = useQueryClient();
   return useMutation({
@@ -89,7 +64,6 @@ export function useAsignarExpo() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
-
 export function useQuitarExpo() {
   const qc = useQueryClient();
   return useMutation({

@@ -15,7 +15,8 @@ export default function App() {
           <h1 className="text-lg font-semibold">Art Gallery · Admin</h1>
           <nav className="flex gap-2">
             {(["obras","tiendas","expos"] as Tab[]).map(t => (
-              <button key={t}
+              <button
+                key={t}
                 onClick={() => setTab(t)}
                 className={`px-3 py-1.5 rounded-full text-sm ${tab===t ? "bg-black text-white" : "bg-gray-100"}`}>
                 {t}

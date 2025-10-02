@@ -1,4 +1,5 @@
-import * as repo from "../repositories/expos.Repo";
+// src/services/exposService.ts
+import * as repo from "../repositories/exposRepo";
 import { expoInputSchema } from "../domain/validation";
 import type { ExpoInput } from "../domain/types";
 
