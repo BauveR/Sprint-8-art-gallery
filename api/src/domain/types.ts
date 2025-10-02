@@ -6,6 +6,8 @@ export interface ObraInput {
   medidas?: string | null;
   tecnica?: string | null;
   precio_salida?: number | null; // number en dominio
+  id_tienda?: number | null;
+  id_expo?: number | null;
 }
 
 export interface ObraState {

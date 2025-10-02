@@ -24,3 +24,14 @@ export async function insertTienda(input: TiendaInput): Promise<number> {
   );
   return res.insertId;
 }
+
+export async function updateTienda(id_tienda: number, input: TiendaInput) {
+  await pool.query(
+    "UPDATE tiendas SET nombre = ?, lat = ?, lng = ?, url_tienda = ? WHERE id_tienda = ?",
+    [input.nombre, input.lat, input.lng, input.url_tienda ?? null, id_tienda]
+  );
+}
+
+export async function deleteTienda(id_tienda: number) {
+  await pool.query("DELETE FROM tiendas WHERE id_tienda = ?", [id_tienda]);
+}

@@ -32,3 +32,24 @@ export async function insertExpo(input: ExpoInput): Promise<number> {
   );
   return res.insertId;
 }
+
+export async function updateExpo(id_expo: number, input: ExpoInput) {
+  await pool.query(
+    `UPDATE exposiciones
+     SET nombre = ?, lat = ?, lng = ?, fecha_inicio = ?, fecha_fin = ?, url_expo = ?
+     WHERE id_expo = ?`,
+    [
+      input.nombre,
+      input.lat,
+      input.lng,
+      input.fecha_inicio,
+      input.fecha_fin,
+      input.url_expo ?? null,
+      id_expo,
+    ]
+  );
+}
+
+export async function deleteExpo(id_expo: number) {
+  await pool.query("DELETE FROM exposiciones WHERE id_expo = ?", [id_expo]);
+}

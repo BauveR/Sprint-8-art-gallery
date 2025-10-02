@@ -29,9 +29,13 @@ router.delete("/imagenes/:id", removeImg);
 // Tiendas
 router.get("/tiendas", tiendas.list);
 router.post("/tiendas", tiendas.create);
+router.put("/tiendas/:id", tiendas.update);
+router.delete("/tiendas/:id", tiendas.remove);
 
 // Expos
 router.get("/expos", expos.list);
 router.post("/expos", expos.create);
+router.put("/expos/:id", expos.update);
+router.delete("/expos/:id", expos.remove);
 
 export default router;

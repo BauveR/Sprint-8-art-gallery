@@ -23,3 +23,27 @@ export function useCreateTienda() {
     onError: (e: any) => toast.error(e.message ?? "Error al crear tienda"),
   });
 }
+
+export function useUpdateTienda() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: number; input: TiendaInput }) => tiendasService.update(id, input),
+    onSuccess: () => {
+      toast.success("Tienda actualizada");
+      qc.invalidateQueries({ queryKey: tiendasKeys.all });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Error al actualizar tienda"),
+  });
+}
+
+export function useRemoveTienda() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => tiendasService.remove(id),
+    onSuccess: () => {
+      toast.success("Tienda eliminada");
+      qc.invalidateQueries({ queryKey: tiendasKeys.all });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Error al eliminar tienda"),
+  });
+}

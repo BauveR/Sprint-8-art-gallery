@@ -51,7 +51,12 @@ export function useUpdateObra() {
   return useMutation({
     mutationFn: (p: { id: number; input: ObraInput }) =>
       api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["obras"] });
+    },
+    onError: (error: any) => {
+      console.error("Error updating obra:", error);
+    },
   });
 }
 

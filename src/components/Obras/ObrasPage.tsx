@@ -5,10 +5,6 @@ import {
   useCreateObra,
   useRemoveObra,
   useUpdateObra,
-  useAsignarExpo,
-  useAsignarTienda,
-  useQuitarExpo,
-  useSacarTienda,
 } from "../../query/obras";
 import { useTiendas } from "../../query/tiendas";
 import { useExpos } from "../../query/expos";
@@ -21,10 +17,12 @@ import ObraThumb from "./ObraThumb";
 const emptyObra: ObraInput = {
   autor: "",
   titulo: "",
-  anio: undefined,
-  medidas: "",
-  tecnica: "",
-  precio_salida: undefined,
+  anio: null,
+  medidas: null,
+  tecnica: null,
+  precio_salida: null,
+  id_tienda: null,
+  id_expo: null,
 };
 
 type EditState = { id: number; form: ObraInput } | null;
@@ -48,10 +46,6 @@ export default function ObrasPage() {
   const createObra = useCreateObra();
   const removeObra = useRemoveObra();
   const updateObra = useUpdateObra();
-  const asignarTienda = useAsignarTienda();
-  const sacarTienda = useSacarTienda();
-  const asignarExpo = useAsignarExpo();
-  const quitarExpo = useQuitarExpo();
 
   const [form, setForm] = useState<ObraInput>(emptyObra);
   const [edit, setEdit] = useState<EditState>(null);
@@ -80,45 +74,12 @@ export default function ObrasPage() {
   const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
-    createObra.mutate(
-      {
-        ...form,
-        anio: form.anio ? Number(form.anio) : null,
-        precio_salida: form.precio_salida ? Number(form.precio_salida) : null,
-      },
-      { onSuccess: () => setForm(emptyObra) }
-    );
+    createObra.mutate(form, { onSuccess: () => setForm(emptyObra) });
   };
 
   const onDelete = (id: number) => {
     if (!confirm("¿Eliminar la obra?")) return;
     removeObra.mutate(id);
-  };
-
-  const onAsignarTienda = (id_obra: number, id_tienda: number) => {
-    if (!id_tienda) return;
-    asignarTienda.mutate({
-      id_obra,
-      id_tienda,
-      fecha_entrada: new Date().toISOString().slice(0, 10),
-    });
-  };
-
-  const onSacarTienda = (id_obra: number) => {
-    sacarTienda.mutate({
-      id_obra,
-      fecha_salida: new Date().toISOString().slice(0, 10),
-    });
-  };
-
-  const onAsignarExpo = (id_obra: number, id_expo: number) => {
-    if (!id_expo) return;
-    asignarExpo.mutate({ id_obra, id_expo });
-  };
-
-  const onQuitarExpo = (id_obra: number, id_expo?: number | null) => {
-    if (!id_expo) return;
-    quitarExpo.mutate({ id_obra, id_expo });
   };
 
   const startEdit = (o: Obra) => {
@@ -127,13 +88,15 @@ export default function ObrasPage() {
       form: {
         autor: o.autor ?? "",
         titulo: o.titulo ?? "",
-        anio: o.anio ?? undefined,
-        medidas: o.medidas ?? "",
-        tecnica: o.tecnica ?? "",
+        anio: o.anio ?? null,
+        medidas: o.medidas ?? null,
+        tecnica: o.tecnica ?? null,
         precio_salida:
           o.precio_salida != null
             ? (typeof o.precio_salida === "string" ? Number(o.precio_salida) : o.precio_salida)
-            : undefined,
+            : null,
+        id_tienda: o.id_tienda ?? null,
+        id_expo: o.id_expo ?? null,
       },
     });
   };
@@ -144,22 +107,16 @@ export default function ObrasPage() {
     ev.preventDefault();
     if (!edit) return;
     const { id, form } = edit;
-    updateObra.mutate(
-      {
-        id,
-        input: {
-          ...form,
-          anio: form.anio ? Number(form.anio) : null,
-          precio_salida:
-            form.precio_salida === undefined ||
-            form.precio_salida === null ||
-            (form.precio_salida as unknown as string) === ""
-              ? null
-              : Number(form.precio_salida),
-        },
+    console.log("Guardando obra:", { id, input: form });
+    updateObra.mutate({ id, input: form }, {
+      onSuccess: () => {
+        console.log("Obra actualizada exitosamente");
+        setEdit(null);
       },
-      { onSuccess: () => setEdit(null) }
-    );
+      onError: (error) => {
+        console.error("Error al actualizar obra:", error);
+      }
+    });
   };
 
   const toggleSort = (key: Sort["key"]) => {
@@ -197,17 +154,41 @@ export default function ObrasPage() {
         <input className="border rounded p-2" placeholder="Título" value={form.titulo}
           onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} required />
         <input className="border rounded p-2" placeholder="Año" type="number" value={form.anio ?? ""}
-          onChange={(e) => setForm((f) => ({ ...f, anio: e.target.value === "" ? undefined : Number(e.target.value) }))} />
+          onChange={(e) => setForm((f) => ({ ...f, anio: e.target.value === "" ? null : Number(e.target.value) }))} />
         <input className="border rounded p-2" placeholder="Medidas" value={form.medidas ?? ""}
-          onChange={(e) => setForm((f) => ({ ...f, medidas: e.target.value }))} />
+          onChange={(e) => setForm((f) => ({ ...f, medidas: e.target.value || null }))} />
         <input className="border rounded p-2" placeholder="Técnica" value={form.tecnica ?? ""}
-          onChange={(e) => setForm((f) => ({ ...f, tecnica: e.target.value }))} />
+          onChange={(e) => setForm((f) => ({ ...f, tecnica: e.target.value || null }))} />
         <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01"
           value={form.precio_salida ?? ""}
           onChange={(e) => setForm((f) => ({
             ...f,
-            precio_salida: e.target.value === "" ? undefined : Number(e.target.value),
+            precio_salida: e.target.value === "" ? null : Number(e.target.value),
           }))} />
+        <select
+          className="border rounded p-2"
+          value={form.id_tienda ?? ""}
+          onChange={(e) => setForm((f) => ({ ...f, id_tienda: e.target.value ? Number(e.target.value) : null }))}
+        >
+          <option value="">Sin tienda</option>
+          {tiendas.map((t: Tienda) => (
+            <option key={`tienda-create-${t.id_tienda}`} value={t.id_tienda}>
+              {t.nombre}
+            </option>
+          ))}
+        </select>
+        <select
+          className="border rounded p-2"
+          value={form.id_expo ?? ""}
+          onChange={(e) => setForm((f) => ({ ...f, id_expo: e.target.value ? Number(e.target.value) : null }))}
+        >
+          <option value="">Sin exposición</option>
+          {expos.map((x: Expo) => (
+            <option key={`expo-create-${x.id_expo}`} value={x.id_expo}>
+              {x.nombre}
+            </option>
+          ))}
+        </select>
         <div className="col-span-2">
           <Button disabled={!canSubmit || createObra.isPending} className="w-fit">
             {createObra.isPending ? "Creando..." : "Crear obra"}
@@ -237,61 +218,9 @@ export default function ObrasPage() {
                 <td className="p-2 w-[96px]"><ObraThumb id_obra={o.id_obra} /></td>
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
-                <td className="p-2"><Badge variant="secondary">{o.disponibilidad ?? "—"}</Badge></td>
-                <td className="p-2">
-                  <div className="flex items-center gap-2">
-                    <select
-                      className="border rounded p-1"
-                      defaultValue=""
-                      disabled={asignarTienda.isPending}
-                      onChange={(e) => {
-                        const id_tienda = Number(e.target.value);
-                        if (id_tienda) onAsignarTienda(o.id_obra, id_tienda);
-                        e.currentTarget.value = "";
-                      }}
-                    >
-                      <option value="">Asignar a tienda…</option>
-                      {tiendas.map((t: Tienda) => (
-                        <option key={`tienda-opt-${t.id_tienda}`} value={t.id_tienda}>
-                          {t.nombre}
-                        </option>
-                      ))}
-                    </select>
-                    {o.id_tienda && (
-                      <Button variant="link" className="px-0" disabled={sacarTienda.isPending}
-                        onClick={() => onSacarTienda(o.id_obra)}>
-                        Sacar de tienda
-                      </Button>
-                    )}
-                  </div>
-                </td>
-                <td className="p-2">
-                  <div className="flex items-center gap-2">
-                    <select
-                      className="border rounded p-1"
-                      defaultValue=""
-                      disabled={asignarExpo.isPending}
-                      onChange={(e) => {
-                        const id_expo = Number(e.target.value);
-                        if (id_expo) onAsignarExpo(o.id_obra, id_expo);
-                        e.currentTarget.value = "";
-                      }}
-                    >
-                      <option value="">Asignar a expo…</option>
-                      {expos.map((x: Expo) => (
-                        <option key={`expo-opt-${x.id_expo}`} value={x.id_expo}>
-                          {x.nombre}
-                        </option>
-                      ))}
-                    </select>
-                    {o.id_expo && (
-                      <Button variant="link" className="px-0" disabled={quitarExpo.isPending}
-                        onClick={() => onQuitarExpo(o.id_obra, o.id_expo)}>
-                        Quitar de expo
-                      </Button>
-                    )}
-                  </div>
-                </td>
+                <td className="p-2"><Badge variant="secondary">{o.disponibilidad ?? "almacen"}</Badge></td>
+                <td className="p-2">{o.tienda_nombre ?? "—"}</td>
+                <td className="p-2">{o.expo_nombre ?? "—"}</td>
                 <td className="p-2 space-x-2">
                   <Button variant="ghost" onClick={() => { setImgState({ id_obra: o.id_obra, titulo: o.titulo }); setImgOpen(true); }}>
                     Imágenes
@@ -352,13 +281,37 @@ export default function ObrasPage() {
               <input className="border rounded p-2" placeholder="Título" value={edit.form.titulo}
                 onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, titulo: e.target.value } } : s)} required />
               <input className="border rounded p-2" placeholder="Año" type="number" value={edit.form.anio ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, anio: e.target.value === "" ? undefined : Number(e.target.value) } } : s)} />
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, anio: e.target.value === "" ? null : Number(e.target.value) } } : s)} />
               <input className="border rounded p-2" placeholder="Medidas" value={edit.form.medidas ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, medidas: e.target.value } } : s)} />
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, medidas: e.target.value || null } } : s)} />
               <input className="border rounded p-2" placeholder="Técnica" value={edit.form.tecnica ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, tecnica: e.target.value } } : s)} />
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, tecnica: e.target.value || null } } : s)} />
               <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01" value={edit.form.precio_salida ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, precio_salida: e.target.value === "" ? undefined : Number(e.target.value) } } : s)} />
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, precio_salida: e.target.value === "" ? null : Number(e.target.value) } } : s)} />
+              <select
+                className="border rounded p-2"
+                value={edit.form.id_tienda ?? ""}
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, id_tienda: e.target.value ? Number(e.target.value) : null } } : s)}
+              >
+                <option value="">Sin tienda</option>
+                {tiendas.map((t: Tienda) => (
+                  <option key={`tienda-edit-${t.id_tienda}`} value={t.id_tienda}>
+                    {t.nombre}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="border rounded p-2"
+                value={edit.form.id_expo ?? ""}
+                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, id_expo: e.target.value ? Number(e.target.value) : null } } : s)}
+              >
+                <option value="">Sin exposición</option>
+                {expos.map((x: Expo) => (
+                  <option key={`expo-edit-${x.id_expo}`} value={x.id_expo}>
+                    {x.nombre}
+                  </option>
+                ))}
+              </select>
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
                 <Button disabled={updateObra.isPending}>

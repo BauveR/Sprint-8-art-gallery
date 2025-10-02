@@ -31,6 +31,8 @@ export const obraInputSchema = z.object({
   medidas: z.string().min(1).nullable().optional(),
   tecnica: z.string().min(1).nullable().optional(),
   precio_salida: z.number().nonnegative().nullable().optional(),
+  id_tienda: z.number().int().positive().nullable().optional(),
+  id_expo: z.number().int().positive().nullable().optional(),
 });
 
 export const asignarTiendaSchema = z.object({

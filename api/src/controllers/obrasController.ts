@@ -38,9 +38,12 @@ export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);
     if (Number.isNaN(id)) throw new Error("ID inválido");
+    console.log(`[UPDATE] Actualizando obra ${id} con:`, req.body);
     await svc.updateObra(id, req.body);
+    console.log(`[UPDATE] Obra ${id} actualizada exitosamente`);
     res.json({ ok: true });
   } catch (e) {
+    console.error(`[UPDATE] Error actualizando obra ${id}:`, e);
     next(e);
   }
 }

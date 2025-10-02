@@ -18,7 +18,7 @@ export type TiendaInput = {
   nombre: string;
   lat: number;
   lng: number;
-  url_tienda?: string;
+  url_tienda?: string | null;
 };
 
 // ---------- Expos ----------
@@ -38,7 +38,7 @@ export type ExpoInput = {
   lng: number;
   fecha_inicio: string;
   fecha_fin: string;
-  url_expo?: string;
+  url_expo?: string | null;
 };
 
 // ---------- Obras ----------
@@ -53,21 +53,29 @@ export type Obra = {
   // En MySQL DECIMAL puede venir como string; lo dejamos flexible
   precio_salida?: number | string | null;
 
-  // Campos “derivados” del view obras_estado_actual (si los tienes)
-  disponibilidad?: "en_taller" | "en_tienda" | "en_exposicion" | string | null;
+  // Campos "derivados" del view obras_estado_actual
+  disponibilidad?: "en_exposicion" | "en_tienda" | "almacen" | null;
 
   id_tienda?: number | null;
   tienda_nombre?: string | null;
+  tienda_lat?: number | null;
+  tienda_lng?: number | null;
+  tienda_url?: string | null;
 
   id_expo?: number | null;
   expo_nombre?: string | null;
+  expo_lat?: number | null;
+  expo_lng?: number | null;
+  expo_url?: string | null;
 };
 
 export type ObraInput = {
   autor: string;
   titulo: string;
   anio?: number | null;
-  medidas?: string;
-  tecnica?: string;
+  medidas?: string | null;
+  tecnica?: string | null;
   precio_salida?: number | null;
+  id_tienda?: number | null;
+  id_expo?: number | null;
 };
