@@ -237,6 +237,17 @@ export default function ObrasPage() {
         </div>
       </form>
 
+      {/* Buscador */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <Input
+          placeholder="Buscar por autor, título, técnica, tienda o exposición..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       {/* Tabla obras */}
       <div className="bg-white/80 rounded-xl shadow overflow-x-auto">
         <table className="min-w-full text-sm">
@@ -254,7 +265,7 @@ export default function ObrasPage() {
             </tr>
           </thead>
           <tbody>
-            {obras.map((o) => (
+            {filteredObras.map((o) => (
               <tr key={`obra-${o.id_obra}`} className="border-t align-top">
                 <td className="p-2">{o.id_obra}</td>
                 <td className="p-2 w-[96px]"><ObraThumb id_obra={o.id_obra} /></td>
@@ -289,8 +300,10 @@ export default function ObrasPage() {
                 </td>
               </tr>
             ))}
-            {!isLoading && obras.length === 0 && (
-              <tr><td className="p-4 text-gray-500" colSpan={9}>Sin obras</td></tr>
+            {!isLoading && filteredObras.length === 0 && (
+              <tr><td className="p-4 text-gray-500" colSpan={9}>
+                {searchQuery ? "No se encontraron obras con ese criterio" : "Sin obras"}
+              </td></tr>
             )}
           </tbody>
         </table>
