@@ -128,17 +128,17 @@ export default function ExposPage() {
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
               <input className="border rounded p-2" placeholder="Nombre" value={edit.form.nombre}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, nombre: e.target.value } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, nombre: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="URL" value={edit.form.url_expo ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, url_expo: e.target.value || null } } : s)} />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, url_expo: e.target.value || null } })} />
               <input className="border rounded p-2" placeholder="Lat" type="number" step="0.000001" value={edit.form.lat}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, lat: Number(e.target.value) } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })} required />
               <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={edit.form.lng}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, lng: Number(e.target.value) } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })} required />
               <input className="border rounded p-2" placeholder="Inicio (YYYY-MM-DD)" value={edit.form.fecha_inicio}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, fecha_inicio: e.target.value } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, fecha_inicio: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="Fin (YYYY-MM-DD)" value={edit.form.fecha_fin}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, fecha_fin: e.target.value } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, fecha_fin: e.target.value } })} required />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
                 <Button disabled={updateExpo.isPending}>

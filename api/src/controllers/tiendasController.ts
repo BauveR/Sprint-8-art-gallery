@@ -1,41 +1,24 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import * as svc from "../services/tiendasService";
+import { asyncHandler, parseIdParam } from "../utils/helpers";
 
-export async function list(_req: Request, res: Response, next: NextFunction) {
-  try {
-    res.json(await svc.listTiendas());
-  } catch (e) {
-    next(e);
-  }
-}
+export const list = asyncHandler(async (_req: Request, res: Response) => {
+  res.json(await svc.listTiendas());
+});
 
-export async function create(req: Request, res: Response, next: NextFunction) {
-  try {
-    const id = await svc.createTienda(req.body);
-    res.status(201).json({ id_tienda: id });
-  } catch (e) {
-    next(e);
-  }
-}
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const id = await svc.createTienda(req.body);
+  res.status(201).json({ id_tienda: id });
+});
 
-export async function update(req: Request, res: Response, next: NextFunction) {
-  try {
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new Error("ID inválido");
-    await svc.updateTienda(id, req.body);
-    res.json({ ok: true });
-  } catch (e) {
-    next(e);
-  }
-}
+export const update = asyncHandler(async (req: Request, res: Response) => {
+  const id = parseIdParam(req);
+  await svc.updateTienda(id, req.body);
+  res.json({ ok: true });
+});
 
-export async function remove(req: Request, res: Response, next: NextFunction) {
-  try {
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new Error("ID inválido");
-    await svc.removeTienda(id);
-    res.status(204).end();
-  } catch (e) {
-    next(e);
-  }
-}
+export const remove = asyncHandler(async (req: Request, res: Response) => {
+  const id = parseIdParam(req);
+  await svc.removeTienda(id);
+  res.status(204).end();
+});

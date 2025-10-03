@@ -58,19 +58,6 @@ export default function ObrasPage() {
     [form.autor, form.titulo]
   );
 
-  // Dedupe defensivo
-  const obrasUnique = useMemo(() => {
-    const seen = new Set<number>();
-    const arr: typeof obras = [];
-    for (const it of obras) {
-      if (!seen.has(it.id_obra)) {
-        seen.add(it.id_obra);
-        arr.push(it);
-      }
-    }
-    return arr;
-  }, [obras]);
-
   const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
@@ -224,7 +211,7 @@ export default function ObrasPage() {
             </tr>
           </thead>
           <tbody>
-            {obrasUnique.map((o) => (
+            {obras.map((o) => (
               <tr key={`obra-${o.id_obra}`} className="border-t align-top">
                 <td className="p-2">{o.id_obra}</td>
                 <td className="p-2 w-[96px]"><ObraThumb id_obra={o.id_obra} /></td>
@@ -244,7 +231,7 @@ export default function ObrasPage() {
                 </td>
               </tr>
             ))}
-            {!isLoading && obrasUnique.length === 0 && (
+            {!isLoading && obras.length === 0 && (
               <tr><td className="p-4 text-gray-500" colSpan={8}>Sin obras</td></tr>
             )}
           </tbody>
@@ -289,21 +276,21 @@ export default function ObrasPage() {
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
               <input className="border rounded p-2" placeholder="Autor" value={edit.form.autor}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, autor: e.target.value } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, autor: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="Título" value={edit.form.titulo}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, titulo: e.target.value } } : s)} required />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, titulo: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="Año" type="number" value={edit.form.anio ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, anio: e.target.value === "" ? null : Number(e.target.value) } } : s)} />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, anio: e.target.value === "" ? null : Number(e.target.value) } })} />
               <input className="border rounded p-2" placeholder="Medidas" value={edit.form.medidas ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, medidas: e.target.value || null } } : s)} />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, medidas: e.target.value || null } })} />
               <input className="border rounded p-2" placeholder="Técnica" value={edit.form.tecnica ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, tecnica: e.target.value || null } } : s)} />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, tecnica: e.target.value || null } })} />
               <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01" value={edit.form.precio_salida ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, precio_salida: e.target.value === "" ? null : Number(e.target.value) } } : s)} />
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, precio_salida: e.target.value === "" ? null : Number(e.target.value) } })} />
               <select
                 className="border rounded p-2"
                 value={edit.form.id_tienda ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, id_tienda: e.target.value ? Number(e.target.value) : null } } : s)}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, id_tienda: e.target.value ? Number(e.target.value) : null } })}
               >
                 <option value="">Sin tienda</option>
                 {tiendas.map((t: Tienda) => (
@@ -315,7 +302,7 @@ export default function ObrasPage() {
               <select
                 className="border rounded p-2"
                 value={edit.form.id_expo ?? ""}
-                onChange={(e) => setEdit((s) => s ? { ...s, form: { ...s.form, id_expo: e.target.value ? Number(e.target.value) : null } } : s)}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, id_expo: e.target.value ? Number(e.target.value) : null } })}
               >
                 <option value="">Sin exposición</option>
                 {expos.map((x: Expo) => (
