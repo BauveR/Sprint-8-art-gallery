@@ -66,6 +66,20 @@ export default function ObrasPage() {
     [form.autor, form.titulo]
   );
 
+  // Filtrar obras basado en la búsqueda
+  const filteredObras = useMemo(() => {
+    if (!searchQuery.trim()) return obras;
+
+    const query = searchQuery.toLowerCase();
+    return obras.filter((obra) =>
+      obra.autor?.toLowerCase().includes(query) ||
+      obra.titulo?.toLowerCase().includes(query) ||
+      obra.tecnica?.toLowerCase().includes(query) ||
+      obra.tienda_nombre?.toLowerCase().includes(query) ||
+      obra.expo_nombre?.toLowerCase().includes(query)
+    );
+  }, [obras, searchQuery]);
+
   const onCreate = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
