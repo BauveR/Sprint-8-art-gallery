@@ -8,16 +8,15 @@ import {
 } from "../../query/obras";
 import { useTiendas } from "../../query/tiendas";
 import { useExpos } from "../../query/expos";
+import { imagenesService } from "../../services/imageService";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import ObraImagesDialog from "./ObraImagesDialog";
-import ObraThumb from "./ObraThumb";
 import ObrasUbicacionChart from "./ObrasUbicacionChart";
 import ObrasVentasChart from "./ObrasVentasChart";
 import LocationsMap from "./LocationsMap";
-import { Search } from "lucide-react";
+import { Search, Upload } from "lucide-react";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -32,7 +31,6 @@ const emptyObra: ObraInput = {
 };
 
 type EditState = { id: number; form: ObraInput } | null;
-type ImgState = { id_obra: number; titulo: string } | null;
 type Sort = { key: keyof Obra | "ubicacion" | "expo_nombre" | "tienda_nombre"; dir: "asc" | "desc" };
 
 export default function ObrasPage() {
@@ -55,11 +53,15 @@ export default function ObrasPage() {
 
   const [form, setForm] = useState<ObraInput>(emptyObra);
   const [edit, setEdit] = useState<EditState>(null);
-
-  const [imgState, setImgState] = useState<ImgState>(null);
-  const [imgOpen, setImgOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Estado para imágenes en el modal de edición
+  const [editImages, setEditImages] = useState<Array<{id: number; url: string}>>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const editFileInputRef = React.useRef<HTMLInputElement>(null);
 
   const canSubmit = useMemo(
     () => form.autor.trim() !== "" && form.titulo.trim() !== "",
@@ -80,14 +82,29 @@ export default function ObrasPage() {
     );
   }, [obras, searchQuery]);
 
-  const onCreate = (ev: React.FormEvent) => {
+  const onCreate = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!canSubmit) return;
     console.log("Creando obra con:", form);
     createObra.mutate(form, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         console.log("Obra creada exitosamente:", data);
+
+        // Si hay imagen seleccionada, subirla
+        if (selectedImage && data.id_obra) {
+          try {
+            await imagenesService.uploadForObra(data.id_obra, selectedImage);
+            console.log("Imagen subida exitosamente");
+          } catch (error) {
+            console.error("Error al subir imagen:", error);
+            alert("Obra creada pero hubo un error al subir la imagen");
+          }
+        }
+
         setForm(emptyObra);
+        setSelectedImage(null);
+        // Reset file input
+        if (fileInputRef.current) fileInputRef.current.value = "";
       },
       onError: (error) => {
         console.error("Error al crear obra:", error);
@@ -100,7 +117,7 @@ export default function ObrasPage() {
     removeObra.mutate(id);
   };
 
-  const startEdit = (o: Obra) => {
+  const startEdit = async (o: Obra) => {
     setEdit({
       id: o.id_obra,
       form: {
@@ -118,9 +135,68 @@ export default function ObrasPage() {
         id_expo: o.id_expo ?? null,
       },
     });
+
+    // Cargar imágenes de la obra
+    try {
+      const images = await imagenesService.listByObra(o.id_obra);
+      setEditImages(images);
+    } catch (error) {
+      console.error("Error cargando imágenes:", error);
+      setEditImages([]);
+    }
   };
 
-  const cancelEdit = () => setEdit(null);
+  const handleUploadEditImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!edit) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tamaño (2MB máximo)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La imagen no debe superar 2MB. Por favor, selecciona una imagen más pequeña.");
+      e.target.value = "";
+      return;
+    }
+
+    // Validar límite de 3 imágenes
+    if (editImages.length >= 3) {
+      alert("Solo puedes tener un máximo de 3 imágenes por obra.");
+      e.target.value = "";
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      await imagenesService.uploadForObra(edit.id, file);
+      const images = await imagenesService.listByObra(edit.id);
+      setEditImages(images);
+      e.target.value = "";
+    } catch (error) {
+      console.error("Error subiendo imagen:", error);
+      alert("Error al subir la imagen");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleDeleteEditImage = async (imageId: number) => {
+    if (!edit) return;
+    if (!confirm("¿Eliminar imagen?")) return;
+
+    try {
+      await imagenesService.remove(imageId);
+      const images = await imagenesService.listByObra(edit.id);
+      setEditImages(images);
+    } catch (error) {
+      console.error("Error eliminando imagen:", error);
+      alert("Error al eliminar la imagen");
+    }
+  };
+
+  const cancelEdit = () => {
+    setEdit(null);
+    setEditImages([]);
+  };
 
   const saveEdit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -178,7 +254,7 @@ export default function ObrasPage() {
         {/* Columna derecha: Formulario + Tabla */}
         <div className="space-y-6">
           {/* Form alta obra */}
-          <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border">
+          <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
         <input className="border rounded p-2 bg-background text-foreground" placeholder="Autor" value={form.autor}
           onChange={(e) => setForm((f) => ({ ...f, autor: e.target.value }))} required />
         <input className="border rounded p-2 bg-background text-foreground" placeholder="Título" value={form.titulo}
@@ -230,7 +306,45 @@ export default function ObrasPage() {
             </option>
           ))}
         </select>
-        <div className="col-span-2">
+        <div className="col-span-2 space-y-3">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
+              <Upload className="h-4 w-4" />
+              <span className="text-sm">{selectedImage ? selectedImage.name : "Seleccionar imagen"}</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Validar tamaño (2MB máximo)
+                    if (file.size > 2 * 1024 * 1024) {
+                      alert("La imagen no debe superar 2MB. Por favor, selecciona una imagen más pequeña.");
+                      e.target.value = "";
+                      return;
+                    }
+                    setSelectedImage(file);
+                  } else {
+                    setSelectedImage(null);
+                  }
+                }}
+              />
+            </label>
+            {selectedImage && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedImage(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Quitar
+              </button>
+            )}
+          </div>
           <Button disabled={!canSubmit || createObra.isPending} className="w-fit">
             {createObra.isPending ? "Creando..." : "Crear obra"}
           </Button>
@@ -249,12 +363,11 @@ export default function ObrasPage() {
       </div>
 
       {/* Tabla obras */}
-      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border">
+      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
         <table className="min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
               <th className="text-left p-2">{headerBtn("#", "id_obra")}</th>
-              <th className="text-left p-2">Imagen</th>
               <th className="text-left p-2">{headerBtn("Autor", "autor")}</th>
               <th className="text-left p-2">{headerBtn("Título", "titulo")}</th>
               <th className="text-left p-2">{headerBtn("Estado", "estado_venta")}</th>
@@ -268,7 +381,6 @@ export default function ObrasPage() {
             {filteredObras.map((o) => (
               <tr key={`obra-${o.id_obra}`} className="border-t align-top">
                 <td className="p-2">{o.id_obra}</td>
-                <td className="p-2 w-[96px]"><ObraThumb id_obra={o.id_obra} /></td>
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
                 <td className="p-2">
@@ -290,9 +402,6 @@ export default function ObrasPage() {
                 <td className="p-2">{o.tienda_nombre ?? "—"}</td>
                 <td className="p-2">{o.expo_nombre ?? "—"}</td>
                 <td className="p-2 space-x-2">
-                  <Button variant="ghost" onClick={() => { setImgState({ id_obra: o.id_obra, titulo: o.titulo }); setImgOpen(true); }}>
-                    Imágenes
-                  </Button>
                   <Button variant="ghost" onClick={() => startEdit(o)}>Editar</Button>
                   <Button variant="ghost" onClick={() => onDelete(o.id_obra)} disabled={removeObra.isPending} className="text-red-600">
                     Eliminar
@@ -301,7 +410,7 @@ export default function ObrasPage() {
               </tr>
             ))}
             {!isLoading && filteredObras.length === 0 && (
-              <tr><td className="p-4 text-gray-500" colSpan={9}>
+              <tr><td className="p-4 text-gray-500" colSpan={8}>
                 {searchQuery ? "No se encontraron obras con ese criterio" : "Sin obras"}
               </td></tr>
             )}
@@ -329,24 +438,61 @@ export default function ObrasPage() {
         </div>
       </div>
 
-      {/* Dialog imágenes */}
-      <ObraImagesDialog
-        obra={imgState}
-        open={imgOpen}
-        onOpenChange={(next: boolean) => {
-          setImgOpen(next);
-          if (!next) setImgState(null);
-        }}
-      />
-
       {/* Modal edición */}
       {edit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto border dark:bg-white/[0.05] dark:backdrop-blur-2xl dark:border-white/20">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Editar obra #{edit.id}</h3>
               <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground">✕</button>
             </div>
+
+            {/* Sección de imágenes */}
+            <div className="mb-6 p-4 border rounded-lg bg-secondary/20">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold">Imágenes ({editImages.length}/3)</h4>
+                {editImages.length < 3 && (
+                  <label className="flex items-center gap-2 px-3 py-1.5 border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors text-sm">
+                    <Upload className="h-3.5 w-3.5" />
+                    {uploadingImage ? "Subiendo..." : "Subir imagen"}
+                    <input
+                      ref={editFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleUploadEditImage}
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {editImages.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-4 text-center">
+                  Sin imágenes. Sube hasta 3 imágenes.
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {editImages.map((img) => (
+                    <div key={img.id} className="relative group">
+                      <img
+                        src={img.url}
+                        alt=""
+                        className="w-full aspect-square object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteEditImage(img.id)}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <form onSubmit={saveEdit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input className="border rounded p-2 bg-background text-foreground" placeholder="Autor" value={edit.form.autor}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, autor: e.target.value } })} required />

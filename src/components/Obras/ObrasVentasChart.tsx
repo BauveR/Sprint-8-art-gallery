@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -9,6 +9,32 @@ interface Props {
 }
 
 export default function ObrasVentasChart({ obras }: Props) {
+  const [colors, setColors] = useState({
+    chart1: "#000",
+    chart2: "#000",
+  });
+
+  useEffect(() => {
+    const updateColors = () => {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+      setColors({
+        chart1: computedStyle.getPropertyValue('--chart-1').trim(),
+        chart2: computedStyle.getPropertyValue('--chart-2').trim(),
+      });
+    };
+
+    updateColors();
+
+    // Observar cambios en la clase dark
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
   const data = useMemo(() => {
     // Simulamos datos de ventas mensuales
     // En producción, esto vendría de un endpoint con datos históricos reales
@@ -45,11 +71,11 @@ export default function ObrasVentasChart({ obras }: Props) {
   const chartConfig = {
     ventas: {
       label: "Ventas",
-      color: "hsl(var(--chart-1))",
+      color: colors.chart1,
     },
     entregas: {
       label: "Entregas",
-      color: "hsl(var(--chart-2))",
+      color: colors.chart2,
     },
   };
 
@@ -69,12 +95,12 @@ export default function ObrasVentasChart({ obras }: Props) {
           <AreaChart data={data} width={500} height={300}>
               <defs>
                 <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1} />
+                  <stop offset="5%" stopColor={colors.chart1} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={colors.chart1} stopOpacity={0.1} />
                 </linearGradient>
                 <linearGradient id="colorEntregas" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1} />
+                  <stop offset="5%" stopColor={colors.chart2} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={colors.chart2} stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -97,7 +123,7 @@ export default function ObrasVentasChart({ obras }: Props) {
             <Area
               type="monotone"
               dataKey="ventas"
-              stroke="hsl(var(--chart-1))"
+              stroke={colors.chart1}
               fillOpacity={1}
               fill="url(#colorVentas)"
               strokeWidth={2}
@@ -105,7 +131,7 @@ export default function ObrasVentasChart({ obras }: Props) {
             <Area
               type="monotone"
               dataKey="entregas"
-              stroke="hsl(var(--chart-2))"
+              stroke={colors.chart2}
               fillOpacity={1}
               fill="url(#colorEntregas)"
               strokeWidth={2}

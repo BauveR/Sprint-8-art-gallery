@@ -58,10 +58,10 @@ export default function ExposPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 md:px-[5%] py-6 space-y-6">
       <h2 className="text-xl font-semibold">Exposiciones</h2>
 
-      <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border">
+      <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
         <input className="border rounded p-2 bg-background text-foreground" placeholder="Nombre" value={form.nombre}
           onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} required />
         <input className="border rounded p-2 bg-background text-foreground" placeholder="URL" value={form.url_expo ?? ""}
@@ -89,7 +89,7 @@ export default function ExposPage() {
         </div>
       </form>
 
-      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border">
+      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
         <table className="min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
@@ -126,8 +126,8 @@ export default function ExposPage() {
 
       {/* Modal edición */}
       {edit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-6 border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-6 border dark:bg-white/[0.05] dark:backdrop-blur-2xl dark:border-white/20">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Editar exposición #{edit.id}</h3>
               <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground">✕</button>

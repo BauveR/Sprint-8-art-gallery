@@ -29,6 +29,14 @@ export default function ObraImagesDialog({ obra, open, onOpenChange }: Props) {
   const onUpload = async (ev: React.ChangeEvent<HTMLInputElement>) => {
     const f = ev.target.files?.[0];
     if (!f || !obra) return;
+
+    // Validar tamaño (2MB máximo)
+    if (f.size > 2 * 1024 * 1024) {
+      alert("La imagen no debe superar 2MB. Por favor, selecciona una imagen más pequeña.");
+      ev.target.value = "";
+      return;
+    }
+
     setBusy(true);
     try {
       await imagenesService.uploadForObra(obra.id_obra, f);

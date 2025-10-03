@@ -1,14 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Pie, PieChart, Cell, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { Obra } from "../../types";
-
-const COLORS = {
-  en_exposicion: "hsl(var(--chart-1))",
-  en_tienda: "hsl(var(--chart-2))",
-  almacen: "hsl(var(--chart-3))",
-};
 
 const LABELS = {
   en_exposicion: "En Exposición",
@@ -21,6 +15,35 @@ interface Props {
 }
 
 export default function ObrasUbicacionChart({ obras }: Props) {
+  const [colors, setColors] = useState({
+    en_exposicion: "#000",
+    en_tienda: "#000",
+    almacen: "#000",
+  });
+
+  useEffect(() => {
+    const updateColors = () => {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+      setColors({
+        en_exposicion: computedStyle.getPropertyValue('--chart-1').trim(),
+        en_tienda: computedStyle.getPropertyValue('--chart-2').trim(),
+        almacen: computedStyle.getPropertyValue('--chart-3').trim(),
+      });
+    };
+
+    updateColors();
+
+    // Observar cambios en la clase dark
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const data = useMemo(() => {
     const counts = obras.reduce((acc, obra) => {
       const ubicacion = obra.ubicacion ?? "almacen";
@@ -41,15 +64,15 @@ export default function ObrasUbicacionChart({ obras }: Props) {
     },
     en_exposicion: {
       label: "En Exposición",
-      color: COLORS.en_exposicion,
+      color: colors.en_exposicion,
     },
     en_tienda: {
       label: "En Tienda",
-      color: COLORS.en_tienda,
+      color: colors.en_tienda,
     },
     almacen: {
       label: "Almacén",
-      color: COLORS.almacen,
+      color: colors.almacen,
     },
   };
 
@@ -76,7 +99,7 @@ export default function ObrasUbicacionChart({ obras }: Props) {
               {data.map((entry) => (
                 <Cell
                   key={entry.ubicacion}
-                  fill={COLORS[entry.ubicacion as keyof typeof COLORS]}
+                  fill={colors[entry.ubicacion as keyof typeof colors]}
                 />
               ))}
             </Pie>

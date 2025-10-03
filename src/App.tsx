@@ -1,13 +1,14 @@
 import { useState } from "react";
+import HomePage from "./components/Home/HomePage";
 import ObrasPage from "./components/Obras/ObrasPage";
 import TiendasPage from "./components/Tiendas/TiendasPage";
 import ExposPage from "./components/Expos/ExposPage";
 import { ThemeToggle } from "./components/ui/theme-toggle";
 
-type Tab = "obras" | "tiendas" | "expos";
+type Tab = "home" | "obras" | "tiendas" | "expos";
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("obras");
+  const [tab, setTab] = useState<Tab>("home");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
@@ -16,10 +17,10 @@ export default function App() {
           <h1 className="text-lg font-semibold text-foreground">Art Gallery · Admin</h1>
           <div className="flex items-center gap-4">
             <nav className="flex gap-2">
-              {(["obras","tiendas","expos"] as Tab[]).map(t => (
+              {(["home","obras","tiendas","expos"] as Tab[]).map(t => (
                 <button key={t}
                   onClick={() => setTab(t)}
-                  className={`px-3 py-1.5 rounded-full text-sm ${tab===t ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
+                  className={`px-3 py-1.5 rounded-full text-sm capitalize ${tab===t ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
                   {t}
                 </button>
               ))}
@@ -30,6 +31,7 @@ export default function App() {
       </header>
 
       <main>
+        {tab === "home" && <HomePage />}
         {tab === "obras" && <ObrasPage />}
         {tab === "tiendas" && <TiendasPage />}
         {tab === "expos" && <ExposPage />}
