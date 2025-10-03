@@ -15,6 +15,7 @@ import ObraImagesDialog from "./ObraImagesDialog";
 import ObraThumb from "./ObraThumb";
 import ObrasUbicacionChart from "./ObrasUbicacionChart";
 import ObrasVentasChart from "./ObrasVentasChart";
+import LocationsMap from "./LocationsMap";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -155,6 +156,7 @@ export default function ObrasPage() {
         <div className="space-y-6">
           <ObrasUbicacionChart obras={obras} />
           <ObrasVentasChart obras={obras} />
+          <LocationsMap tiendas={tiendas} expos={expos} />
         </div>
 
         {/* Columna derecha: Formulario + Tabla */}
