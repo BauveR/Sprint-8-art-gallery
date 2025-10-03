@@ -61,15 +61,15 @@ export default function ExposPage() {
     <div className="p-6 space-y-6">
       <h2 className="text-xl font-semibold">Exposiciones</h2>
 
-      <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-white/80 p-4 rounded-xl shadow">
-        <input className="border rounded p-2" placeholder="Nombre" value={form.nombre}
+      <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border">
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Nombre" value={form.nombre}
           onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} required />
-        <input className="border rounded p-2" placeholder="URL" value={form.url_expo ?? ""}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="URL" value={form.url_expo ?? ""}
           onChange={e => setForm(f => ({ ...f, url_expo: e.target.value || null }))} />
-        <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={form.lat}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={form.lat}
           onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))}
           onFocus={e => e.target.select()} required />
-        <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={form.lng}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={form.lng}
           onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))}
           onFocus={e => e.target.select()} required />
         <DatePicker
@@ -83,18 +83,15 @@ export default function ExposPage() {
           placeholder="Fecha de fin"
         />
         <div className="col-span-2">
-          <button
-            className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
-            disabled={createExpo.isPending}
-          >
+          <Button disabled={createExpo.isPending}>
             {createExpo.isPending ? "Creando..." : "Crear exposición"}
-          </button>
+          </Button>
         </div>
       </form>
 
-      <div className="bg-white/80 rounded-xl shadow overflow-x-auto">
+      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-muted">
             <tr>
               <th className="text-left p-2">#</th><th className="text-left p-2">Nombre</th>
               <th className="text-left p-2">Fechas</th><th className="text-left p-2">URL</th>
@@ -130,20 +127,20 @@ export default function ExposPage() {
       {/* Modal edición */}
       {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
+          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Editar exposición #{edit.id}</h3>
-              <button onClick={cancelEdit} className="text-gray-500 hover:text-black">✕</button>
+              <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground">✕</button>
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
-              <input className="border rounded p-2" placeholder="Nombre" value={edit.form.nombre}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Nombre" value={edit.form.nombre}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, nombre: e.target.value } })} required />
-              <input className="border rounded p-2" placeholder="URL" value={edit.form.url_expo ?? ""}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="URL" value={edit.form.url_expo ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, url_expo: e.target.value || null } })} />
-              <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={edit.form.lat}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={edit.form.lat}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })}
                 onFocus={e => e.target.select()} required />
-              <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={edit.form.lng}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={edit.form.lng}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })}
                 onFocus={e => e.target.select()} required />
               <DatePicker
@@ -157,7 +154,7 @@ export default function ExposPage() {
                 placeholder="Fecha de fin"
               />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
-                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
+                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancelar</button>
                 <Button disabled={updateExpo.isPending}>
                   {updateExpo.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>

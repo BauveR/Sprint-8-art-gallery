@@ -60,10 +60,10 @@ export default function ObrasUbicacionChart({ obras }: Props) {
         <CardDescription>Por ubicación física</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+        <ChartContainer config={chartConfig} className="h-[300px] w-full bg-background/50 rounded-lg">
           <PieChart width={400} height={300}>
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend />
+              <Legend wrapperStyle={{ color: 'hsl(var(--foreground))' }} />
             <Pie
               data={data}
               dataKey="value"
@@ -71,7 +71,7 @@ export default function ObrasUbicacionChart({ obras }: Props) {
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label
+              label={{ fill: 'hsl(var(--foreground))' }}
             >
               {data.map((entry) => (
                 <Cell

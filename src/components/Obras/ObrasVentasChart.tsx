@@ -65,7 +65,7 @@ export default function ObrasVentasChart({ obras }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+        <ChartContainer config={chartConfig} className="h-[300px] w-full bg-background/50 rounded-lg">
           <AreaChart data={data} width={500} height={300}>
               <defs>
                 <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
@@ -84,12 +84,14 @@ export default function ObrasVentasChart({ obras }: Props) {
                 axisLine={false}
                 tickMargin={8}
                 className="text-xs"
+                tick={{ fill: 'hsl(var(--foreground))' }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
                 className="text-xs"
+                tick={{ fill: 'hsl(var(--foreground))' }}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
             <Area

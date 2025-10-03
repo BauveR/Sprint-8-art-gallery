@@ -178,25 +178,25 @@ export default function ObrasPage() {
         {/* Columna derecha: Formulario + Tabla */}
         <div className="space-y-6">
           {/* Form alta obra */}
-          <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/80 p-4 rounded-xl shadow">
-        <input className="border rounded p-2" placeholder="Autor" value={form.autor}
+          <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border">
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Autor" value={form.autor}
           onChange={(e) => setForm((f) => ({ ...f, autor: e.target.value }))} required />
-        <input className="border rounded p-2" placeholder="Título" value={form.titulo}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Título" value={form.titulo}
           onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} required />
-        <input className="border rounded p-2" placeholder="Año" type="number" value={form.anio ?? ""}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Año" type="number" value={form.anio ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, anio: e.target.value === "" ? null : Number(e.target.value) }))} />
-        <input className="border rounded p-2" placeholder="Medidas" value={form.medidas ?? ""}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Medidas" value={form.medidas ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, medidas: e.target.value || null }))} />
-        <input className="border rounded p-2" placeholder="Técnica" value={form.tecnica ?? ""}
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Técnica" value={form.tecnica ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, tecnica: e.target.value || null }))} />
-        <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01"
+        <input className="border rounded p-2 bg-background text-foreground" placeholder="Precio salida" type="number" step="0.01"
           value={form.precio_salida ?? ""}
           onChange={(e) => setForm((f) => ({
             ...f,
             precio_salida: e.target.value === "" ? null : Number(e.target.value),
           }))} />
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 bg-background text-foreground"
           value={form.estado_venta ?? "disponible"}
           onChange={(e) => setForm((f) => ({ ...f, estado_venta: e.target.value as EstadoVenta }))}
         >
@@ -207,7 +207,7 @@ export default function ObrasPage() {
           <option value="entregado">Entregado</option>
         </select>
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 bg-background text-foreground"
           value={form.id_tienda ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, id_tienda: e.target.value ? Number(e.target.value) : null }))}
         >
@@ -219,7 +219,7 @@ export default function ObrasPage() {
           ))}
         </select>
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 bg-background text-foreground"
           value={form.id_expo ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, id_expo: e.target.value ? Number(e.target.value) : null }))}
         >
@@ -249,9 +249,9 @@ export default function ObrasPage() {
       </div>
 
       {/* Tabla obras */}
-      <div className="bg-white/80 rounded-xl shadow overflow-x-auto">
+      <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-muted">
             <tr>
               <th className="text-left p-2">{headerBtn("#", "id_obra")}</th>
               <th className="text-left p-2">Imagen</th>
@@ -342,26 +342,26 @@ export default function ObrasPage() {
       {/* Modal edición */}
       {edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-2xl bg-card text-card-foreground rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto border">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Editar obra #{edit.id}</h3>
-              <button onClick={cancelEdit} className="text-gray-500 hover:text-black">✕</button>
+              <button onClick={cancelEdit} className="text-muted-foreground hover:text-foreground">✕</button>
             </div>
             <form onSubmit={saveEdit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input className="border rounded p-2" placeholder="Autor" value={edit.form.autor}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Autor" value={edit.form.autor}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, autor: e.target.value } })} required />
-              <input className="border rounded p-2" placeholder="Título" value={edit.form.titulo}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Título" value={edit.form.titulo}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, titulo: e.target.value } })} required />
-              <input className="border rounded p-2" placeholder="Año" type="number" value={edit.form.anio ?? ""}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Año" type="number" value={edit.form.anio ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, anio: e.target.value === "" ? null : Number(e.target.value) } })} />
-              <input className="border rounded p-2" placeholder="Medidas" value={edit.form.medidas ?? ""}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Medidas" value={edit.form.medidas ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, medidas: e.target.value || null } })} />
-              <input className="border rounded p-2" placeholder="Técnica" value={edit.form.tecnica ?? ""}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Técnica" value={edit.form.tecnica ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, tecnica: e.target.value || null } })} />
-              <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01" value={edit.form.precio_salida ?? ""}
+              <input className="border rounded p-2 bg-background text-foreground" placeholder="Precio salida" type="number" step="0.01" value={edit.form.precio_salida ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, precio_salida: e.target.value === "" ? null : Number(e.target.value) } })} />
               <select
-                className="border rounded p-2"
+                className="border rounded p-2 bg-background text-foreground"
                 value={edit.form.estado_venta ?? "disponible"}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, estado_venta: e.target.value as EstadoVenta } })}
               >
@@ -372,7 +372,7 @@ export default function ObrasPage() {
                 <option value="entregado">Entregado</option>
               </select>
               <select
-                className="border rounded p-2"
+                className="border rounded p-2 bg-background text-foreground"
                 value={edit.form.id_tienda ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, id_tienda: e.target.value ? Number(e.target.value) : null } })}
               >
@@ -384,7 +384,7 @@ export default function ObrasPage() {
                 ))}
               </select>
               <select
-                className="border rounded p-2"
+                className="border rounded p-2 bg-background text-foreground"
                 value={edit.form.id_expo ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, id_expo: e.target.value ? Number(e.target.value) : null } })}
               >
@@ -396,7 +396,7 @@ export default function ObrasPage() {
                 ))}
               </select>
               <div className="col-span-2 flex justify-end gap-2 mt-2">
-                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
+                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancelar</button>
                 <Button type="submit" disabled={updateObra.isPending}>
                   {updateObra.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>
