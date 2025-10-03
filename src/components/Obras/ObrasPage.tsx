@@ -11,11 +11,13 @@ import { useExpos } from "../../query/expos";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import ObraImagesDialog from "./ObraImagesDialog";
 import ObraThumb from "./ObraThumb";
 import ObrasUbicacionChart from "./ObrasUbicacionChart";
 import ObrasVentasChart from "./ObrasVentasChart";
 import LocationsMap from "./LocationsMap";
+import { Search } from "lucide-react";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -56,6 +58,8 @@ export default function ObrasPage() {
 
   const [imgState, setImgState] = useState<ImgState>(null);
   const [imgOpen, setImgOpen] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   const canSubmit = useMemo(
     () => form.autor.trim() !== "" && form.titulo.trim() !== "",
@@ -148,9 +152,7 @@ export default function ObrasPage() {
   };
 
   return (
-    <div className="px-4 md:px-[5%] py-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Obras</h1>
-
+    <div className="px-4 md:px-[5%] py-6">
       <div className="grid grid-cols-1 lg:grid-cols-[30%_1fr] gap-6">
         {/* Columna izquierda: Charts */}
         <div className="space-y-6">

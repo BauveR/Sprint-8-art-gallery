@@ -66,10 +66,12 @@ export default function ExposPage() {
           onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} required />
         <input className="border rounded p-2" placeholder="URL" value={form.url_expo ?? ""}
           onChange={e => setForm(f => ({ ...f, url_expo: e.target.value || null }))} />
-        <input className="border rounded p-2" placeholder="Lat" type="number" step="0.000001" value={form.lat}
-          onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))} required />
-        <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={form.lng}
-          onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))} required />
+        <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={form.lat}
+          onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))}
+          onFocus={e => e.target.select()} required />
+        <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={form.lng}
+          onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))}
+          onFocus={e => e.target.select()} required />
         <DatePicker
           value={form.fecha_inicio}
           onChange={(date) => setForm(f => ({ ...f, fecha_inicio: date }))}
@@ -138,10 +140,12 @@ export default function ExposPage() {
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, nombre: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="URL" value={edit.form.url_expo ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, url_expo: e.target.value || null } })} />
-              <input className="border rounded p-2" placeholder="Lat" type="number" step="0.000001" value={edit.form.lat}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })} required />
-              <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={edit.form.lng}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })} required />
+              <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={edit.form.lat}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })}
+                onFocus={e => e.target.select()} required />
+              <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={edit.form.lng}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })}
+                onFocus={e => e.target.select()} required />
               <DatePicker
                 value={edit.form.fecha_inicio}
                 onChange={(date) => setEdit({ ...edit, form: { ...edit.form, fecha_inicio: date } })}

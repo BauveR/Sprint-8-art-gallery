@@ -61,10 +61,12 @@ export default function TiendasPage() {
           onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} required />
         <input className="border rounded p-2" placeholder="URL" value={form.url_tienda ?? ""}
           onChange={e => setForm(f => ({ ...f, url_tienda: e.target.value || null }))} />
-        <input className="border rounded p-2" placeholder="Lat" type="number" step="0.000001" value={form.lat}
-          onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))} required />
-        <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={form.lng}
-          onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))} required />
+        <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={form.lat}
+          onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))}
+          onFocus={e => e.target.select()} required />
+        <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={form.lng}
+          onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))}
+          onFocus={e => e.target.select()} required />
         <div className="col-span-2">
           <button
             className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
@@ -123,10 +125,12 @@ export default function TiendasPage() {
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, nombre: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="URL" value={edit.form.url_tienda ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, url_tienda: e.target.value || null } })} />
-              <input className="border rounded p-2" placeholder="Lat" type="number" step="0.000001" value={edit.form.lat}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })} required />
-              <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={edit.form.lng}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })} required />
+              <input className="border rounded p-2" placeholder="Lat (-90 a 90)" type="number" step="any" min="-90" max="90" value={edit.form.lat}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })}
+                onFocus={e => e.target.select()} required />
+              <input className="border rounded p-2" placeholder="Lng (-180 a 180)" type="number" step="any" min="-180" max="180" value={edit.form.lng}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })}
+                onFocus={e => e.target.select()} required />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
                 <Button disabled={updateTienda.isPending}>

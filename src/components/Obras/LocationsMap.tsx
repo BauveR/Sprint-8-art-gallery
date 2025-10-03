@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useMemo, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Tienda, Expo } from "../../types";
@@ -27,6 +27,25 @@ const expoIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
+
+// Componente para ajustar el mapa automáticamente a todos los marcadores
+function FitBounds({ tiendas, expos }: { tiendas: Tienda[]; expos: Expo[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const allLocations = [
+      ...tiendas.map(t => ({ lat: t.lat, lng: t.lng })),
+      ...expos.map(e => ({ lat: e.lat, lng: e.lng }))
+    ];
+
+    if (allLocations.length > 0) {
+      const bounds = L.latLngBounds(allLocations.map(loc => [loc.lat, loc.lng]));
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [map, tiendas, expos]);
+
+  return null;
+}
 
 export default function LocationsMap({ tiendas, expos }: LocationsMapProps) {
   // Calcular el centro del mapa basado en todas las ubicaciones
@@ -70,6 +89,7 @@ export default function LocationsMap({ tiendas, expos }: LocationsMapProps) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <FitBounds tiendas={tiendas} expos={expos} />
 
               {/* Marcadores de tiendas */}
               {tiendas.map((tienda) => (
