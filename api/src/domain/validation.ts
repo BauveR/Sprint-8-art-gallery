@@ -24,6 +24,14 @@ export const expoInputSchema = z.object({
   url_expo: z.string().url().optional().nullable(),
 });
 
+export const estadoVentaSchema = z.enum([
+  "disponible",
+  "en_carrito",
+  "procesando_envio",
+  "enviado",
+  "entregado",
+]);
+
 export const obraInputSchema = z.object({
   autor: z.string().min(1),
   titulo: z.string().min(1),
@@ -31,6 +39,7 @@ export const obraInputSchema = z.object({
   medidas: z.string().nullable().optional(),
   tecnica: z.string().nullable().optional(),
   precio_salida: z.number().nonnegative().nullable().optional(),
+  estado_venta: estadoVentaSchema.optional(),
   id_tienda: z.number().int().positive().nullable().optional(),
   id_expo: z.number().int().positive().nullable().optional(),
 });

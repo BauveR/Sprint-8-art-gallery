@@ -10,7 +10,8 @@ export type SortKey =
   | "medidas"
   | "tecnica"
   | "precio_salida"
-  | "disponibilidad"
+  | "estado_venta"
+  | "ubicacion"
   | "expo_nombre"
   | "tienda_nombre";
 
@@ -34,7 +35,8 @@ export interface ObraEstadoActualRow extends RowDataPacket {
   medidas: string | null;
   tecnica: string | null;
   precio_salida: string | null;
-  disponibilidad: "en_exposicion" | "en_tienda" | "almacen";
+  estado_venta: "disponible" | "en_carrito" | "procesando_envio" | "enviado" | "entregado";
+  ubicacion: "en_exposicion" | "en_tienda" | "almacen";
   id_expo: number | null;
   expo_nombre: string | null;
   expo_lat: number | null;
@@ -55,7 +57,8 @@ const SORTABLE: Record<SortKey, string> = {
   medidas: "medidas",
   tecnica: "tecnica",
   precio_salida: "precio_salida",
-  disponibilidad: "disponibilidad",
+  estado_venta: "estado_venta",
+  ubicacion: "ubicacion",
   expo_nombre: "expo_nombre",
   tienda_nombre: "tienda_nombre",
 };
@@ -108,8 +111,8 @@ export async function findObraById(id_obra: number) {
 
 export async function insertObra(input: ObraInput) {
   const [res] = await pool.query<ResultSetHeader>(
-    `INSERT INTO obras (autor, titulo, anio, medidas, tecnica, precio_salida)
-     VALUES (?,?,?,?,?,?)`,
+    `INSERT INTO obras (autor, titulo, anio, medidas, tecnica, precio_salida, estado_venta)
+     VALUES (?,?,?,?,?,?,?)`,
     [
       input.autor,
       input.titulo,
@@ -117,6 +120,7 @@ export async function insertObra(input: ObraInput) {
       input.medidas ?? null,
       input.tecnica ?? null,
       input.precio_salida ?? null,
+      input.estado_venta ?? "disponible",
     ]
   );
   return res.insertId;
@@ -125,7 +129,7 @@ export async function insertObra(input: ObraInput) {
 export async function updateObra(id_obra: number, input: ObraInput) {
   await pool.query(
     `UPDATE obras
-     SET autor = ?, titulo = ?, anio = ?, medidas = ?, tecnica = ?, precio_salida = ?
+     SET autor = ?, titulo = ?, anio = ?, medidas = ?, tecnica = ?, precio_salida = ?, estado_venta = ?
      WHERE id_obra = ?`,
     [
       input.autor,
@@ -134,6 +138,7 @@ export async function updateObra(id_obra: number, input: ObraInput) {
       input.medidas ?? null,
       input.tecnica ?? null,
       input.precio_salida ?? null,
+      input.estado_venta ?? "disponible",
       id_obra,
     ]
   );

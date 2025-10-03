@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Expo, Obra, ObraInput, Tienda } from "../../types";
+import { Expo, Obra, ObraInput, Tienda, EstadoVenta } from "../../types";
 import {
   useObras,
   useCreateObra,
@@ -21,13 +21,14 @@ const emptyObra: ObraInput = {
   medidas: null,
   tecnica: null,
   precio_salida: null,
+  estado_venta: "disponible",
   id_tienda: null,
   id_expo: null,
 };
 
 type EditState = { id: number; form: ObraInput } | null;
 type ImgState = { id_obra: number; titulo: string } | null;
-type Sort = { key: keyof Obra | "disponibilidad" | "expo_nombre" | "tienda_nombre"; dir: "asc" | "desc" };
+type Sort = { key: keyof Obra | "ubicacion" | "expo_nombre" | "tienda_nombre"; dir: "asc" | "desc" };
 
 export default function ObrasPage() {
   // Estado de sort/paginación
@@ -91,6 +92,7 @@ export default function ObrasPage() {
           o.precio_salida != null
             ? (typeof o.precio_salida === "string" ? Number(o.precio_salida) : o.precio_salida)
             : null,
+        estado_venta: o.estado_venta ?? "disponible",
         id_tienda: o.id_tienda ?? null,
         id_expo: o.id_expo ?? null,
       },
@@ -166,6 +168,17 @@ export default function ObrasPage() {
           }))} />
         <select
           className="border rounded p-2"
+          value={form.estado_venta ?? "disponible"}
+          onChange={(e) => setForm((f) => ({ ...f, estado_venta: e.target.value as EstadoVenta }))}
+        >
+          <option value="disponible">Disponible</option>
+          <option value="en_carrito">En carrito</option>
+          <option value="procesando_envio">Procesando envío</option>
+          <option value="enviado">Enviado</option>
+          <option value="entregado">Entregado</option>
+        </select>
+        <select
+          className="border rounded p-2"
           value={form.id_tienda ?? ""}
           onChange={(e) => setForm((f) => ({ ...f, id_tienda: e.target.value ? Number(e.target.value) : null }))}
         >
@@ -204,7 +217,8 @@ export default function ObrasPage() {
               <th className="text-left p-2">Imagen</th>
               <th className="text-left p-2">{headerBtn("Autor", "autor")}</th>
               <th className="text-left p-2">{headerBtn("Título", "titulo")}</th>
-              <th className="text-left p-2">{headerBtn("Disponibilidad", "disponibilidad")}</th>
+              <th className="text-left p-2">{headerBtn("Estado", "estado_venta")}</th>
+              <th className="text-left p-2">{headerBtn("Ubicación", "ubicacion")}</th>
               <th className="text-left p-2">{headerBtn("Tienda", "tienda_nombre")}</th>
               <th className="text-left p-2">{headerBtn("Expo", "expo_nombre")}</th>
               <th className="text-left p-2">Acciones</th>
@@ -217,7 +231,22 @@ export default function ObrasPage() {
                 <td className="p-2 w-[96px]"><ObraThumb id_obra={o.id_obra} /></td>
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
-                <td className="p-2"><Badge variant="secondary">{o.disponibilidad ?? "almacen"}</Badge></td>
+                <td className="p-2">
+                  <Badge variant="secondary">
+                    {o.estado_venta === "disponible" && "Disponible"}
+                    {o.estado_venta === "en_carrito" && "En carrito"}
+                    {o.estado_venta === "procesando_envio" && "Procesando"}
+                    {o.estado_venta === "enviado" && "Enviado"}
+                    {o.estado_venta === "entregado" && "Entregado"}
+                  </Badge>
+                </td>
+                <td className="p-2">
+                  <Badge variant="outline">
+                    {o.ubicacion === "en_exposicion" && "Exposición"}
+                    {o.ubicacion === "en_tienda" && "Tienda"}
+                    {o.ubicacion === "almacen" && "Almacén"}
+                  </Badge>
+                </td>
                 <td className="p-2">{o.tienda_nombre ?? "—"}</td>
                 <td className="p-2">{o.expo_nombre ?? "—"}</td>
                 <td className="p-2 space-x-2">
@@ -232,7 +261,7 @@ export default function ObrasPage() {
               </tr>
             ))}
             {!isLoading && obras.length === 0 && (
-              <tr><td className="p-4 text-gray-500" colSpan={8}>Sin obras</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={9}>Sin obras</td></tr>
             )}
           </tbody>
         </table>
@@ -287,6 +316,17 @@ export default function ObrasPage() {
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, tecnica: e.target.value || null } })} />
               <input className="border rounded p-2" placeholder="Precio salida" type="number" step="0.01" value={edit.form.precio_salida ?? ""}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, precio_salida: e.target.value === "" ? null : Number(e.target.value) } })} />
+              <select
+                className="border rounded p-2"
+                value={edit.form.estado_venta ?? "disponible"}
+                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, estado_venta: e.target.value as EstadoVenta } })}
+              >
+                <option value="disponible">Disponible</option>
+                <option value="en_carrito">En carrito</option>
+                <option value="procesando_envio">Procesando envío</option>
+                <option value="enviado">Enviado</option>
+                <option value="entregado">Entregado</option>
+              </select>
               <select
                 className="border rounded p-2"
                 value={edit.form.id_tienda ?? ""}

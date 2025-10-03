@@ -1,4 +1,13 @@
 // ----------- Obras -----------
+export type EstadoVenta =
+  | "disponible"
+  | "en_carrito"
+  | "procesando_envio"
+  | "enviado"
+  | "entregado";
+
+export type Ubicacion = "en_exposicion" | "en_tienda" | "almacen";
+
 export interface ObraInput {
   autor: string;
   titulo: string;
@@ -6,6 +15,7 @@ export interface ObraInput {
   medidas?: string | null;
   tecnica?: string | null;
   precio_salida?: number | null; // number en dominio
+  estado_venta?: EstadoVenta;
   id_tienda?: number | null;
   id_expo?: number | null;
 }
@@ -18,7 +28,8 @@ export interface ObraState {
   medidas: string | null;
   tecnica: string | null;
   precio_salida: string | number | null; // MySQL DECIMAL puede venir string
-  disponibilidad: "en_exposicion" | "en_tienda" | "almacen";
+  estado_venta: EstadoVenta;
+  ubicacion: Ubicacion; // Calculado por la VIEW (dónde está físicamente)
   id_expo: number | null;
   expo_nombre: string | null;
   expo_lat: number | null;

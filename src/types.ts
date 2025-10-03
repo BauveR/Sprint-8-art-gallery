@@ -42,6 +42,15 @@ export type ExpoInput = {
 };
 
 // ---------- Obras ----------
+export type EstadoVenta =
+  | "disponible"
+  | "en_carrito"
+  | "procesando_envio"
+  | "enviado"
+  | "entregado";
+
+export type Ubicacion = "en_exposicion" | "en_tienda" | "almacen";
+
 export type Obra = {
   id_obra: number;
   autor: string;
@@ -53,8 +62,11 @@ export type Obra = {
   // En MySQL DECIMAL puede venir como string; lo dejamos flexible
   precio_salida?: number | string | null;
 
-  // Campos "derivados" del view obras_estado_actual
-  disponibilidad?: "en_exposicion" | "en_tienda" | "almacen" | null;
+  // Estado de venta (editable)
+  estado_venta: EstadoVenta;
+
+  // Ubicación física calculada por la VIEW (no editable)
+  ubicacion?: Ubicacion | null;
 
   id_tienda?: number | null;
   tienda_nombre?: string | null;
@@ -76,6 +88,7 @@ export type ObraInput = {
   medidas?: string | null;
   tecnica?: string | null;
   precio_salida?: number | null;
+  estado_venta?: EstadoVenta;
   id_tienda?: number | null;
   id_expo?: number | null;
 };
