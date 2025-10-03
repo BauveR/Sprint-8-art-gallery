@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ObraImagesDialog from "./ObraImagesDialog";
 import ObraThumb from "./ObraThumb";
+import ObrasUbicacionChart from "./ObrasUbicacionChart";
+import ObrasVentasChart from "./ObrasVentasChart";
 
 const emptyObra: ObraInput = {
   autor: "",
@@ -145,11 +147,20 @@ export default function ObrasPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 md:px-[5%] py-6 space-y-6">
       <h1 className="text-2xl font-semibold">Obras</h1>
 
-      {/* Form alta obra */}
-      <form onSubmit={onCreate} className="grid grid-cols-2 gap-3 bg-white/80 p-4 rounded-xl shadow">
+      <div className="grid grid-cols-1 lg:grid-cols-[30%_1fr] gap-6">
+        {/* Columna izquierda: Charts */}
+        <div className="space-y-6">
+          <ObrasUbicacionChart obras={obras} />
+          <ObrasVentasChart obras={obras} />
+        </div>
+
+        {/* Columna derecha: Formulario + Tabla */}
+        <div className="space-y-6">
+          {/* Form alta obra */}
+          <form onSubmit={onCreate} className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/80 p-4 rounded-xl shadow">
         <input className="border rounded p-2" placeholder="Autor" value={form.autor}
           onChange={(e) => setForm((f) => ({ ...f, autor: e.target.value }))} required />
         <input className="border rounded p-2" placeholder="Título" value={form.titulo}
@@ -284,6 +295,8 @@ export default function ObrasPage() {
         {isLoading && <div className="p-3 text-sm text-gray-500">Cargando…</div>}
         {error && <div className="p-3 text-sm text-red-600">Error: {error instanceof Error ? error.message : String(error)}</div>}
       </div>
+        </div>
+      </div>
 
       {/* Dialog imágenes */}
       <ObraImagesDialog
@@ -297,13 +310,13 @@ export default function ObrasPage() {
 
       {/* Modal edición */}
       {edit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Editar obra #{edit.id}</h3>
               <button onClick={cancelEdit} className="text-gray-500 hover:text-black">✕</button>
             </div>
-            <form onSubmit={saveEdit} className="grid grid-cols-2 gap-3">
+            <form onSubmit={saveEdit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input className="border rounded p-2" placeholder="Autor" value={edit.form.autor}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, autor: e.target.value } })} required />
               <input className="border rounded p-2" placeholder="Título" value={edit.form.titulo}

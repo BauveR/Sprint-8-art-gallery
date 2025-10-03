@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useExpos, useCreateExpo, useUpdateExpo, useRemoveExpo } from "../../query/expos";
 import { Expo, ExpoInput } from "../../types";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const empty: ExpoInput = {
   nombre: "", lat: 0, lng: 0, fecha_inicio: "", fecha_fin: "", url_expo: null
@@ -69,10 +70,16 @@ export default function ExposPage() {
           onChange={e => setForm(f => ({ ...f, lat: Number(e.target.value) }))} required />
         <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={form.lng}
           onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))} required />
-        <input className="border rounded p-2" placeholder="Inicio (YYYY-MM-DD)" value={form.fecha_inicio}
-          onChange={e => setForm(f => ({ ...f, fecha_inicio: e.target.value }))} required />
-        <input className="border rounded p-2" placeholder="Fin (YYYY-MM-DD)" value={form.fecha_fin}
-          onChange={e => setForm(f => ({ ...f, fecha_fin: e.target.value }))} required />
+        <DatePicker
+          value={form.fecha_inicio}
+          onChange={(date) => setForm(f => ({ ...f, fecha_inicio: date }))}
+          placeholder="Fecha de inicio"
+        />
+        <DatePicker
+          value={form.fecha_fin}
+          onChange={(date) => setForm(f => ({ ...f, fecha_fin: date }))}
+          placeholder="Fecha de fin"
+        />
         <div className="col-span-2">
           <button
             className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-40"
@@ -135,10 +142,16 @@ export default function ExposPage() {
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lat: Number(e.target.value) } })} required />
               <input className="border rounded p-2" placeholder="Lng" type="number" step="0.000001" value={edit.form.lng}
                 onChange={(e) => setEdit({ ...edit, form: { ...edit.form, lng: Number(e.target.value) } })} required />
-              <input className="border rounded p-2" placeholder="Inicio (YYYY-MM-DD)" value={edit.form.fecha_inicio}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, fecha_inicio: e.target.value } })} required />
-              <input className="border rounded p-2" placeholder="Fin (YYYY-MM-DD)" value={edit.form.fecha_fin}
-                onChange={(e) => setEdit({ ...edit, form: { ...edit.form, fecha_fin: e.target.value } })} required />
+              <DatePicker
+                value={edit.form.fecha_inicio}
+                onChange={(date) => setEdit({ ...edit, form: { ...edit.form, fecha_inicio: date } })}
+                placeholder="Fecha de inicio"
+              />
+              <DatePicker
+                value={edit.form.fecha_fin}
+                onChange={(date) => setEdit({ ...edit, form: { ...edit.form, fecha_fin: date } })}
+                placeholder="Fecha de fin"
+              />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
                 <Button disabled={updateExpo.isPending}>
