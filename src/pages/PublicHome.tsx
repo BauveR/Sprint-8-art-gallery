@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import { useObras } from "../query/obras";
 import PublicNavbar from "../components/layout/PublicNavbar";
 import Footer from "../components/layout/Footer";
@@ -9,123 +8,194 @@ import { motion } from "framer-motion";
 
 export default function PublicHome() {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
   const { data } = useObras({ sort: { key: "id_obra", dir: "desc" }, page: 1, pageSize: 15 });
   const obras = data?.data ?? [];
 
-  // Animaciones para el texto
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3,
-      },
+  // Configuración de SVGs del Welcome Section
+  const svgElements = [
+    {
+      src: "/piedra-arte-02.svg",
+      position: "top-10 left-20",
+      size: "w-96 h-96",
+      opacity: "opacity-100",
+      animation: { type: "rotate", from: -180, delay: 0.2 },
     },
-  };
+    {
+      src: "/piedra-arte-03.svg",
+      position: "top-50 right-20",
+      size: "w-120 h-120",
+      opacity: "opacity-100",
+      animation: { type: "rotate", from: 180, delay: 0.4 },
+    },
+    {
+      src: "/piedra-arte-04.svg",
+      position: "top-1/3 left-5",
+      size: "w-144 h-144",
+      opacity: "opacity-100",
+      animation: { type: "slideX", from: -100, delay: 0.6 },
+    },
+    {
+      src: "/piedra-arte-05.svg",
+      position: "top-1/2 right-10",
+      size: "w-108 h-108",
+      opacity: "opacity-100",
+      animation: { type: "slideX", from: 100, delay: 0.8 },
+    },
+    {
+      src: "/piedra-arte-06.svg",
+      position: "top-1/4 left-1/3",
+      size: "w-84 h-84",
+      opacity: "opacity-100",
+      animation: { type: "slideY", from: -50, delay: 1 },
+    },
+    {
+      src: "/piedra-arte-07.svg",
+      position: "top-2/3 right-1/4",
+      size: "w-96 h-96",
+      opacity: "opacity-100",
+      animation: { type: "slideY", from: 50, delay: 1.2 },
+    },
+    {
+      src: "/piedra-arte-08.svg",
+      position: "bottom-20 left-1/4",
+      size: "w-132 h-132",
+      opacity: "opacity-100",
+      animation: { type: "scale", from: 0, delay: 1.4 },
+    },
+    {
+      src: "/piedra-arte-09.svg",
+      position: "bottom-32 right-1/3",
+      size: "w-108 h-108",
+      opacity: "opacity-100",
+      animation: { type: "rotate", from: -90, delay: 1.6 },
+    },
+    {
+      src: "/piedra-arte-10.svg",
+      position: "bottom-10 left-1/2",
+      size: "w-120 h-120",
+      opacity: "opacity-100",
+      animation: { type: "scale", from: 0.5, delay: 1.8 },
+    },
+  ];
 
-  const textVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-      },
-    },
-  };
-
-  const typingVariants = {
-    hidden: { width: 0 },
-    visible: {
-      width: "100%",
-      transition: {
-        duration: 2,
-      },
-    },
+  const getAnimationProps = (animation: any) => {
+    switch (animation.type) {
+      case "rotate":
+        return {
+          initial: { opacity: 0, scale: 0, rotate: animation.from },
+          whileInView: { opacity: 1, scale: 1, rotate: 0 },
+        };
+      case "slideX":
+        return {
+          initial: { opacity: 0, x: animation.from },
+          whileInView: { opacity: 1, x: 0 },
+        };
+      case "slideY":
+        return {
+          initial: { opacity: 0, y: animation.from },
+          whileInView: { opacity: 1, y: 0 },
+        };
+      case "scale":
+        return {
+          initial: { opacity: 0, scale: animation.from },
+          whileInView: { opacity: 1, scale: 1 },
+        };
+      default:
+        return {
+          initial: { opacity: 0 },
+          whileInView: { opacity: 1 },
+        };
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
       <PublicNavbar />
 
+      {/* Welcome Section */}
+      <section className="relative min-h-screen overflow-hidden bg-white dark:bg-white">
+        {/* SVG Background Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {svgElements.map((element, index) => {
+            const animationProps = getAnimationProps(element.animation);
+            return (
+              <motion.img
+                key={index}
+                src={element.src}
+                alt=""
+                className={`absolute ${element.position} ${element.size} ${element.opacity}`}
+                {...animationProps}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: element.animation.delay }}
+              />
+            );
+          })}
+        </div>
+      </section>
+
       {/* Hero Section */}
-      <section className="min-h-[calc(100vh-73px)] flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center">
-            {/* Imagen - 65% */}
+      <section className="min-h-screen bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center min-h-[80vh]">
+            {/* Lado izquierdo - Imagen */}
             <motion.div
-              className="order-2 lg:order-1"
+              className="flex items-center justify-center"
               initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
             >
-              <div className="relative w-full aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="/piedra-arte-02.svg"
-                  alt="Art Gallery Hero"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </div>
+              <img
+                src="/piedra-arte-02.svg"
+                alt="Arte Piedra"
+                className="w-full max-w-2xl h-auto"
+              />
             </motion.div>
 
-            {/* Contenido - 35% */}
+            {/* Lado derecho - Contenido */}
             <motion.div
-              className="order-1 lg:order-2 space-y-6 text-center lg:text-left"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
+              className="space-y-6 text-center lg:text-left"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
             >
-              <motion.div variants={textVariants} className="overflow-hidden">
-                <motion.h1
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold"
-                  variants={typingVariants}
-                  style={{ whiteSpace: "nowrap" }}
-                >
-                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                    Descubre el Arte
-                  </span>
-                </motion.h1>
-              </motion.div>
+              <motion.h1
+                className="text-4xl md:text-5xl lg:text-6xl font-bold"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  Arte que Inspira
+                </span>
+              </motion.h1>
 
               <motion.p
-                variants={textVariants}
-                className="text-lg md:text-xl text-muted-foreground"
+                className="text-lg md:text-xl text-muted-foreground leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.4 }}
               >
-                Explora nuestra colección de obras únicas. Gestiona tu galería con las herramientas más avanzadas.
+                Explora nuestra colección exclusiva de obras de arte. Cada pieza es una ventana a nuevas emociones y perspectivas.
               </motion.p>
 
               <motion.div
-                variants={textVariants}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.6 }}
               >
                 <Button
                   size="lg"
                   onClick={() => navigate("/shop")}
-                  className="flex items-center gap-2"
+                  className="text-lg px-8 py-6"
                 >
-                  Explorar Tienda
-                  <ArrowRight className="h-5 w-5" />
+                  Ver Colección
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-
-                {isAuthenticated && user?.role === "admin" ? (
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Ir al Dashboard
-                  </Button>
-                ) : !isAuthenticated ? (
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => navigate("/login")}
-                  >
-                    Iniciar Sesión
-                  </Button>
-                ) : null}
               </motion.div>
             </motion.div>
           </div>
