@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import PublicNavbar from "../components/layout/PublicNavbar";
-import Footer from "../components/layout/Footer";
+import { formatPrice } from "../lib/formatters";
+import PublicLayout from "../components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,8 +39,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulación de procesamiento de pago
-    setTimeout(() => {
+    try {
+      // Simulación de procesamiento de pago
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       setIsProcessing(false);
       setOrderComplete(true);
       clearCart();
@@ -50,7 +52,10 @@ export default function CheckoutPage() {
       setTimeout(() => {
         navigate("/");
       }, 3000);
-    }, 2000);
+    } catch (error) {
+      setIsProcessing(false);
+      toast.error("Error al procesar el pago");
+    }
   };
 
   if (items.length === 0 && !orderComplete) {
@@ -60,8 +65,7 @@ export default function CheckoutPage() {
 
   if (orderComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-        <PublicNavbar />
+      <PublicLayout>
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <CheckCircle className="h-24 w-24 mx-auto text-green-500 mb-4" />
           <h1 className="text-3xl font-bold mb-2">¡Compra exitosa!</h1>
@@ -72,14 +76,12 @@ export default function CheckoutPage() {
             Volver al inicio
           </Button>
         </div>
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-      <PublicNavbar />
+    <PublicLayout>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
@@ -208,7 +210,7 @@ export default function CheckoutPage() {
                           {item.obra.titulo} x{item.quantity}
                         </span>
                         <span className="font-medium">
-                          ${((item.obra.precio_salida ?? 0) * item.quantity).toLocaleString("es-ES")}
+                          ${formatPrice((Number(item.obra.precio_salida) || 0) * item.quantity)}
                         </span>
                       </div>
                     ))}
@@ -217,7 +219,7 @@ export default function CheckoutPage() {
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span>${totalPrice.toLocaleString("es-ES")}</span>
+                      <span>${formatPrice(totalPrice)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Envío</span>
@@ -225,7 +227,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between text-lg font-bold pt-2 border-t">
                       <span>Total</span>
-                      <span className="text-primary">${totalPrice.toLocaleString("es-ES")}</span>
+                      <span className="text-primary">${formatPrice(totalPrice)}</span>
                     </div>
                   </div>
 
@@ -243,8 +245,6 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 }

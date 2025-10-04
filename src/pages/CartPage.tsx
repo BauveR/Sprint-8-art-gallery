@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import PublicNavbar from "../components/layout/PublicNavbar";
-import Footer from "../components/layout/Footer";
+import { formatPrice } from "../lib/formatters";
+import PublicLayout from "../components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -22,8 +22,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-        <PublicNavbar />
+      <PublicLayout>
         <div className="max-w-7xl mx-auto px-4 py-16 text-center">
           <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-2xl font-bold mb-2">Tu carrito está vacío</h2>
@@ -32,14 +31,12 @@ export default function CartPage() {
             Ir a la Tienda
           </Button>
         </div>
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-      <PublicNavbar />
+    <PublicLayout>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -63,7 +60,7 @@ export default function CartPage() {
                         <p className="text-sm text-muted-foreground">{item.obra.tecnica}</p>
                       )}
                       <p className="text-primary font-bold mt-2">
-                        ${item.obra.precio_salida?.toLocaleString("es-ES")}
+                        ${formatPrice(item.obra.precio_salida)}
                       </p>
                     </div>
 
@@ -110,7 +107,7 @@ export default function CartPage() {
                 <div className="space-y-2 border-b pb-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${totalPrice.toLocaleString("es-ES")}</span>
+                    <span>${formatPrice(totalPrice)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Envío</span>
@@ -120,7 +117,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-primary">${totalPrice.toLocaleString("es-ES")}</span>
+                  <span className="text-primary">${formatPrice(totalPrice)}</span>
                 </div>
 
                 <Button className="w-full" size="lg" onClick={handleCheckout}>
@@ -139,8 +136,6 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 }

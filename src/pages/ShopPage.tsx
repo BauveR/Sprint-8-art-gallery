@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { useObras } from "../query/obras";
 import { useCart } from "../context/CartContext";
-import PublicNavbar from "../components/layout/PublicNavbar";
-import Footer from "../components/layout/Footer";
+import { useIsInCart } from "../hooks/useIsInCart";
+import { formatPrice } from "../lib/formatters";
+import PublicLayout from "../components/layout/PublicLayout";
+import ObraImage from "../components/common/ObraImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +14,7 @@ import { toast } from "sonner";
 
 export default function ShopPage() {
   const { data, isLoading } = useObras({ sort: { key: "id_obra", dir: "desc" }, page: 1, pageSize: 100 });
-  const { addToCart, items } = useCart();
+  const { addToCart } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
 
   const obras = data?.data ?? [];
@@ -37,14 +39,8 @@ export default function ShopPage() {
     toast.success(`${obra.titulo} agregado al carrito`);
   };
 
-  const isInCart = (obraId: number) => {
-    return items.some((item) => item.obra.id_obra === obraId);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-      <PublicNavbar />
-
+    <PublicLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 space-y-4">
@@ -79,65 +75,79 @@ export default function ShopPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {availableObras.map((obra) => (
-              <Card
+              <ObraCard
                 key={obra.id_obra}
-                className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10 hover:shadow-lg transition-shadow"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{obra.titulo}</CardTitle>
-                      <CardDescription className="truncate">{obra.autor}</CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="shrink-0">
-                      Disponible
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="space-y-1 text-sm">
-                    {obra.anio && (
-                      <p className="text-muted-foreground">Año: {obra.anio}</p>
-                    )}
-                    {obra.tecnica && (
-                      <p className="text-muted-foreground">Técnica: {obra.tecnica}</p>
-                    )}
-                    {obra.medidas && (
-                      <p className="text-muted-foreground">Medidas: {obra.medidas}</p>
-                    )}
-                  </div>
-
-                  <div className="pt-2 border-t">
-                    <p className="text-2xl font-bold text-primary">
-                      ${obra.precio_salida?.toLocaleString("es-ES") ?? "N/A"}
-                    </p>
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    onClick={() => handleAddToCart(obra)}
-                    disabled={isInCart(obra.id_obra)}
-                  >
-                    {isInCart(obra.id_obra) ? (
-                      <>
-                        <Check className="h-4 w-4 mr-2" />
-                        En el carrito
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        Agregar al carrito
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
+                obra={obra}
+                onAddToCart={handleAddToCart}
+              />
             ))}
           </div>
         )}
       </div>
+    </PublicLayout>
+  );
+}
 
-      <Footer />
-    </div>
+function ObraCard({ obra, onAddToCart }: { obra: any; onAddToCart: (obra: any) => void }) {
+  const isInCart = useIsInCart(obra.id_obra);
+
+  return (
+    <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10 hover:shadow-lg transition-shadow overflow-hidden">
+      <div className="aspect-square overflow-hidden">
+        <ObraImage
+          obraId={obra.id_obra}
+          alt={obra.titulo}
+          className="w-full h-full object-cover hover:scale-105 transition-transform"
+        />
+      </div>
+      <CardHeader className="pb-3 pt-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg truncate">{obra.titulo}</CardTitle>
+            <CardDescription className="truncate">{obra.autor}</CardDescription>
+          </div>
+          <Badge variant="secondary" className="shrink-0">
+            Disponible
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="space-y-1 text-sm">
+          {obra.anio && (
+            <p className="text-muted-foreground">Año: {obra.anio}</p>
+          )}
+          {obra.tecnica && (
+            <p className="text-muted-foreground">Técnica: {obra.tecnica}</p>
+          )}
+          {obra.medidas && (
+            <p className="text-muted-foreground">Medidas: {obra.medidas}</p>
+          )}
+        </div>
+
+        <div className="pt-2 border-t">
+          <p className="text-2xl font-bold text-primary">
+            ${formatPrice(obra.precio_salida)}
+          </p>
+        </div>
+
+        <Button
+          className="w-full"
+          onClick={() => onAddToCart(obra)}
+          disabled={isInCart}
+        >
+          {isInCart ? (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              En el carrito
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Agregar al carrito
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

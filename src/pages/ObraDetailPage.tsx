@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useObras } from "../query/obras";
 import { useCart } from "../context/CartContext";
-import PublicNavbar from "../components/layout/PublicNavbar";
-import Footer from "../components/layout/Footer";
+import { useIsInCart } from "../hooks/useIsInCart";
+import { formatPrice } from "../lib/formatters";
+import PublicLayout from "../components/layout/PublicLayout";
+import ObraImage from "../components/common/ObraImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,24 +16,22 @@ export default function ObraDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data } = useObras({ sort: { key: "id_obra", dir: "desc" }, page: 1, pageSize: 100 });
-  const { addToCart, items } = useCart();
+  const { addToCart } = useCart();
 
   const obra = data?.data.find((o) => o.id_obra === Number(id));
 
   if (!obra) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-        <PublicNavbar />
+      <PublicLayout>
         <div className="max-w-7xl mx-auto px-4 py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Obra no encontrada</h2>
           <Button onClick={() => navigate("/")}>Volver al inicio</Button>
         </div>
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
-  const isInCart = items.some((item) => item.obra.id_obra === obra.id_obra);
+  const isInCart = useIsInCart(obra.id_obra);
   const isAvailable = obra.estado_venta === "disponible";
 
   const handleAddToCart = () => {
@@ -42,8 +42,7 @@ export default function ObraDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-      <PublicNavbar />
+    <PublicLayout>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Botón de regreso */}
@@ -67,8 +66,8 @@ export default function ObraDetailPage() {
             <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
               <CardContent className="p-0">
                 <div className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src="/piedra-arte-02.svg"
+                  <ObraImage
+                    obraId={obra.id_obra}
                     alt={obra.titulo}
                     className="w-full h-full object-cover"
                   />
@@ -146,7 +145,7 @@ export default function ObraDetailPage() {
             <div className="space-y-4">
               <div className="border-t pt-4">
                 <p className="text-3xl font-bold text-primary">
-                  ${obra.precio_salida?.toLocaleString("es-ES") ?? "N/A"}
+                  ${formatPrice(obra.precio_salida)}
                 </p>
               </div>
 
@@ -184,8 +183,6 @@ export default function ObraDetailPage() {
           </motion.div>
         </div>
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 }

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
@@ -9,6 +10,16 @@ export default function PublicNavbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { totalItems } = useCart();
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -16,8 +27,15 @@ export default function PublicNavbar() {
   };
 
   return (
-    <header className="sticky top-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur border-b border-gray-200 dark:border-zinc-800 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-1">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      scrolled
+        ? "shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1)]"
+        : "bg-white/70 dark:bg-zinc-900/70 backdrop-blur border-b border-gray-200 dark:border-zinc-800"
+    }`}>
+      {scrolled && (
+        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-transparent dark:from-zinc-900/90 dark:via-zinc-900/70 dark:to-transparent pointer-events-none" />
+      )}
+      <div className="max-w-7xl mx-auto px-4 py-1 relative z-10">
         <div className="flex items-center justify-between">
           <Link to="/" className="h-20 md:h-24 flex items-center">
             <img
@@ -80,8 +98,10 @@ export default function PublicNavbar() {
               <Button
                 size="sm"
                 onClick={() => navigate("/login")}
+                className="md:rounded-md rounded-full md:px-4 px-2"
               >
-                Iniciar Sesión
+                <User className="h-4 w-4 md:hidden" />
+                <span className="hidden md:inline">Iniciar Sesión</span>
               </Button>
             )}
           </div>
