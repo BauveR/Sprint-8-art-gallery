@@ -34,18 +34,15 @@ export default function WelcomeSection() {
               src={element.src}
               alt=""
               className={`absolute ${element.position} ${element.size} ${element.opacity} ${
-                element.invertColorOnHover ? "cursor-pointer" : "pointer-events-none"
+                element.hoverColorChange ? "cursor-pointer hover-orange-filter transition-all duration-200" : "pointer-events-none"
               }`}
               initial={animationProps.initial}
               animate={
                 element.continuousRotate
                   ? { ...animationProps.whileInView, rotate: 360 }
+                  : element.bounceDownEffect
+                  ? { ...animationProps.whileInView, y: [0, 10, 0] }
                   : animationProps.whileInView
-              }
-              whileHover={
-                element.invertColorOnHover
-                  ? { filter: "invert(1)", transition: { duration: 0.3 } }
-                  : undefined
               }
               transition={
                 element.continuousRotate
@@ -57,6 +54,17 @@ export default function WelcomeSection() {
                         repeat: Infinity,
                         ease: "linear",
                         delay: element.animation.delay + 1,
+                      },
+                    }
+                  : element.bounceDownEffect
+                  ? {
+                      duration: 1,
+                      delay: element.animation.delay,
+                      y: {
+                        duration: 1.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: element.animation.delay + 3.9,
                       },
                     }
                   : { duration: 1, delay: element.animation.delay }
@@ -102,7 +110,7 @@ function CoinFlipImage({ element }: { element: any }) {
         duration: 1,
         delay: element.animation.delay,
         rotateY: isStopping
-          ? { duration: 1.5, ease: [0.22, 1, 0.36, 1] } // Desaceleración suave
+          ? { duration: 1.5, ease: [0.22, 1, 0.36, 1] }
           : {
               duration: 0.6,
               repeat: Infinity,

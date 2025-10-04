@@ -27,17 +27,20 @@ export default function PublicNavbar() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled
-        ? "shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1)]"
-        : "bg-white/70 dark:bg-zinc-900/70 backdrop-blur border-b border-gray-200 dark:border-zinc-800"
-    }`}>
-      {scrolled && (
-        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-transparent dark:from-zinc-900/90 dark:via-zinc-900/70 dark:to-transparent pointer-events-none" />
-      )}
-      <div className="max-w-7xl mx-auto px-4 py-1 relative z-10">
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out overflow-hidden">
+      <div
+        className={`absolute inset-0 bg-white/70 dark:bg-[#EC8E34] backdrop-blur border-b border-gray-200 dark:border-[#EC8E34] transition-opacity duration-500 ${
+          scrolled ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      <div
+        className={`absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-white/40 dark:from-[#EC8E34] dark:via-[#EC8E34]/70 dark:to-[#EC8E34]/40 pointer-events-none transition-opacity duration-500 ${
+          scrolled ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div className="w-full px-6 py-1 relative z-10">
         <div className="flex items-center justify-between">
-          <Link to="/" className="h-20 md:h-24 flex items-center">
+          <Link to="/" className="h-14 md:h-16 flex items-center translate-x-full">
             <img
               src="/piedra  svgs-01.svg"
               alt="Logo"

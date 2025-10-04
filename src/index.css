@@ -138,3 +138,9 @@
     @apply bg-white/10 border-white/20;
   }
 }
+
+@layer utilities {
+  .hover-orange-filter:hover {
+    filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(2079%) hue-rotate(349deg) brightness(99%) contrast(92%);
+  }
+}
