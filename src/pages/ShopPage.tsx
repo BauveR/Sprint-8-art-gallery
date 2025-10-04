@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useObras } from "../query/obras";
 import { useCart } from "../context/CartContext";
 import PublicNavbar from "../components/layout/PublicNavbar";
+import Footer from "../components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -135,6 +136,8 @@ export default function ShopPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

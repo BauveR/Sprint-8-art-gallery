@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useObras } from "../query/obras";
 import PublicNavbar from "../components/layout/PublicNavbar";
+import Footer from "../components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -183,6 +184,8 @@ export default function PublicHome() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

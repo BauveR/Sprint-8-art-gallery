@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import PublicNavbar from "../components/layout/PublicNavbar";
+import Footer from "../components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ export default function CheckoutPage() {
             Volver al inicio
           </Button>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -241,6 +243,8 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+
+      <Footer />
     </div>
   );
 }

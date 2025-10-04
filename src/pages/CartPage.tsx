@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import PublicNavbar from "../components/layout/PublicNavbar";
+import Footer from "../components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -31,6 +32,7 @@ export default function CartPage() {
             Ir a la Tienda
           </Button>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -137,6 +139,8 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useObras } from "../query/obras";
 import { useCart } from "../context/CartContext";
 import PublicNavbar from "../components/layout/PublicNavbar";
+import Footer from "../components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ export default function ObraDetailPage() {
           <h2 className="text-2xl font-bold mb-4">Obra no encontrada</h2>
           <Button onClick={() => navigate("/")}>Volver al inicio</Button>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -182,6 +184,8 @@ export default function ObraDetailPage() {
           </motion.div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
