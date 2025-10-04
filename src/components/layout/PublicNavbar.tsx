@@ -1,0 +1,101 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LogOut, User, ShoppingCart, Store } from "lucide-react";
+
+export default function PublicNavbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const { totalItems } = useCart();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  return (
+    <header className="sticky top-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur border-b border-gray-200 dark:border-zinc-800 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src="/piedra-arte-02.svg"
+              alt="Logo"
+              className="w-10 h-10"
+            />
+            <span className="text-xl font-semibold text-foreground">Art Gallery</span>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            {/* Link Tienda */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/shop")}
+              className="flex items-center gap-2"
+            >
+              <Store className="h-4 w-4" />
+              <span className="hidden sm:inline">Tienda</span>
+            </Button>
+
+            {/* Carrito */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/cart")}
+              className="flex items-center gap-2 relative"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+              <span className="hidden sm:inline">Carrito</span>
+            </Button>
+
+            <ThemeToggle />
+
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4" />
+                  <span>{user?.name}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                    {user?.role}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Cerrar Sesión</span>
+                </Button>
+                {user?.role === "admin" && (
+                  <Button
+                    size="sm"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Dashboard
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => navigate("/login")}
+              >
+                Iniciar Sesión
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
