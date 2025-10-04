@@ -17,15 +17,14 @@ export default function PublicNavbar() {
 
   return (
     <header className="sticky top-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur border-b border-gray-200 dark:border-zinc-800 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="max-w-7xl mx-auto px-4 py-1">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="h-20 md:h-24 flex items-center">
             <img
-              src="/piedra-arte-02.svg"
+              src="/piedra  svgs-01.svg"
               alt="Logo"
-              className="w-10 h-10"
+              className="h-full w-auto"
             />
-            <span className="text-xl font-semibold text-foreground">Art Gallery</span>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -76,14 +75,6 @@ export default function PublicNavbar() {
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:inline">Cerrar Sesión</span>
                 </Button>
-                {user?.role === "admin" && (
-                  <Button
-                    size="sm"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Dashboard
-                  </Button>
-                )}
               </div>
             ) : (
               <Button

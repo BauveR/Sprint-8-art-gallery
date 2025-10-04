@@ -9,6 +9,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import ShopPage from "./pages/ShopPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import ObraDetailPage from "./pages/ObraDetailPage";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/obra/:id" element={<ObraDetailPage />} />
 
             {/* Rutas protegidas - Usuarios autenticados */}
             <Route
