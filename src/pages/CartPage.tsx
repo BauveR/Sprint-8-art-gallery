@@ -3,8 +3,8 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { formatPrice } from "../lib/formatters";
 import PublicLayout from "../components/layout/PublicLayout";
+import ObraImage from "../components/common/ObraImage";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
@@ -23,12 +23,16 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <PublicLayout>
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-          <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Tu carrito está vacío</h2>
-          <p className="text-muted-foreground mb-6">Agrega obras a tu carrito para continuar</p>
-          <Button onClick={() => navigate("/shop")}>
-            Ir a la Tienda
+        <div className="max-w-7xl mx-auto px-8 py-24 text-center">
+          <ShoppingBag className="h-32 w-32 mx-auto text-muted-foreground/30 mb-8 stroke-[0.5]" />
+          <h2 className="text-3xl font-light tracking-wide mb-4">Tu carrito está vacío</h2>
+          <p className="text-muted-foreground mb-10 text-lg tracking-wide">Descubre nuestra colección de obras de arte</p>
+          <Button
+            onClick={() => navigate("/shop")}
+            variant="outline"
+            className="px-8 py-6 text-base border-foreground/20 hover:bg-foreground hover:text-background rounded-none tracking-wide"
+          >
+            Explorar la colección
           </Button>
         </div>
       </PublicLayout>
@@ -37,102 +41,127 @@ export default function CartPage() {
 
   return (
     <PublicLayout>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-[1400px] mx-auto px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
           {/* Lista de items */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold">Carrito de Compras</h1>
-              <Button variant="outline" size="sm" onClick={clearCart}>
+          <div className="space-y-8">
+            <div className="flex items-center justify-between pb-8 border-b border-foreground/10">
+              <h1 className="text-4xl font-light tracking-wide">Mi carrito</h1>
+              <button
+                onClick={clearCart}
+                className="text-sm text-muted-foreground hover:text-foreground tracking-wide underline underline-offset-4"
+              >
                 Vaciar carrito
-              </Button>
+              </button>
             </div>
 
-            {items.map((item) => (
-              <Card key={item.obra.id_obra} className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
-                <CardContent className="p-4">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{item.obra.titulo}</h3>
-                      <p className="text-sm text-muted-foreground">{item.obra.autor}</p>
-                      {item.obra.tecnica && (
-                        <p className="text-sm text-muted-foreground">{item.obra.tecnica}</p>
-                      )}
-                      <p className="text-primary font-bold mt-2">
-                        ${formatPrice(item.obra.precio_salida)}
+            <div className="space-y-8">
+              {items.map((item) => (
+                <div
+                  key={item.obra.id_obra}
+                  className="flex gap-6 pb-8 border-b border-foreground/5"
+                >
+                  {/* Imagen */}
+                  <div className="w-32 h-40 flex-shrink-0 bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                    <ObraImage
+                      obraId={item.obra.id_obra}
+                      alt={item.obra.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Información */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-lg tracking-wide uppercase">
+                        {item.obra.titulo}
+                      </h3>
+                      <p className="text-sm text-muted-foreground tracking-wide">
+                        {item.obra.autor}
                       </p>
+                      {item.obra.tecnica && (
+                        <p className="text-xs text-muted-foreground/70 tracking-wide">
+                          {item.obra.tecnica}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="flex flex-col items-end justify-between">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFromCart(item.obra.id_obra)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex items-end justify-between mt-4">
+                      <p className="text-lg font-light tracking-wide">
+                        ${formatPrice(item.obra.precio_salida)}
+                      </p>
 
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateQuantity(item.obra.id_obra, item.quantity - 1)}
+                      <div className="flex items-center gap-6">
+                        {/* Cantidad */}
+                        <div className="flex items-center gap-3 border border-foreground/20 px-3 py-2">
+                          <button
+                            onClick={() => updateQuantity(item.obra.id_obra, item.quantity - 1)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-6 text-center text-sm">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.obra.id_obra, item.quantity + 1)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+
+                        {/* Eliminar */}
+                        <button
+                          onClick={() => removeFromCart(item.obra.id_obra)}
+                          className="text-muted-foreground hover:text-foreground"
+                          title="Eliminar"
                         >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => updateQuantity(item.obra.id_obra, item.quantity + 1)}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Resumen */}
-          <div className="lg:col-span-1">
-            <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10 sticky top-24">
-              <CardContent className="p-6 space-y-4">
-                <h2 className="text-xl font-bold">Resumen del pedido</h2>
+          <div className="lg:sticky lg:top-24 h-fit">
+            <div className="border border-foreground/10 p-8 space-y-6">
+              <h2 className="text-2xl font-light tracking-wide">Resumen</h2>
 
-                <div className="space-y-2 border-b pb-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>${formatPrice(totalPrice)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Envío</span>
-                    <span>Gratis</span>
-                  </div>
+              <div className="space-y-4 py-6 border-y border-foreground/10">
+                <div className="flex justify-between text-sm tracking-wide">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>${formatPrice(totalPrice)}</span>
                 </div>
-
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span className="text-primary">${formatPrice(totalPrice)}</span>
+                <div className="flex justify-between text-sm tracking-wide">
+                  <span className="text-muted-foreground">Envío</span>
+                  <span>Gratis</span>
                 </div>
+              </div>
 
-                <Button className="w-full" size="lg" onClick={handleCheckout}>
-                  {isAuthenticated ? "Proceder al pago" : "Iniciar sesión para comprar"}
-                </Button>
+              <div className="flex justify-between text-xl font-light tracking-wide">
+                <span>Total</span>
+                <span>${formatPrice(totalPrice)}</span>
+              </div>
 
+              <div className="space-y-3 pt-4">
                 <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate("/shop")}
+                  className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 rounded-none tracking-wide"
+                  onClick={handleCheckout}
                 >
-                  Seguir comprando
+                  {isAuthenticated ? "Proceder al pago" : "Iniciar sesión"}
                 </Button>
-              </CardContent>
-            </Card>
+
+                <button
+                  onClick={() => navigate("/shop")}
+                  className="w-full text-sm text-muted-foreground hover:text-foreground tracking-wide underline underline-offset-4"
+                >
+                  Continuar comprando
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

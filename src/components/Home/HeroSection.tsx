@@ -7,22 +7,33 @@ export default function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+    <section className="min-h-screen bg-gradient-to-t from-orange-500 via-orange-200 to-white dark:from-slate-950 dark:via-blue-700 dark:to-blue-800">
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center min-h-[80vh]">
-          {/* Imagen */}
+          {/* Modelo 3D */}
           <motion.div
-            className="flex items-center justify-center"
+            className="flex items-center justify-center h-[80vh]"
+            style={{ transform: 'translate(-30%, 30%)' }}
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <img
-              src="/piedra-arte-02.svg"
-              alt="Arte Piedra"
-              className="w-full max-w-2xl h-auto"
-            />
+            <div className="w-full max-w-2xl h-full overflow-hidden relative">
+              <iframe
+                title="piedra artwork"
+                allowFullScreen
+                allow="autoplay; fullscreen;"
+                className="w-full h-full border-0 absolute pointer-events-none"
+                style={{
+                  clipPath: 'inset(5% 0 5% 0)',
+                  top: '9%',
+                  left: '-10%',
+                }}
+                src="https://sketchfab.com/models/1bc52cbae36e4c019ff06585c06ed287/embed?autospin=1&autostart=1&camera=0&preload=1&transparent=1&ui_hint=0"
+              />
+              <div className="absolute inset-0 z-10" style={{ pointerEvents: 'all' }} />
+            </div>
           </motion.div>
 
           {/* Contenido */}
@@ -36,6 +47,7 @@ export default function HeroSection() {
             <motion.h1
               className="text-4xl md:text-5xl lg:text-6xl font-bold"
               initial={{ opacity: 0, y: 20 }}
+
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}

@@ -10,6 +10,9 @@ interface GallerySectionProps {
 export default function GallerySection({ obras }: GallerySectionProps) {
   const navigate = useNavigate();
 
+  // Filtrar solo obras en exposición
+  const obrasEnExposicion = obras.filter((obra) => obra.ubicacion === "en_exposicion");
+
   return (
     <section className="py-16 bg-white/50 dark:bg-zinc-900/50">
       <div className="w-full max-w-7xl mx-auto px-4">
@@ -40,7 +43,7 @@ export default function GallerySection({ obras }: GallerySectionProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {obras.slice(0, 15).map((obra, index) => (
+            {obrasEnExposicion.slice(0, 15).map((obra, index) => (
               <motion.div
                 key={obra.id_obra}
                 className="aspect-square cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
