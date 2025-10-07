@@ -75,6 +75,6 @@ describe("imagesController", () => {
     expect(res.status).toBe(204);
 
     expect(imagesService.deleteImagen).toHaveBeenCalledWith(77);
-    expect(delSpy).toHaveBeenCalledWith(77); // ✅ ahora sí cuenta
+    expect(delSpy).toHaveBeenCalledWith(77); 
   });
 });

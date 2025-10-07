@@ -213,3 +213,10 @@ export async function quitarExpo(id_obra: number, id_expo: number) {
     [id_obra, id_expo]
   );
 }
+
+export async function quitarTodasExpos(id_obra: number) {
+  await pool.query(
+    "DELETE FROM obra_exposicion WHERE id_obra = ?",
+    [id_obra]
+  );
+}

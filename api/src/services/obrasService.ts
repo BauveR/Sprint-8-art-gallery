@@ -70,11 +70,11 @@ async function handleExpoUpdate(
   if (newExpoId === undefined) return;
 
   if (newExpoId === null && currentExpoId) {
-    await repo.quitarExpo(obraId, currentExpoId);
+    // Eliminar TODAS las expos asignadas
+    await repo.quitarTodasExpos(obraId);
   } else if (newExpoId !== null && newExpoId !== currentExpoId) {
-    if (currentExpoId) {
-      await repo.quitarExpo(obraId, currentExpoId);
-    }
+    // Eliminar TODAS las expos previas antes de asignar la nueva
+    await repo.quitarTodasExpos(obraId);
     await repo.asignarExpo(obraId, newExpoId);
   }
 }

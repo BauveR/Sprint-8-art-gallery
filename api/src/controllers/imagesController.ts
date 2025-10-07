@@ -6,7 +6,7 @@ import fs from "fs";
 import * as svc from "../services/imagesService";
 import * as imageRepo from "../repositories/imagesRepo"; // ← nombre EXACTO del archivo
 
-const uploadDir = path.resolve(__dirname, "../uploads");
+const uploadDir = path.resolve(__dirname, "../../uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({

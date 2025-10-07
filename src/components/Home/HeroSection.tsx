@@ -7,7 +7,7 @@ export default function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="min-h-screen bg-gradient-to-t from-orange-500 via-orange-200 to-white dark:from-slate-950 dark:via-blue-700 dark:to-blue-800">
+    <section className="min-h-screen bg-gradient-to-t from-orange-500 via-yellow-200 to-white dark:from-slate-950 dark:via-blue-700 dark:to-blue-800">
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center min-h-[80vh]">
           {/* Modelo 3D */}
@@ -45,7 +45,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8 }}
           >
             <motion.h1
-              className="text-4xl md:text-5xl lg:text-6xl font-bold"
+              className="text-4xl md:text-5xl lg:text-8xl font-bold"
               initial={{ opacity: 0, y: 20 }}
 
               whileInView={{ opacity: 1, y: 0 }}
@@ -53,18 +53,18 @@ export default function HeroSection() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Arte que Inspira
+                MATCHLESS
               </span>
             </motion.h1>
 
             <motion.p
-              className="text-lg md:text-xl text-muted-foreground leading-relaxed"
+              className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Explora nuestra colección exclusiva de obras de arte. Cada pieza es una ventana a nuevas emociones y perspectivas.
+              Each stone unrepeatable, each piece matchless—for everyday rituals. 
             </motion.p>
 
             <motion.div
@@ -78,7 +78,7 @@ export default function HeroSection() {
                 onClick={() => navigate("/shop")}
                 className="text-lg px-8 py-6"
               >
-                Ver Colección
+                Add to cart
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </motion.div>
