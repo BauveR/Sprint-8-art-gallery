@@ -7,8 +7,32 @@ export default function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="min-h-screen bg-gradient-to-t from-orange-500 via-yellow-200 to-white dark:from-slate-950 dark:via-blue-700 dark:to-blue-800">
-      <div className="max-w-7xl mx-auto px-4 py-16">
+    <section className="relative min-h-screen
+     bg-gradient-to-t
+     from-transparent from-0% via-white via-60% to-transparent to-90%
+      dark:from-slate-950 dark:from-10% dark:via-blue-700 dark:via-50% dark:to-blue-800 dark:to-90%">
+
+      {/* Capa de degradado adicional blanco */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white from-0% via-transparent via-50% to-white to-100% dark:from-slate-950 dark:to-slate-950 z-[1]" />
+
+      {/* Capa de modelo 3D de fondo */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[15]" style={{ transform: 'translate(-250px, 350px)' }}>
+        <div className="w-[1100px] h-[1100px] overflow-hidden">
+          <iframe
+            title="simple grass"
+            allowFullScreen
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            className="w-full h-full border-0"
+            style={{
+              clipPath: 'circle(600px at center)',
+              boxShadow: 'none',
+            }}
+            src="https://sketchfab.com/models/fabdf00820a640b8bd0c144660724987/embed?autospin=1&autostart=1&camera=0&preload=1&transparent=1"
+          />
+        </div>
+      </div>
+
+      <div className="relative z-[20] max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center min-h-[80vh]">
           {/* Modelo 3D */}
           <motion.div
@@ -38,33 +62,44 @@ export default function HeroSection() {
 
           {/* Contenido */}
           <motion.div
-            className="space-y-6 text-center lg:text-left"
+            className="space-y-0 text-center lg:text-left"
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
+
           >
+            <motion.p
+              className="font-semibold text-lg md:text-xl lg:text-3xl text-muted-foreground leading-relaxed mb-0"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              Each stone
+            </motion.p>
+
             <motion.h1
-              className="text-4xl md:text-5xl lg:text-8xl font-bold"
+              className="text-4xl md:text-5xl lg:text-8xl font-bold mb-3"
               initial={{ opacity: 0, y: 20 }}
 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                MATCHLESS
+              <span className="bg-gradient-to-r from-blue-700 to-green-500 bg-clip-text text-transparent">
+              unrepeatable,
               </span>
             </motion.h1>
 
             <motion.p
-              className="text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed"
+              className="font-semibold text-lg md:text-xl lg:text-3xl text-muted-foreground leading-relaxed whitespace-nowrap mb-15"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Each stone unrepeatable, each piece matchless—for everyday rituals. 
+              each piece matchless—for everyday rituals.
             </motion.p>
 
             <motion.div
@@ -74,9 +109,9 @@ export default function HeroSection() {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <Button
-                size="lg"
+                variant="glass"
                 onClick={() => navigate("/shop")}
-                className="text-lg px-8 py-6"
+                className="text-2xl px-15 py-2"
               >
                 Add to cart
                 <ArrowRight className="ml-2 h-5 w-5" />
