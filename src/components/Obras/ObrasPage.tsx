@@ -13,6 +13,7 @@ import { imagenesService } from "../../services/imageService";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import ObrasUbicacionChart from "./ObrasUbicacionChart";
 import ObrasVentasChart from "./ObrasVentasChart";
 import LocationsMap from "./LocationsMap";
@@ -50,6 +51,7 @@ export default function ObrasPage() {
   const createObra = useCreateObra();
   const removeObra = useRemoveObra();
   const updateObra = useUpdateObra();
+  const { toast } = useToast();
 
   const [form, setForm] = useState<ObraInput>(emptyObra);
   const [edit, setEdit] = useState<EditState>(null);
@@ -97,9 +99,24 @@ export default function ObrasPage() {
             console.log("Imagen subida exitosamente");
           } catch (error) {
             console.error("Error al subir imagen:", error);
-            alert("Obra creada pero hubo un error al subir la imagen");
+            toast({
+              title: "Obra creada",
+              description: "La obra se creó correctamente pero hubo un error al subir la imagen",
+              variant: "default"
+            });
+            setForm(emptyObra);
+            setSelectedImage(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
           }
         }
+
+        // Mostrar toast de éxito
+        toast({
+          title: "✓ Obra creada exitosamente",
+          description: `"${form.titulo}" de ${form.autor} ha sido agregada a la galería`,
+          variant: "default"
+        });
 
         setForm(emptyObra);
         setSelectedImage(null);
@@ -108,6 +125,11 @@ export default function ObrasPage() {
       },
       onError: (error) => {
         console.error("Error al crear obra:", error);
+        toast({
+          title: "Error al crear obra",
+          description: error instanceof Error ? error.message : "Ocurrió un error inesperado",
+          variant: "destructive"
+        });
       }
     });
   };
@@ -345,7 +367,7 @@ export default function ObrasPage() {
               </button>
             )}
           </div>
-          <Button disabled={!canSubmit || createObra.isPending} className="w-fit">
+          <Button type="submit" disabled={!canSubmit || createObra.isPending} className="w-fit">
             {createObra.isPending ? "Creando..." : "Crear obra"}
           </Button>
         </div>
@@ -542,7 +564,7 @@ export default function ObrasPage() {
                 ))}
               </select>
               <div className="col-span-2 flex justify-end gap-2 mt-2">
-                <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancelar</button>
+                <Button type="button" onClick={cancelEdit} variant="default">Cancelar</Button>
                 <Button type="submit" disabled={updateObra.isPending}>
                   {updateObra.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>

@@ -15,8 +15,8 @@ export default function GallerySection({ obras }: GallerySectionProps) {
 
   return (
     <section className="py-16 bg-white/50 dark:bg-zinc-900/50">
-      <div className="w-full max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-8">
+      <div className="w-full mx-auto px-[10%]">
+        <div className="grid grid-cols-1 lg:grid-cols-[20%_60%] gap-[10%]">
           {/* Título */}
           <motion.div
             className="flex flex-col justify-center items-center text-center space-y-6"
@@ -37,7 +37,7 @@ export default function GallerySection({ obras }: GallerySectionProps) {
 
           {/* Grid de imágenes */}
           <motion.div
-            className="grid grid-cols-3 gap-4"
+            className="grid grid-cols-2 gap-6"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

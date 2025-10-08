@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useObras } from "../query/obras";
 import { useCart } from "../context/CartContext";
 import { useIsInCart } from "../hooks/useIsInCart";
@@ -11,14 +12,25 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingCart, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { imagenesService } from "../services/imageService";
+import { ObraImagen } from "../types";
 
 export default function ObraDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data } = useObras({ sort: { key: "id_obra", dir: "desc" }, page: 1, pageSize: 100 });
   const { addToCart } = useCart();
+  const [images, setImages] = useState<ObraImagen[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const obra = data?.data.find((o) => o.id_obra === Number(id));
+
+  // Cargar imágenes de la obra
+  useEffect(() => {
+    if (obra) {
+      imagenesService.listByObra(obra.id_obra).then(setImages);
+    }
+  }, [obra]);
 
   if (!obra) {
     return (
@@ -57,23 +69,56 @@ export default function ObraDetailPage() {
 
         {/* Contenido principal */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Imagen */}
+          {/* Galería de imágenes */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
+            className="space-y-4"
           >
+            {/* Imagen principal */}
             <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
               <CardContent className="p-0">
                 <div className="aspect-square overflow-hidden rounded-lg">
-                  <ObraImage
-                    obraId={obra.id_obra}
-                    alt={obra.titulo}
-                    className="w-full h-full object-cover"
-                  />
+                  {images.length > 0 ? (
+                    <img
+                      src={images[selectedImageIndex].url}
+                      alt={obra.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ObraImage
+                      obraId={obra.id_obra}
+                      alt={obra.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
+
+            {/* Miniaturas */}
+            {images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {images.map((image, index) => (
+                  <button
+                    key={image.id}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                      selectedImageIndex === index
+                        ? "border-primary ring-2 ring-primary/20"
+                        : "border-transparent hover:border-gray-300"
+                    }`}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${obra.titulo} - ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Información */}

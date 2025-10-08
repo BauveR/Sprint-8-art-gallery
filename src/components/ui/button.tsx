@@ -1,14 +1,12 @@
-import { ReactNode } from 'react';
+import { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../../lib/utils';
 
-type ButtonVariant = 'glass' | 'blue' | 'default';
+type ButtonVariant = 'glass' | 'blue' | 'default' | 'ghost' | 'secondary' | 'outline' | 'destructive';
 
-interface ButtonProps {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ReactNode;
-  onClick?: () => void;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
@@ -46,11 +44,34 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
     duration-300
   `,
   default: `
-    bg-gray-600
+    bg-black
     text-white
-    shadow
-    hover:bg-gray-500
-    duration-200
+    hover:opacity-90
+  `,
+  ghost: `
+    bg-transparent
+    hover:bg-gray-100
+    dark:hover:bg-gray-800
+  `,
+  secondary: `
+    bg-gray-100
+    hover:bg-gray-200
+    text-gray-900
+    dark:bg-gray-800
+    dark:hover:bg-gray-700
+    dark:text-gray-100
+  `,
+  outline: `
+    border
+    border-input
+    bg-background
+    hover:bg-accent
+    hover:text-accent-foreground
+  `,
+  destructive: `
+    bg-red-600
+    text-white
+    hover:bg-red-700
   `,
 };
 
@@ -71,23 +92,27 @@ export function buttonVariants({ variant = 'default' }: { variant?: ButtonVarian
  */
 export function Button({
   children,
-  onClick,
   className = '',
   type = 'button',
   variant = 'default',
+  disabled = false,
+  ...props
 }: ButtonProps) {
   return (
     <button
       type={type}
-      onClick={onClick}
+      disabled={disabled}
       className={cn(
         // Estilos base
         'inline-flex items-center justify-center gap-2 mt-0 font-semibold py-2 px-5 rounded-full transition-all whitespace-nowrap',
         // Variante específica
         BUTTON_VARIANTS[variant],
+        // Disabled state
+        disabled && 'opacity-50 cursor-not-allowed',
         // Clases personalizadas
         className
       )}
+      {...props}
     >
       {children}
     </button>
