@@ -4,9 +4,11 @@ export type EstadoVenta =
   | "en_carrito"
   | "procesando_envio"
   | "enviado"
-  | "entregado";
+  | "entregado"
+  | "pendiente_devolucion"
+  | "nunca_entregado";
 
-export type Ubicacion = "en_exposicion" | "en_tienda" | "almacen";
+export type Ubicacion = "en_exposicion" | "en_tienda" | "tienda_online" | "almacen";
 
 export interface ObraInput {
   autor: string;
@@ -16,6 +18,11 @@ export interface ObraInput {
   tecnica?: string | null;
   precio_salida?: number | null; // number en dominio
   estado_venta?: EstadoVenta;
+  numero_seguimiento?: string | null;
+  link_seguimiento?: string | null;
+  comprador_nombre?: string | null;
+  comprador_email?: string | null;
+  fecha_compra?: string | null;
   id_tienda?: number | null;
   id_expo?: number | null;
 }

@@ -19,10 +19,10 @@ export default function ShopPage() {
 
   const obras = data?.data ?? [];
 
-  // Filtrar solo obras disponibles en tienda
+  // Filtrar solo obras disponibles en tienda online
   const availableObras = useMemo(() => {
     const filtered = obras.filter(
-      (obra) => obra.estado_venta === "disponible" && obra.ubicacion === "en_tienda"
+      (obra) => obra.estado_venta === "disponible" && obra.ubicacion === "tienda_online"
     );
 
     if (!searchQuery.trim()) return filtered;

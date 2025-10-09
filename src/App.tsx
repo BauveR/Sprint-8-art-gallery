@@ -10,6 +10,7 @@ import ShopPage from "./pages/ShopPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ObraDetailPage from "./pages/ObraDetailPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/obra/:id" element={<ObraDetailPage />} />
 
             {/* Rutas protegidas - Usuarios autenticados */}
+            <Route path="/my-orders" element={<MyOrdersPage />} />
             <Route
               path="/checkout"
               element={

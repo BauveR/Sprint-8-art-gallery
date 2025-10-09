@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type UserRole = "admin" | "user";
 
@@ -17,8 +17,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_STORAGE_KEY = "gallery_auth_user";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Restaurar usuario desde localStorage al iniciar
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  // Guardar usuario en localStorage cuando cambie
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  }, [user]);
 
   const login = async (email: string, password: string) => {
     // Simulación de login - en producción esto haría una llamada al API
@@ -26,17 +48,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // User: user@gallery.com / user123
 
     if (email === "admin@gallery.com" && password === "admin123") {
-      setUser({
+      const userData = {
         email: "admin@gallery.com",
-        role: "admin",
+        role: "admin" as UserRole,
         name: "Admin User"
-      });
+      };
+      setUser(userData);
     } else if (email === "user@gallery.com" && password === "user123") {
-      setUser({
+      const userData = {
         email: "user@gallery.com",
-        role: "user",
+        role: "user" as UserRole,
         name: "Regular User"
-      });
+      };
+      setUser(userData);
     } else {
       throw new Error("Credenciales inválidas");
     }
@@ -44,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   return (

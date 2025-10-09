@@ -1,6 +1,7 @@
 import * as repo from "../repositories/obrasRepo";
 import {
   obraInputSchema,
+  obraUpdateSchema,
   asignarTiendaSchema,
   sacarTiendaSchema,
   asignarExpoSchema,
@@ -80,7 +81,7 @@ async function handleExpoUpdate(
 }
 
 export async function updateObra(id_obra: number, body: unknown) {
-  const input = obraInputSchema.parse(body) as ObraInput;
+  const input = obraUpdateSchema.parse(body) as Partial<ObraInput>;
 
   const exists = await repo.findObraById(id_obra);
   if (!exists) throw new Error("Obra no encontrada");

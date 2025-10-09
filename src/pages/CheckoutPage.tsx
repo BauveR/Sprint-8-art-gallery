@@ -9,11 +9,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { stripePromise } from "../lib/stripe";
+import { api } from "../lib/api";
+import { sendPaymentConfirmation } from "../lib/emailjs";
 
-export default function CheckoutPage() {
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: "16px",
+      color: "hsl(var(--foreground))",
+      "::placeholder": {
+        color: "hsl(var(--muted-foreground))",
+      },
+    },
+    invalid: {
+      color: "#fa755a",
+      iconColor: "#fa755a",
+    },
+  },
+};
+
+function CheckoutForm() {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const stripe = useStripe();
+  const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
 
@@ -23,9 +45,6 @@ export default function CheckoutPage() {
     ciudad: "",
     codigoPostal: "",
     telefono: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCvv: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,24 +56,97 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      // Simulación de procesamiento de pago
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // 1. Crear Payment Intent en el backend
+      const paymentData = await api.post<{
+        clientSecret: string;
+        paymentIntentId: string;
+        amount: number;
+      }>("/payments/create-payment-intent", {
+        items: items.map((item) => ({
+          id_obra: item.obra.id_obra,
+          titulo: item.obra.titulo,
+          precio: item.obra.precio_salida,
+        })),
+      });
 
-      setIsProcessing(false);
-      setOrderComplete(true);
-      clearCart();
-      toast.success("¡Compra realizada con éxito!");
+      // 2. Confirmar pago con Stripe
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        throw new Error("Card element not found");
+      }
 
-      // Redirigir al home después de 3 segundos
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    } catch (error) {
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+        paymentData.clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: formData.nombre,
+              address: {
+                line1: formData.direccion,
+                city: formData.ciudad,
+                postal_code: formData.codigoPostal,
+              },
+              phone: formData.telefono,
+            },
+          },
+        }
+      );
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+
+      if (paymentIntent?.status === "succeeded") {
+        // 3. Confirmar en el backend y actualizar estado de obras
+        await api.post("/payments/confirm", {
+          paymentIntentId: paymentData.paymentIntentId,
+          obra_ids: items.map((item) => item.obra.id_obra),
+          buyer_name: formData.nombre,
+          buyer_email: user?.email || "",
+        });
+
+        // 4. Enviar email de confirmación de pago
+        if (user?.email) {
+          try {
+            await sendPaymentConfirmation({
+              to_email: user.email,
+              to_name: formData.nombre,
+              order_id: paymentData.paymentIntentId,
+              total_amount: totalPrice,
+              items: items.map((item) => ({
+                titulo: item.obra.titulo,
+                precio: Number(item.obra.precio_salida) || 0,
+              })),
+            });
+          } catch (emailError) {
+            console.error("Error sending confirmation email:", emailError);
+            // No mostrar error al usuario, el pago fue exitoso
+          }
+        }
+
+        setIsProcessing(false);
+        setOrderComplete(true);
+        clearCart();
+        toast.success("¡Compra realizada con éxito!");
+
+        // Redirigir al home después de 3 segundos
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      }
+    } catch (error: any) {
       setIsProcessing(false);
-      toast.error("Error al procesar el pago");
+      toast.error(error.message || "Error al procesar el pago");
+      console.error("Payment error:", error);
     }
   };
 
@@ -72,9 +164,14 @@ export default function CheckoutPage() {
           <p className="text-muted-foreground mb-6">
             Tu pedido ha sido procesado correctamente. Recibirás un correo de confirmación pronto.
           </p>
-          <Button onClick={() => navigate("/")}>
-            Volver al inicio
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button onClick={() => navigate("/my-orders")} variant="default">
+              Ver mis compras
+            </Button>
+            <Button onClick={() => navigate("/")} variant="outline">
+              Volver al inicio
+            </Button>
+          </div>
         </div>
       </PublicLayout>
     );
@@ -154,43 +251,13 @@ export default function CheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Número de tarjeta</label>
-                    <Input
-                      name="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={formData.cardNumber}
-                      onChange={handleChange}
-                      maxLength={19}
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Fecha de expiración</label>
-                      <Input
-                        name="cardExpiry"
-                        placeholder="MM/AA"
-                        value={formData.cardExpiry}
-                        onChange={handleChange}
-                        maxLength={5}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">CVV</label>
-                      <Input
-                        name="cardCvv"
-                        placeholder="123"
-                        value={formData.cardCvv}
-                        onChange={handleChange}
-                        maxLength={4}
-                        type="password"
-                        required
-                      />
+                    <label className="block text-sm font-medium mb-2">Tarjeta de crédito o débito</label>
+                    <div className="border rounded-md p-3 bg-background">
+                      <CardElement options={CARD_ELEMENT_OPTIONS} />
                     </div>
                   </div>
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 p-3 rounded-lg text-sm">
-                    <strong>Nota:</strong> Este es un sistema de demostración. No se procesarán pagos reales.
+                  <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded-lg text-sm">
+                    <strong>Modo test:</strong> Usa la tarjeta 4242 4242 4242 4242 con cualquier fecha futura y CVV.
                   </div>
                 </CardContent>
               </Card>
@@ -246,5 +313,13 @@ export default function CheckoutPage() {
         </form>
       </div>
     </PublicLayout>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
+    </Elements>
   );
 }

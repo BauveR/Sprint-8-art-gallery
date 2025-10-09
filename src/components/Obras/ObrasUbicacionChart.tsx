@@ -6,7 +6,8 @@ import type { Obra } from "../../types";
 
 const LABELS = {
   en_exposicion: "En Exposición",
-  en_tienda: "En Tienda",
+  en_tienda: "Tienda Física",
+  tienda_online: "Tienda Online",
   almacen: "Almacén",
 };
 
@@ -18,6 +19,7 @@ export default function ObrasUbicacionChart({ obras }: Props) {
   const [colors, setColors] = useState({
     en_exposicion: "#000",
     en_tienda: "#000",
+    tienda_online: "#000",
     almacen: "#000",
   });
 
@@ -28,6 +30,7 @@ export default function ObrasUbicacionChart({ obras }: Props) {
       setColors({
         en_exposicion: computedStyle.getPropertyValue('--chart-1').trim(),
         en_tienda: computedStyle.getPropertyValue('--chart-2').trim(),
+        tienda_online: computedStyle.getPropertyValue('--chart-4').trim(),
         almacen: computedStyle.getPropertyValue('--chart-3').trim(),
       });
     };
@@ -67,8 +70,12 @@ export default function ObrasUbicacionChart({ obras }: Props) {
       color: colors.en_exposicion,
     },
     en_tienda: {
-      label: "En Tienda",
+      label: "Tienda Física",
       color: colors.en_tienda,
+    },
+    tienda_online: {
+      label: "Tienda Online",
+      color: colors.tienda_online,
     },
     almacen: {
       label: "Almacén",

@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, User, ShoppingCart, Store } from "lucide-react";
+import { LogOut, User, ShoppingCart, Store, Package } from "lucide-react";
 
 export default function PublicNavbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -59,6 +59,19 @@ export default function PublicNavbar() {
               <Store className="h-4 w-4" />
               <span className="hidden sm:inline">Tienda</span>
             </Button>
+
+            {/* Mis Compras - Solo para usuarios autenticados */}
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/my-orders")}
+                className="flex items-center gap-2"
+              >
+                <Package className="h-4 w-4" />
+                <span className="hidden sm:inline">Mis Compras</span>
+              </Button>
+            )}
 
             {/* Carrito */}
             <Button

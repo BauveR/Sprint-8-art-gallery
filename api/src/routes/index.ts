@@ -2,6 +2,8 @@ import { Router } from "express";
 import * as obras from "../controllers/obrasController";
 import * as tiendas from "../controllers/tiendasController";
 import * as expos from "../controllers/exposController";
+import * as payments from "../controllers/paymentsController";
+import * as orders from "../controllers/ordersController";
 import {
   upload,
   listByObra as listImgs,
@@ -37,5 +39,13 @@ router.get("/expos", expos.list);
 router.post("/expos", expos.create);
 router.put("/expos/:id", expos.update);
 router.delete("/expos/:id", expos.remove);
+
+// Payments (Stripe)
+router.post("/payments/create-payment-intent", payments.createPaymentIntent);
+router.post("/payments/confirm", payments.confirmPayment);
+router.post("/payments/webhook", payments.stripeWebhook);
+
+// Orders (User purchases)
+router.get("/orders", orders.getOrdersByEmail);
 
 export default router;

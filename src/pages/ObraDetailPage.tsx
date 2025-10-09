@@ -45,6 +45,8 @@ export default function ObraDetailPage() {
 
   const isInCart = useIsInCart(obra.id_obra);
   const isAvailable = obra.estado_venta === "disponible";
+  const isInExhibition = obra.ubicacion === "en_exposicion";
+  const canPurchase = !isInExhibition && isAvailable;
 
   const handleAddToCart = () => {
     if (isAvailable) {
@@ -186,45 +188,54 @@ export default function ObraDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Precio y acciones */}
-            <div className="space-y-4">
-              <div className="border-t pt-4">
-                <p className="text-3xl font-bold text-primary">
-                  ${formatPrice(obra.precio_salida)}
-                </p>
-              </div>
+            {/* Precio y acciones - Solo visible si NO está en exposición */}
+            {!isInExhibition && (
+              <div className="space-y-4">
+                <div className="border-t pt-4">
+                  <p className="text-3xl font-bold text-primary">
+                    ${formatPrice(obra.precio_salida)}
+                  </p>
+                </div>
 
-              <div className="flex gap-3">
-                <Button
-                  className="flex-1"
-                  size="lg"
-                  onClick={handleAddToCart}
-                  disabled={!isAvailable || isInCart}
-                >
-                  {isInCart ? (
-                    <>
-                      <Check className="h-5 w-5 mr-2" />
-                      En el carrito
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="h-5 w-5 mr-2" />
-                      {isAvailable ? "Agregar al carrito" : "No disponible"}
-                    </>
-                  )}
-                </Button>
-
-                {isInCart && (
+                <div className="flex gap-3">
                   <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => navigate("/cart")}
+                    className="flex-1"
+                    onClick={handleAddToCart}
+                    disabled={!canPurchase || isInCart}
                   >
-                    Ver carrito
+                    {isInCart ? (
+                      <>
+                        <Check className="h-5 w-5 mr-2" />
+                        En el carrito
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        {canPurchase ? "Agregar al carrito" : "No disponible"}
+                      </>
+                    )}
                   </Button>
-                )}
+
+                  {isInCart && (
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate("/cart")}
+                    >
+                      Ver carrito
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Mensaje para obras en exposición */}
+            {isInExhibition && (
+              <div className="border-t pt-4">
+                <Badge variant="outline" className="text-lg px-4 py-2">
+                  Obra en exposición - No disponible para venta
+                </Badge>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

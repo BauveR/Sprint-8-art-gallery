@@ -47,9 +47,11 @@ export type EstadoVenta =
   | "en_carrito"
   | "procesando_envio"
   | "enviado"
-  | "entregado";
+  | "entregado"
+  | "pendiente_devolucion"
+  | "nunca_entregado";
 
-export type Ubicacion = "en_exposicion" | "en_tienda" | "almacen";
+export type Ubicacion = "en_exposicion" | "en_tienda" | "tienda_online" | "almacen";
 
 export type Obra = {
   id_obra: number;
@@ -67,6 +69,15 @@ export type Obra = {
 
   // Ubicación física calculada por la VIEW (no editable)
   ubicacion?: Ubicacion | null;
+
+  // Tracking de envío
+  numero_seguimiento?: string | null;
+  link_seguimiento?: string | null;
+
+  // Información del comprador
+  comprador_nombre?: string | null;
+  comprador_email?: string | null;
+  fecha_compra?: string | null;
 
   id_tienda?: number | null;
   tienda_nombre?: string | null;
@@ -89,6 +100,8 @@ export type ObraInput = {
   tecnica?: string | null;
   precio_salida?: number | null;
   estado_venta?: EstadoVenta;
+  numero_seguimiento?: string | null;
+  link_seguimiento?: string | null;
   id_tienda?: number | null;
   id_expo?: number | null;
 };

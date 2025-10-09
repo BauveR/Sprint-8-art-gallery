@@ -30,6 +30,8 @@ export const estadoVentaSchema = z.enum([
   "procesando_envio",
   "enviado",
   "entregado",
+  "pendiente_devolucion",
+  "nunca_entregado",
 ]);
 
 export const obraInputSchema = z.object({
@@ -40,6 +42,29 @@ export const obraInputSchema = z.object({
   tecnica: z.string().nullable().optional(),
   precio_salida: z.number().nonnegative().nullable().optional(),
   estado_venta: estadoVentaSchema.optional(),
+  numero_seguimiento: z.string().nullable().optional(),
+  link_seguimiento: z.string().nullable().optional(),
+  comprador_nombre: z.string().nullable().optional(),
+  comprador_email: z.string().email().nullable().optional(),
+  fecha_compra: z.string().nullable().optional(),
+  id_tienda: z.number().int().positive().nullable().optional(),
+  id_expo: z.number().int().positive().nullable().optional(),
+});
+
+// Schema para actualizaciones parciales (todos los campos opcionales)
+export const obraUpdateSchema = z.object({
+  autor: z.string().min(1).optional(),
+  titulo: z.string().min(1).optional(),
+  anio: z.number().int().min(0).max(3000).nullable().optional(),
+  medidas: z.string().nullable().optional(),
+  tecnica: z.string().nullable().optional(),
+  precio_salida: z.number().nonnegative().nullable().optional(),
+  estado_venta: estadoVentaSchema.optional(),
+  numero_seguimiento: z.string().nullable().optional(),
+  link_seguimiento: z.string().nullable().optional(),
+  comprador_nombre: z.string().nullable().optional(),
+  comprador_email: z.string().email().nullable().optional(),
+  fecha_compra: z.string().nullable().optional(),
   id_tienda: z.number().int().positive().nullable().optional(),
   id_expo: z.number().int().positive().nullable().optional(),
 });

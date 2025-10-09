@@ -2,12 +2,21 @@ import { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../../lib/utils';
 
 type ButtonVariant = 'glass' | 'blue' | 'default' | 'ghost' | 'secondary' | 'outline' | 'destructive';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'default';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ReactNode;
   variant?: ButtonVariant;
+  size?: ButtonSize;
   type?: 'button' | 'submit' | 'reset';
 }
+
+const BUTTON_SIZES: Record<ButtonSize, string> = {
+  sm: 'py-1 px-3 text-sm',
+  md: 'py-2 px-4',
+  lg: 'py-3 px-6 text-lg',
+  default: 'py-2 px-5',
+};
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   glass: `
@@ -95,6 +104,7 @@ export function Button({
   className = '',
   type = 'button',
   variant = 'default',
+  size = 'default',
   disabled = false,
   ...props
 }: ButtonProps) {
@@ -104,7 +114,9 @@ export function Button({
       disabled={disabled}
       className={cn(
         // Estilos base
-        'inline-flex items-center justify-center gap-2 mt-0 font-semibold py-2 px-5 rounded-full transition-all whitespace-nowrap',
+        'inline-flex items-center justify-center gap-2 mt-0 font-semibold rounded-full transition-all whitespace-nowrap',
+        // Size
+        BUTTON_SIZES[size],
         // Variante específica
         BUTTON_VARIANTS[variant],
         // Disabled state

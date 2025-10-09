@@ -9,6 +9,12 @@ import {
 import { useTiendas } from "../../query/tiendas";
 import { useExpos } from "../../query/expos";
 import { imagenesService } from "../../services/imageService";
+import {
+  sendShipmentNotification,
+  sendDeliveryConfirmation,
+  sendThankYouEmail,
+} from "../../lib/emailjs";
+import { ESTADO_CONFIG } from "../../lib/estadoConfig";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +33,8 @@ const emptyObra: ObraInput = {
   tecnica: null,
   precio_salida: null,
   estado_venta: "disponible",
+  numero_seguimiento: null,
+  link_seguimiento: null,
   id_tienda: null,
   id_expo: null,
 };
@@ -153,6 +161,8 @@ export default function ObrasPage() {
             ? (typeof o.precio_salida === "string" ? Number(o.precio_salida) : o.precio_salida)
             : null,
         estado_venta: o.estado_venta ?? "disponible",
+        numero_seguimiento: o.numero_seguimiento ?? null,
+        link_seguimiento: o.link_seguimiento ?? null,
         id_tienda: o.id_tienda ?? null,
         id_expo: o.id_expo ?? null,
       },
@@ -226,9 +236,73 @@ export default function ObrasPage() {
     const { id, form } = edit;
     console.log("Guardando obra:", { id, input: form });
 
+    // Buscar la obra original para comparar el estado
+    const obraOriginal = obras.find((o) => o.id_obra === id);
+    const estadoAnterior = obraOriginal?.estado_venta;
+    const nuevoEstado = form.estado_venta;
+
     updateObra.mutate({ id, input: form }, {
       onSuccess: async () => {
         console.log("Obra actualizada exitosamente, esperando refresh...");
+
+        // Enviar emails según el cambio de estado
+        if (obraOriginal?.comprador_email) {
+          try {
+            // Email de envío (cuando cambia a "enviado")
+            if (nuevoEstado === "enviado" && estadoAnterior !== "enviado") {
+              if (form.numero_seguimiento && form.link_seguimiento) {
+                await sendShipmentNotification({
+                  to_email: obraOriginal.comprador_email,
+                  to_name: obraOriginal.comprador_nombre || "Cliente",
+                  order_id: `ORD-${id}`,
+                  tracking_number: form.numero_seguimiento,
+                  tracking_link: form.link_seguimiento,
+                  items: [{ titulo: obraOriginal.titulo }],
+                });
+                toast({
+                  title: "Email enviado",
+                  description: "Se ha notificado al cliente sobre el envío",
+                });
+              } else {
+                toast({
+                  title: "Falta información de tracking",
+                  description: "Agrega número y link de seguimiento para notificar al cliente",
+                  variant: "destructive",
+                });
+              }
+            }
+
+            // Email de entrega (cuando cambia a "entregado")
+            if (nuevoEstado === "entregado" && estadoAnterior !== "entregado") {
+              await sendDeliveryConfirmation({
+                to_email: obraOriginal.comprador_email,
+                to_name: obraOriginal.comprador_nombre || "Cliente",
+                order_id: `ORD-${id}`,
+                items: [{ titulo: obraOriginal.titulo }],
+              });
+
+              // También enviar email de agradecimiento
+              await sendThankYouEmail({
+                to_email: obraOriginal.comprador_email,
+                to_name: obraOriginal.comprador_nombre || "Cliente",
+                items: [{ titulo: obraOriginal.titulo }],
+              });
+
+              toast({
+                title: "Emails enviados",
+                description: "Se ha notificado al cliente sobre la entrega",
+              });
+            }
+          } catch (emailError) {
+            console.error("Error enviando email:", emailError);
+            toast({
+              title: "Error al enviar email",
+              description: "La obra se actualizó pero no se pudo enviar el email",
+              variant: "destructive",
+            });
+          }
+        }
+
         // Esperar un momento para que las queries se actualicen
         await new Promise(resolve => setTimeout(resolve, 500));
         setEdit(null);
@@ -303,6 +377,8 @@ export default function ObrasPage() {
           <option value="procesando_envio">Procesando envío</option>
           <option value="enviado">Enviado</option>
           <option value="entregado">Entregado</option>
+          <option value="pendiente_devolucion">Pendiente devolución</option>
+          <option value="nunca_entregado">Nunca entregado</option>
         </select>
         <select
           className="border rounded p-2 bg-background text-foreground"
@@ -406,18 +482,15 @@ export default function ObrasPage() {
                 <td className="p-2">{o.autor}</td>
                 <td className="p-2">{o.titulo}</td>
                 <td className="p-2">
-                  <Badge variant="secondary">
-                    {o.estado_venta === "disponible" && "Disponible"}
-                    {o.estado_venta === "en_carrito" && "En carrito"}
-                    {o.estado_venta === "procesando_envio" && "Procesando"}
-                    {o.estado_venta === "enviado" && "Enviado"}
-                    {o.estado_venta === "entregado" && "Entregado"}
+                  <Badge className={`text-xs font-medium border ${ESTADO_CONFIG[o.estado_venta].badgeClass}`}>
+                    {ESTADO_CONFIG[o.estado_venta].label}
                   </Badge>
                 </td>
                 <td className="p-2">
                   <Badge variant="outline">
                     {o.ubicacion === "en_exposicion" && "Exposición"}
-                    {o.ubicacion === "en_tienda" && "Tienda"}
+                    {o.ubicacion === "en_tienda" && "Tienda Física"}
+                    {o.ubicacion === "tienda_online" && "Tienda Online"}
                     {o.ubicacion === "almacen" && "Almacén"}
                   </Badge>
                 </td>
@@ -538,7 +611,27 @@ export default function ObrasPage() {
                 <option value="procesando_envio">Procesando envío</option>
                 <option value="enviado">Enviado</option>
                 <option value="entregado">Entregado</option>
+                <option value="pendiente_devolucion">Pendiente devolución</option>
+                <option value="nunca_entregado">Nunca entregado</option>
               </select>
+
+              {/* Campos de tracking - Solo visible si está enviado o entregado */}
+              {(edit.form.estado_venta === "enviado" || edit.form.estado_venta === "entregado") && (
+                <>
+                  <input
+                    className="border rounded p-2 bg-background text-foreground col-span-2"
+                    placeholder="Número de seguimiento"
+                    value={edit.form.numero_seguimiento ?? ""}
+                    onChange={(e) => setEdit({ ...edit, form: { ...edit.form, numero_seguimiento: e.target.value || null } })}
+                  />
+                  <input
+                    className="border rounded p-2 bg-background text-foreground col-span-2"
+                    placeholder="Link de seguimiento (URL completa)"
+                    value={edit.form.link_seguimiento ?? ""}
+                    onChange={(e) => setEdit({ ...edit, form: { ...edit.form, link_seguimiento: e.target.value || null } })}
+                  />
+                </>
+              )}
               <select
                 className="border rounded p-2 bg-background text-foreground"
                 value={edit.form.id_tienda ?? ""}

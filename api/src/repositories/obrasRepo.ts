@@ -35,8 +35,13 @@ export interface ObraEstadoActualRow extends RowDataPacket {
   medidas: string | null;
   tecnica: string | null;
   precio_salida: string | null;
-  estado_venta: "disponible" | "en_carrito" | "procesando_envio" | "enviado" | "entregado";
-  ubicacion: "en_exposicion" | "en_tienda" | "almacen";
+  estado_venta: "disponible" | "en_carrito" | "procesando_envio" | "enviado" | "entregado" | "pendiente_devolucion" | "nunca_entregado";
+  numero_seguimiento: string | null;
+  link_seguimiento: string | null;
+  comprador_nombre: string | null;
+  comprador_email: string | null;
+  fecha_compra: string | null;
+  ubicacion: "en_exposicion" | "en_tienda" | "tienda_online" | "almacen";
   id_expo: number | null;
   expo_nombre: string | null;
   expo_lat: number | null;
@@ -47,6 +52,7 @@ export interface ObraEstadoActualRow extends RowDataPacket {
   tienda_lat: number | null;
   tienda_lng: number | null;
   tienda_url: string | null;
+  tienda_es_online: number | null;
 }
 
 const SORTABLE: Record<SortKey, string> = {
@@ -126,22 +132,67 @@ export async function insertObra(input: ObraInput) {
   return res.insertId;
 }
 
-export async function updateObra(id_obra: number, input: ObraInput) {
-  await pool.query(
-    `UPDATE obras
-     SET autor = ?, titulo = ?, anio = ?, medidas = ?, tecnica = ?, precio_salida = ?, estado_venta = ?
-     WHERE id_obra = ?`,
-    [
-      input.autor,
-      input.titulo,
-      input.anio ?? null,
-      input.medidas ?? null,
-      input.tecnica ?? null,
-      input.precio_salida ?? null,
-      input.estado_venta ?? "disponible",
-      id_obra,
-    ]
-  );
+export async function updateObra(id_obra: number, input: Partial<ObraInput>) {
+  // Construir UPDATE dinámicamente solo con los campos presentes
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  if (input.autor !== undefined) {
+    fields.push("autor = ?");
+    values.push(input.autor);
+  }
+  if (input.titulo !== undefined) {
+    fields.push("titulo = ?");
+    values.push(input.titulo);
+  }
+  if (input.anio !== undefined) {
+    fields.push("anio = ?");
+    values.push(input.anio ?? null);
+  }
+  if (input.medidas !== undefined) {
+    fields.push("medidas = ?");
+    values.push(input.medidas ?? null);
+  }
+  if (input.tecnica !== undefined) {
+    fields.push("tecnica = ?");
+    values.push(input.tecnica ?? null);
+  }
+  if (input.precio_salida !== undefined) {
+    fields.push("precio_salida = ?");
+    values.push(input.precio_salida ?? null);
+  }
+  if (input.estado_venta !== undefined) {
+    fields.push("estado_venta = ?");
+    values.push(input.estado_venta);
+  }
+  if (input.numero_seguimiento !== undefined) {
+    fields.push("numero_seguimiento = ?");
+    values.push(input.numero_seguimiento ?? null);
+  }
+  if (input.link_seguimiento !== undefined) {
+    fields.push("link_seguimiento = ?");
+    values.push(input.link_seguimiento ?? null);
+  }
+  if (input.comprador_nombre !== undefined) {
+    fields.push("comprador_nombre = ?");
+    values.push(input.comprador_nombre ?? null);
+  }
+  if (input.comprador_email !== undefined) {
+    fields.push("comprador_email = ?");
+    values.push(input.comprador_email ?? null);
+  }
+  if (input.fecha_compra !== undefined) {
+    fields.push("fecha_compra = ?");
+    values.push(input.fecha_compra ?? null);
+  }
+
+  if (fields.length === 0) {
+    return; // No hay nada que actualizar
+  }
+
+  values.push(id_obra);
+  const sql = `UPDATE obras SET ${fields.join(", ")} WHERE id_obra = ?`;
+  await pool.query(sql, values);
 }
 
 export async function deleteObra(id_obra: number) {
