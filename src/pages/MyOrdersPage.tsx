@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContextFirebase";
 import { useOrders } from "../query/orders";
 import { formatPrice } from "../lib/formatters";
 import { ESTADO_CONFIG } from "../lib/estadoConfig";

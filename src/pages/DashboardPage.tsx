@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContextFirebase";
 import HomePage from "../components/Home/HomePage";
 import ObrasPage from "../components/Obras/ObrasPage";
 import TiendasPage from "../components/Tiendas/TiendasPage";

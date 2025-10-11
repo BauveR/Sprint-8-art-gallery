@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContextFirebase";
 import { formatPrice } from "../lib/formatters";
 import PublicLayout from "../components/layout/PublicLayout";
 import ObraImage from "../components/common/ObraImage";

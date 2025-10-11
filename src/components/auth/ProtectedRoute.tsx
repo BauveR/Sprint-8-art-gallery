@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth, UserRole } from "../../context/AuthContext";
+import { useAuth, UserRole } from "../../context/AuthContextFirebase";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,7 +7,16 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+
+  // Mostrar loading mientras Firebase verifica la sesión
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

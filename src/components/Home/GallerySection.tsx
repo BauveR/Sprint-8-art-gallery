@@ -14,9 +14,9 @@ export default function GallerySection({ obras }: GallerySectionProps) {
   const obrasEnExposicion = obras.filter((obra) => obra.ubicacion === "en_exposicion");
 
   return (
-    <section className="py-16 bg-white/50 dark:bg-zinc-900/50">
-      <div className="w-full mx-auto px-[10%]">
-        <div className="grid grid-cols-1 lg:grid-cols-[20%_60%] gap-[10%]">
+    <section className="min-h-screen flex items-center bg-white/50 dark:bg-zinc-900/50 py-16">
+      <div className="w-full px-[10%]">
+        <div className="grid grid-cols-1 lg:grid-cols-[30%_60%] gap-[10%] items-center">
           {/* Título */}
           <motion.div
             className="flex flex-col justify-center items-center text-center space-y-6"
@@ -35,18 +35,18 @@ export default function GallerySection({ obras }: GallerySectionProps) {
             </p>
           </motion.div>
 
-          {/* Grid de imágenes */}
+          {/* Grid de imágenes - 3 columnas x 2 filas */}
           <motion.div
-            className="grid grid-cols-2 gap-6"
+            className="grid grid-cols-3 grid-rows-2 gap-6 h-[70vh]"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {obrasEnExposicion.slice(0, 15).map((obra, index) => (
+            {obrasEnExposicion.slice(0, 6).map((obra, index) => (
               <motion.div
                 key={obra.id_obra}
-                className="aspect-square cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                className="w-full h-full cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}

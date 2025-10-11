@@ -15,6 +15,10 @@ dist-ssr
 # Uploaded files
 api/uploads/
 
+# Firebase Service Account (NUNCA subir a GitHub!)
+api/firebase-service-account.json
+api/*-firebase-adminsdk-*.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

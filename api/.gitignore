@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.local
+.env.production
+
+# Firebase Service Account (NUNCA subir a GitHub!)
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+
+# Uploads
+uploads/
+
+# Logs
+*.log
+npm-debug.log*

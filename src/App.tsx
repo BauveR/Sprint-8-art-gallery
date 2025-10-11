@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContextFirebase";
 import { CartProvider } from "./context/CartContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicHome from "./pages/PublicHome";

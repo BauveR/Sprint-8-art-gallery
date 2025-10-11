@@ -23,10 +23,14 @@ export default function WelcomeSection() {
       <div className="absolute inset-0">
         {elements.map((element, index) => {
           if (element.coinFlipOnHover) {
-            return <CoinFlipImage key={index} element={element} />;
+            return <CoinFlipImage key={index} element={element} isMobile={isMobile} />;
           }
 
           const animationProps = getAnimationProps(element.animation);
+
+          // Para pantallas grandes: bloquear posición (sin animación de entrada)
+          // Para móvil: mantener animaciones de entrada
+          const initialState = isMobile ? animationProps.initial : animationProps.whileInView;
 
           return (
             <motion.img
@@ -36,7 +40,7 @@ export default function WelcomeSection() {
               className={`absolute ${element.position} ${element.size} ${element.opacity} ${
                 element.hoverColorChange ? "cursor-pointer hover-orange-filter transition-all duration-200" : "pointer-events-none"
               }`}
-              initial={animationProps.initial}
+              initial={initialState}
               animate={
                 element.continuousRotate
                   ? { ...animationProps.whileInView, rotate: 360 }
@@ -47,27 +51,29 @@ export default function WelcomeSection() {
               transition={
                 element.continuousRotate
                   ? {
-                      duration: 1,
-                      delay: element.animation.delay,
+                      duration: isMobile ? 1 : 0, // Sin transición inicial en desktop
+                      delay: isMobile ? element.animation.delay : 0,
                       rotate: {
                         duration: 20,
                         repeat: Infinity,
                         ease: "linear",
-                        delay: element.animation.delay + 1,
+                        delay: isMobile ? element.animation.delay + 1 : 0,
                       },
                     }
                   : element.bounceDownEffect
                   ? {
-                      duration: 1,
-                      delay: element.animation.delay,
+                      duration: isMobile ? 1 : 0, // Sin transición inicial en desktop
+                      delay: isMobile ? element.animation.delay : 0,
                       y: {
                         duration: 1.2,
                         repeat: Infinity,
                         ease: "easeInOut",
-                        delay: element.animation.delay + 3.9,
+                        delay: isMobile ? element.animation.delay + 3.9 : 0,
                       },
                     }
-                  : { duration: 1, delay: element.animation.delay }
+                  : isMobile
+                  ? { duration: 1, delay: element.animation.delay }
+                  : { duration: 0 } // Sin transición en desktop
               }
             />
           );

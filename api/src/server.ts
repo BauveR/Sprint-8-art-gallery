@@ -4,8 +4,21 @@ import routes from "./routes";
 import dotenv from "dotenv";
 import path from "path";
 import { errorHandler } from "./middleware/errorHandler";
+import { initializeFirebaseAdmin } from "./config/firebase-admin";
 
 dotenv.config();
+
+// Initialize Firebase Admin SDK
+try {
+  initializeFirebaseAdmin();
+  console.log("[Server] Firebase Admin initialized successfully");
+} catch (error) {
+  console.error("[Server] Failed to initialize Firebase Admin:", error);
+  // En desarrollo puedes continuar sin Firebase, en producción deberías fallar
+  if (process.env.NODE_ENV === "production") {
+    process.exit(1);
+  }
+}
 
 const app = express();
 app.use(cors());
