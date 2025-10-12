@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (NUNCA subir a GitHub!)
+.env
+api/.env
+.env.production
+
 # Uploaded files
 api/uploads/
 

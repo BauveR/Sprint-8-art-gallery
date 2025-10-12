@@ -17,15 +17,16 @@ export default function HeroSection() {
 
       {/* Capa de modelo 3D de fondo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[15]" style={{ transform: 'translate(-250px, 350px)' }}>
-        <div className="w-[1100px] h-[1100px] overflow-hidden bg-transparent">
+        <div className="w-[1100px] h-[1100px] overflow-hidden bg-transparent dark:bg-transparent">
           <iframe
             title="simple grass"
             allowFullScreen
             allow="autoplay; fullscreen; xr-spatial-tracking"
-            className="w-full h-full border-0 bg-transparent"
+            className="w-full h-full border-0 bg-transparent dark:bg-transparent"
             style={{
               clipPath: 'circle(600px at center)',
               boxShadow: 'none',
+              backgroundColor: 'transparent',
             }}
             src="https://sketchfab.com/models/fabdf00820a640b8bd0c144660724987/embed?autospin=1&autostart=1&camera=0&preload=1&transparent=1&ui_controls=0&ui_infos=0&ui_watermark=0"
           />
@@ -36,27 +37,28 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8 items-center min-h-[80vh]">
           {/* Modelo 3D */}
           <motion.div
-            className="flex items-center justify-center h-[80vh] bg-transparent"
+            className="flex items-center justify-center h-[80vh] bg-transparent dark:bg-transparent"
             style={{ transform: 'translate(-30%, 30%)' }}
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div className="w-full max-w-2xl h-full overflow-hidden relative bg-transparent">
+            <div className="w-full max-w-2xl h-full overflow-hidden relative bg-transparent dark:bg-transparent">
               <iframe
                 title="piedra artwork"
                 allowFullScreen
                 allow="autoplay; fullscreen;"
-                className="w-full h-full border-0 absolute pointer-events-none bg-transparent"
+                className="w-full h-full border-0 absolute pointer-events-none bg-transparent dark:bg-transparent"
                 style={{
                   clipPath: 'inset(5% 0 5% 0)',
                   top: '9%',
                   left: '-10%',
+                  backgroundColor: 'transparent',
                 }}
                 src="https://sketchfab.com/models/1bc52cbae36e4c019ff06585c06ed287/embed?autospin=1&autostart=1&camera=0&preload=1&transparent=1&ui_hint=0&ui_controls=0&ui_infos=0&ui_watermark=0"
               />
-              <div className="absolute inset-0 z-10 bg-transparent" style={{ pointerEvents: 'all' }} />
+              <div className="absolute inset-0 z-10 bg-transparent dark:bg-transparent" style={{ pointerEvents: 'all' }} />
             </div>
           </motion.div>
 
