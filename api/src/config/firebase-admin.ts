@@ -26,7 +26,20 @@ export function initializeFirebaseAdmin(): admin.app.App {
     // Opción 2: Usar credenciales individuales (para development/testing)
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    // Si la private key está en base64, decodificarla
+    if (privateKey && !privateKey.includes('BEGIN PRIVATE KEY')) {
+      try {
+        privateKey = Buffer.from(privateKey, 'base64').toString('utf-8');
+        console.log("[Firebase Admin] Decoded private key from base64");
+      } catch (error) {
+        console.warn("[Firebase Admin] Failed to decode base64, trying as plain text");
+      }
+    }
+
+    // Reemplazar \n literales con saltos de línea reales
+    privateKey = privateKey?.replace(/\\n/g, "\n");
 
     if (projectId && clientEmail && privateKey) {
       firebaseApp = admin.initializeApp({
