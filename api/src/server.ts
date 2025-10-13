@@ -65,4 +65,7 @@ app.use("/api", (_req, res) => res.status(404).json({ error: "Ruta no encontrada
 app.use(errorHandler);
 
 const PORT = Number(process.env.PORT) || 3000;
-app.listen(PORT, () => console.log(`API http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Server] Listening on 0.0.0.0:${PORT}`);
+  console.log(`[Server] Health check: /api/health`);
+});
