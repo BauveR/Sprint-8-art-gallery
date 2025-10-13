@@ -181,15 +181,15 @@ En Vercel → Settings → Environment Variables, agrega:
 VITE_API_URL=https://tu-proyecto.up.railway.app/api
 
 # Stripe Public Key
-VITE_STRIPE_PUBLIC_KEY=pk_test_tu_clave_publica
+VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
 
-# Firebase
+# Firebase - Obtén estos valores de Firebase Console
 VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=artgallery-e079a.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=artgallery-e079a
-VITE_FIREBASE_STORAGE_BUCKET=artgallery-e079a.appspot.com
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=1:your_sender_id:web:1fde02b33500114b9b4424
+VITE_FIREBASE_APP_ID=your_app_id
 
 # EmailJS (opcional - si ya lo configuraste)
 VITE_EMAILJS_SERVICE_ID=tu_service_id
