@@ -83,7 +83,7 @@ export default function ExposPage() {
           placeholder="Fecha de fin"
         />
         <div className="col-span-2">
-          <Button disabled={createExpo.isPending}>
+          <Button type="submit" disabled={createExpo.isPending}>
             {createExpo.isPending ? "Creando..." : "Crear exposición"}
           </Button>
         </div>
@@ -155,7 +155,7 @@ export default function ExposPage() {
               />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancelar</button>
-                <Button disabled={updateExpo.isPending}>
+                <Button type="submit" disabled={updateExpo.isPending}>
                   {updateExpo.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>
               </div>

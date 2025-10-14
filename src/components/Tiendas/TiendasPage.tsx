@@ -68,7 +68,7 @@ export default function TiendasPage() {
           onChange={e => setForm(f => ({ ...f, lng: Number(e.target.value) }))}
           onFocus={e => e.target.select()} required />
         <div className="col-span-2">
-          <Button disabled={createTienda.isPending}>
+          <Button type="submit" disabled={createTienda.isPending}>
             {createTienda.isPending ? "Creando..." : "Crear tienda"}
           </Button>
         </div>
@@ -130,7 +130,7 @@ export default function TiendasPage() {
                 onFocus={e => e.target.select()} required />
               <div className="col-span-2 flex justify-end gap-2 mt-2">
                 <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80">Cancelar</button>
-                <Button disabled={updateTienda.isPending}>
+                <Button type="submit" disabled={updateTienda.isPending}>
                   {updateTienda.isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>
               </div>
