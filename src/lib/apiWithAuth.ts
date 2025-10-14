@@ -2,12 +2,25 @@ import { auth } from "./firebase";
 
 const BASE = import.meta.env.VITE_API_URL || "/api";
 
+// Log para debug en desarrollo
+console.log('[API Config] Base URL:', BASE);
+console.log('[API Config] Environment:', import.meta.env.MODE);
+
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const msg = await res.text().catch(() => "");
+    console.error(`[API Error] ${res.status} ${res.statusText}`, msg);
     throw new Error(msg || `HTTP ${res.status}`);
   }
-  return res.status === 204 ? (undefined as any) : await res.json();
+
+  // Intentar parsear JSON, pero capturar errores si es HTML
+  try {
+    return res.status === 204 ? (undefined as any) : await res.json();
+  } catch (error) {
+    const text = await res.text().catch(() => "");
+    console.error('[API Error] Failed to parse JSON response:', text.substring(0, 200));
+    throw new Error(`Invalid JSON response. Got HTML instead. Check API URL: ${BASE}`);
+  }
 }
 
 function toQuery(params?: Record<string, any>): string {
@@ -40,9 +53,12 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 export const api = {
   async get<T>(url: string, params?: Record<string, any>): Promise<T> {
+    const fullUrl = `${BASE}${url}${toQuery(params)}`;
+    console.log(`[API GET] ${fullUrl}`);
     const headers = await getAuthHeaders();
     delete headers["Content-Type"]; // No necesario en GET
-    const res = await fetch(`${BASE}${url}${toQuery(params)}`, { headers });
+    const res = await fetch(fullUrl, { headers });
+    console.log(`[API GET] Response status: ${res.status}`);
     return handle<T>(res);
   },
 
