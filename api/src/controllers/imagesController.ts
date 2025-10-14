@@ -1,24 +1,12 @@
 // src/controllers/imagesController.ts
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import cloudinary from "../config/cloudinary";
 import * as svc from "../services/imagesService";
-import * as imageRepo from "../repositories/imagesRepo"; // ← nombre EXACTO del archivo
+import * as imageRepo from "../repositories/imagesRepo";
 
-const uploadDir = path.resolve(__dirname, "../../uploads");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination(_req, _file, cb) {
-    cb(null, uploadDir);
-  },
-  filename(_req, file, cb) {
-    const ts = Date.now();
-    const safe = file.originalname.replace(/\s+/g, "-");
-    cb(null, `${ts}-${safe}`);
-  },
-});
+// Multer para guardar archivos en memoria (buffer)
+const storage = multer.memoryStorage();
 
 function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
   const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -53,10 +41,31 @@ export async function uploadForObra(req: MulterReq, res: Response, next: NextFun
     const file = req.file;
     if (!file) return res.status(400).json({ error: "Archivo requerido (campo 'file')" });
 
-    const publicUrl = `/uploads/${path.basename(file.path)}`;
+    // Subir a Cloudinary usando buffer
+    const uploadResult = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "art-gallery/obras",
+          resource_type: "image",
+          transformation: [
+            { width: 1200, height: 1200, crop: "limit" }, // Máximo 1200x1200
+            { quality: "auto:good" }, // Optimización automática
+          ],
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(file.buffer);
+    });
+
+    const publicUrl = uploadResult.secure_url;
     const { id } = await svc.addImagen(id_obra, publicUrl);
     res.status(201).json({ id, url: publicUrl });
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 }
 
 export async function remove(req: Request, res: Response, next: NextFunction) {
@@ -66,18 +75,34 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
 
     const { url } = await svc.deleteImagen(id);
 
-    // 1) borra fila en DB usando el MISMO objeto de módulo
+    // 1) borra fila en DB
     await imageRepo.deleteImagen(id);
 
-    // 2) borra archivo físico si existe
-    if (url) {
-      const filename = url.split("/uploads/")[1];
-      if (filename) {
-        const abs = path.join(uploadDir, filename);
-        try { await fs.promises.unlink(abs); } catch { /* ignore */ }
+    // 2) borra imagen de Cloudinary si existe
+    if (url && url.includes("cloudinary.com")) {
+      try {
+        // Extraer public_id de la URL de Cloudinary
+        // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/{transformations}/{public_id}.{format}
+        const urlParts = url.split("/");
+
+        // El public_id incluye la carpeta
+        const folderIndex = urlParts.indexOf("upload");
+        if (folderIndex !== -1) {
+          const pathParts = urlParts.slice(folderIndex + 1);
+          // Filtrar transformaciones (empiezan con letras como v, w_, h_, etc)
+          const cleanParts = pathParts.filter(part => !part.match(/^[a-z]_/));
+          const publicId = cleanParts.join("/").replace(/\.[^/.]+$/, "");
+
+          await cloudinary.uploader.destroy(publicId);
+        }
+      } catch (error) {
+        console.error("[Cloudinary] Error deleting image:", error);
+        // No fallar si hay error al eliminar de Cloudinary
       }
     }
 
     res.status(204).end();
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 }
