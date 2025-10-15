@@ -3,9 +3,9 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContextFirebase";
 import { formatPrice } from "../lib/formatters";
 import PublicLayout from "../components/layout/PublicLayout";
-import ObraImage from "../components/common/ObraImage";
+import CartItem from "../components/Cart/CartItem";
 import { Button } from "@/components/ui/button";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
@@ -26,7 +26,9 @@ export default function CartPage() {
         <div className="max-w-7xl mx-auto px-8 py-24 text-center">
           <ShoppingBag className="h-32 w-32 mx-auto text-muted-foreground/30 mb-8 stroke-[0.5]" />
           <h2 className="text-3xl font-light tracking-wide mb-4">Tu carrito está vacío</h2>
-          <p className="text-muted-foreground mb-10 text-lg tracking-wide">Descubre nuestra colección de obras de arte</p>
+          <p className="text-muted-foreground mb-10 text-lg tracking-wide">
+            Descubre nuestra colección de obras de arte
+          </p>
           <Button
             onClick={() => navigate("/shop")}
             variant="outline"
@@ -57,70 +59,13 @@ export default function CartPage() {
 
             <div className="space-y-8">
               {items.map((item) => (
-                <div
+                <CartItem
                   key={item.obra.id_obra}
-                  className="flex gap-6 pb-8 border-b border-foreground/5"
-                >
-                  {/* Imagen */}
-                  <div className="w-32 h-40 flex-shrink-0 bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                    <ObraImage
-                      obraId={item.obra.id_obra}
-                      alt={item.obra.titulo}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Información */}
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <h3 className="font-medium text-lg tracking-wide uppercase">
-                        {item.obra.titulo}
-                      </h3>
-                      <p className="text-sm text-muted-foreground tracking-wide">
-                        {item.obra.autor}
-                      </p>
-                      {item.obra.tecnica && (
-                        <p className="text-xs text-muted-foreground/70 tracking-wide">
-                          {item.obra.tecnica}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-end justify-between mt-4">
-                      <p className="text-lg font-light tracking-wide">
-                        ${formatPrice(item.obra.precio_salida)}
-                      </p>
-
-                      <div className="flex items-center gap-6">
-                        {/* Cantidad */}
-                        <div className="flex items-center gap-3 border border-foreground/20 px-3 py-2">
-                          <button
-                            onClick={() => updateQuantity(item.obra.id_obra, item.quantity - 1)}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-6 text-center text-sm">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.obra.id_obra, item.quantity + 1)}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-
-                        {/* Eliminar */}
-                        <button
-                          onClick={() => removeFromCart(item.obra.id_obra)}
-                          className="text-muted-foreground hover:text-foreground"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  obra={item.obra}
+                  quantity={item.quantity}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeFromCart}
+                />
               ))}
             </div>
           </div>
