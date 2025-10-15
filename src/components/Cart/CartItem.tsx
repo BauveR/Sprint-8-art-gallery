@@ -1,14 +1,7 @@
 import ObraImage from "../common/ObraImage";
 import { formatPrice } from "../../lib/formatters";
 import { Trash2, Plus, Minus } from "lucide-react";
-import { Obra } from "../../types";
-
-interface CartItemProps {
-  obra: Obra;
-  quantity: number;
-  onUpdateQuantity: (id: number, newQuantity: number) => void;
-  onRemove: (id: number) => void;
-}
+import { CartItemProps } from "../../types/components";
 
 export default function CartItem({ obra, quantity, onUpdateQuantity, onRemove }: CartItemProps) {
   return (

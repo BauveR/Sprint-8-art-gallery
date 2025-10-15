@@ -1,10 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { useAuth, UserRole } from "../../context/AuthContextFirebase";
-
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  allowedRoles?: UserRole[];
-}
+import { useAuth } from "../../context/AuthContextFirebase";
+import { ProtectedRouteProps } from "../../types/components";
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, isAuthenticated, loading } = useAuth();

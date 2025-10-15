@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContextFirebase";
-
-interface CheckoutFormData {
-  nombre: string;
-  direccion: string;
-  ciudad: string;
-  codigoPostal: string;
-  telefono: string;
-}
+import { CheckoutFormData } from "../types/forms";
 
 export function useCheckoutForm() {
   const { user } = useAuth();

@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useTiendas, useCreateTienda, useUpdateTienda, useRemoveTienda } from "../../query/tiendas";
 import { Tienda, TiendaInput } from "../../types";
+import { EditState } from "../../types/forms";
 import LocationForm from "../shared/LocationForm";
 import LocationTable from "../shared/LocationTable";
 import LocationEditModal from "../shared/LocationEditModal";
 
 const empty: TiendaInput = { nombre: "", lat: 0, lng: 0, url_tienda: null };
-
-type EditState = { id: number; form: TiendaInput } | null;
 
 export default function TiendasPage() {
   const { data: list = [], isLoading, error } = useTiendas();
@@ -16,7 +15,7 @@ export default function TiendasPage() {
   const removeTienda = useRemoveTienda();
 
   const [form, setForm] = useState<TiendaInput>(empty);
-  const [edit, setEdit] = useState<EditState>(null);
+  const [edit, setEdit] = useState<EditState<TiendaInput>>(null);
 
   const onCreate = (e: React.FormEvent) => {
     e.preventDefault();

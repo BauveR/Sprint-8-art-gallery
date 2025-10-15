@@ -1,12 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Obra } from "../../types";
 import { motion } from "framer-motion";
-
-interface ObraInfoProps {
-  obra: Obra;
-  isAvailable: boolean;
-}
+import { ObraInfoProps } from "../../types/components";
 
 export default function ObraInfo({ obra, isAvailable }: ObraInfoProps) {
   return (

@@ -5,21 +5,7 @@ import { ExternalLink } from "lucide-react";
 import ObraImage from "../common/ObraImage";
 import { formatPrice } from "../../lib/formatters";
 import { ESTADO_CONFIG } from "../../lib/estadoConfig";
-
-interface Order {
-  id_obra: number;
-  titulo: string;
-  autor: string;
-  estado_venta: string;
-  numero_seguimiento?: string | null;
-  link_seguimiento?: string | null;
-  fecha_compra?: string | null;
-  precio_salida?: string | number | null;
-}
-
-interface OrderCardProps {
-  order: Order;
-}
+import { OrderCardProps } from "../../types/components";
 
 export default function OrderCard({ order }: OrderCardProps) {
   const navigate = useNavigate();

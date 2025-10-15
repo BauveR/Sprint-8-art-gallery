@@ -1,16 +1,5 @@
-import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-
-interface LocationEditModalProps<T> {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  form: T;
-  onChange: (updatedForm: T) => void;
-  isSubmitting: boolean;
-  title: string;
-  children?: ReactNode; // Para campos adicionales específicos
-}
+import { LocationEditModalProps } from "../../types/components";
 
 export default function LocationEditModal<T extends { nombre: string; lat: number; lng: number; url_tienda?: string | null; url_expo?: string | null }>({
   isOpen,

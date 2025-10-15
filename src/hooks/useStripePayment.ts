@@ -4,14 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContextFirebase";
 import { api } from "../lib/api";
 import { sendPaymentConfirmation } from "../lib/emailjs";
-
-interface CheckoutFormData {
-  nombre: string;
-  direccion: string;
-  ciudad: string;
-  codigoPostal: string;
-  telefono: string;
-}
+import { CheckoutFormData } from "../types/forms";
 
 export function useStripePayment() {
   const stripe = useStripe();

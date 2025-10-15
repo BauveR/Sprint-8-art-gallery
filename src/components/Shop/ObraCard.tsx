@@ -3,13 +3,7 @@ import { Check } from "lucide-react";
 import ObraImage from "../common/ObraImage";
 import { formatPrice } from "../../lib/formatters";
 import { useIsInCart } from "../../hooks/useIsInCart";
-import { Obra } from "../../types";
-
-interface ObraCardProps {
-  obra: Obra;
-  onAddToCart: (obra: Obra) => void;
-  onViewDetails: () => void;
-}
+import { ObraCardProps } from "../../types/components";
 
 export default function ObraCard({ obra, onAddToCart, onViewDetails }: ObraCardProps) {
   const isInCart = useIsInCart(obra.id_obra);

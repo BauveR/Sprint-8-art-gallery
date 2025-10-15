@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import ObraImage from "../common/ObraImage";
-import { ObraImagen } from "../../types";
 import { motion } from "framer-motion";
-
-interface ObraImageGalleryProps {
-  images: ObraImagen[];
-  obraId: number;
-  obraTitulo: string;
-}
+import { ObraImageGalleryProps } from "../../types/components";
 
 export default function ObraImageGallery({ images, obraId, obraTitulo }: ObraImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);

@@ -1,16 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-
-interface ShippingFormProps {
-  formData: {
-    nombre: string;
-    direccion: string;
-    ciudad: string;
-    codigoPostal: string;
-    telefono: string;
-  };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+import { ShippingFormProps } from "../../types/components";
 
 export default function ShippingForm({ formData, onChange }: ShippingFormProps) {
   return (

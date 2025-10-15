@@ -1,14 +1,5 @@
-import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-
-interface LocationFormProps<T> {
-  form: T;
-  onSubmit: (e: React.FormEvent) => void;
-  onChange: (updatedForm: T) => void;
-  isSubmitting: boolean;
-  submitLabel: string;
-  children?: ReactNode; // Para campos adicionales específicos
-}
+import { LocationFormProps } from "../../types/components";
 
 export default function LocationForm<T extends { nombre: string; lat: number; lng: number; url_tienda?: string | null; url_expo?: string | null }>({
   form,

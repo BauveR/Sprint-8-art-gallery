@@ -3,16 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Check } from "lucide-react";
 import { formatPrice } from "../../lib/formatters";
-import { Obra } from "../../types";
-
-interface ObraActionsProps {
-  obra: Obra;
-  isInCart: boolean;
-  isAvailable: boolean;
-  isInExhibition: boolean;
-  canPurchase: boolean;
-  onAddToCart: () => void;
-}
+import { ObraActionsProps } from "../../types/components";
 
 export default function ObraActions({
   obra,

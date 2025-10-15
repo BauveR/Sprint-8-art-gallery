@@ -2,11 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "../../lib/formatters";
 import { useCart } from "../../context/CartContext";
-
-interface OrderSummaryProps {
-  isProcessing: boolean;
-  onSubmit: () => void;
-}
+import { OrderSummaryProps } from "../../types/components";
 
 export default function OrderSummary({ isProcessing, onSubmit }: OrderSummaryProps) {
   const { items, totalPrice } = useCart();

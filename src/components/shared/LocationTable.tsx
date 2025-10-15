@@ -1,18 +1,5 @@
-import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-
-interface LocationTableProps<T> {
-  items: T[];
-  isLoading: boolean;
-  error: Error | null;
-  emptyMessage: string;
-  onEdit: (item: T) => void;
-  onDelete: (id: number) => void;
-  isDeleting: boolean;
-  getItemId: (item: T) => number;
-  renderRow: (item: T) => ReactNode;
-  headers: string[];
-}
+import { LocationTableProps } from "../../types/components";
 
 export default function LocationTable<T>({
   items,

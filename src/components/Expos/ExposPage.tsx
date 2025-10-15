@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useExpos, useCreateExpo, useUpdateExpo, useRemoveExpo } from "../../query/expos";
 import { Expo, ExpoInput } from "../../types";
+import { EditState } from "../../types/forms";
 import { DatePicker } from "@/components/ui/date-picker";
 import LocationForm from "../shared/LocationForm";
 import LocationTable from "../shared/LocationTable";
@@ -15,8 +16,6 @@ const empty: ExpoInput = {
   url_expo: null,
 };
 
-type EditState = { id: number; form: ExpoInput } | null;
-
 export default function ExposPage() {
   const { data: list = [], isLoading, error } = useExpos();
   const createExpo = useCreateExpo();
@@ -24,7 +23,7 @@ export default function ExposPage() {
   const removeExpo = useRemoveExpo();
 
   const [form, setForm] = useState<ExpoInput>(empty);
-  const [edit, setEdit] = useState<EditState>(null);
+  const [edit, setEdit] = useState<EditState<ExpoInput>>(null);
 
   const onCreate = (e: React.FormEvent) => {
     e.preventDefault();
