@@ -41,6 +41,8 @@ export async function uploadForObra(req: MulterReq, res: Response, next: NextFun
     const file = req.file;
     if (!file) return res.status(400).json({ error: "Archivo requerido (campo 'file')" });
 
+    console.log(`[Upload] Starting upload for obra ${id_obra}, file: ${file.originalname}, size: ${file.size} bytes`);
+
     // Subir a Cloudinary usando buffer
     const uploadResult = await new Promise<any>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
@@ -53,8 +55,13 @@ export async function uploadForObra(req: MulterReq, res: Response, next: NextFun
           ],
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error("[Cloudinary] Upload error:", error);
+            reject(error);
+          } else {
+            console.log("[Cloudinary] Upload success:", result?.secure_url);
+            resolve(result);
+          }
         }
       );
       uploadStream.end(file.buffer);
@@ -62,8 +69,10 @@ export async function uploadForObra(req: MulterReq, res: Response, next: NextFun
 
     const publicUrl = uploadResult.secure_url;
     const { id } = await svc.addImagen(id_obra, publicUrl);
+    console.log(`[Upload] Image saved to DB with id: ${id}`);
     res.status(201).json({ id, url: publicUrl });
   } catch (e) {
+    console.error("[Upload] Error:", e);
     next(e);
   }
 }
