@@ -25,6 +25,9 @@ const app = express();
 // CORS Configuration
 const allowedOrigins = [
   "http://localhost:5173", // Vite dev
+  "http://localhost:5174", // Vite dev alternate
+  "http://localhost:5175", // Vite dev alternate
+  "http://localhost:5176", // Vite dev alternate
   "http://localhost:3000", // Local testing
   process.env.FRONTEND_URL || "", // URL de producción (configurar en Railway)
 ].filter(Boolean);
