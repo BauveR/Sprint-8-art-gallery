@@ -8,11 +8,27 @@ export function errorHandler(
   _next: NextFunction
 ) {
   if (err instanceof ZodError) {
-    console.error("[ERROR] Validación fallida:", err.flatten());
-    return res
-      .status(400)
-      .json({ error: "Validación fallida", details: err.flatten() });
+    const flattened = err.format();
+    console.error("[ERROR] Validación fallida:", JSON.stringify(flattened, null, 2));
+
+    // Crear mensaje más amigable
+    const issues = err.issues;
+    let friendlyMessage = "Error de validación";
+
+    if (issues && issues.length > 0) {
+      const firstError = issues[0];
+      const field = firstError.path.join(".");
+      const message = firstError.message;
+      friendlyMessage = `${field}: ${message}`;
+    }
+
+    return res.status(400).json({
+      error: friendlyMessage,
+      details: flattened,
+      validation_errors: issues
+    });
   }
+
   const msg = err instanceof Error ? err.message : "Error interno";
   const code = msg.includes("no encontrada") ? 404 : 400;
   console.error(`[ERROR] ${code}:`, msg, err);

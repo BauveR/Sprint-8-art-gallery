@@ -6,9 +6,17 @@ console.log('[API Config] Environment:', import.meta.env.MODE);
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const msg = await res.text().catch(() => "");
-    console.error(`[API Error] ${res.status} ${res.statusText}`, msg);
-    throw new Error(msg || `HTTP ${res.status}`);
+    try {
+      const errorData = await res.json();
+      const errorMessage = errorData.error || errorData.message || `HTTP ${res.status}`;
+      console.error(`[API Error] ${res.status} ${res.statusText}`, errorData);
+      throw new Error(errorMessage);
+    } catch (jsonError) {
+      // Si no es JSON, usar el texto plano
+      const msg = await res.text().catch(() => "");
+      console.error(`[API Error] ${res.status} ${res.statusText}`, msg);
+      throw new Error(msg || `HTTP ${res.status}`);
+    }
   }
 
   // Intentar parsear JSON, pero capturar errores si es HTML
