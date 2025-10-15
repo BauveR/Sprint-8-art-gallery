@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { welcomeSvgElements, welcomeSvgElementsMobile } from "../../config/welcomeSvgs";
-import { getAnimationProps } from "../../lib/animations";
+import { getAnimationProps } from "../../utils/animations";
 
 export default function WelcomeSection() {
   const [isMobile, setIsMobile] = useState(false);

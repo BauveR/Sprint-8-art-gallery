@@ -1,4 +1,4 @@
-import { api } from "../lib/api";
+import { api } from "../api/client";
 import { Obra, ObraInput } from "../types";
 
 export const obrasService = {

@@ -1,4 +1,4 @@
-import { api } from "../lib/api";
+import { api } from "../api/client";
 import { Expo, ExpoInput } from "../types";
 
 export const exposService = {

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContextFirebase";
-import { api } from "../lib/api";
-import { sendPaymentConfirmation } from "../lib/emailjs";
+import { api } from "../api/client";
+import { sendPaymentConfirmation } from "../config/emailjs";
 import { CheckoutFormData } from "../types/forms";
 
 export function useStripePayment() {

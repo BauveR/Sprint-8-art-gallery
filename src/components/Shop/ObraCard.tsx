@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import ObraImage from "../common/ObraImage";
-import { formatPrice } from "../../lib/formatters";
+import { formatPrice } from "../../utils/formatters";
 import { useIsInCart } from "../../hooks/useIsInCart";
 import { ObraCardProps } from "../../types/components";
 

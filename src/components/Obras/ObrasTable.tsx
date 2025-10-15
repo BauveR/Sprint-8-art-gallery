@@ -1,7 +1,7 @@
 import { Obra } from "../../types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ESTADO_CONFIG } from "../../lib/estadoConfig";
+import { ESTADO_CONFIG } from "../../config/estadoConfig";
 
 type ObrasTableProps = {
   obras: Obra[];

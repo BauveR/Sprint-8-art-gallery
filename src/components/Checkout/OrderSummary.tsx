@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "../../lib/formatters";
+import { formatPrice } from "../../utils/formatters";
 import { useCart } from "../../context/CartContext";
 import { OrderSummaryProps } from "../../types/components";
 

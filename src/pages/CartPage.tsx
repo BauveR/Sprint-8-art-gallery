@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContextFirebase";
-import { formatPrice } from "../lib/formatters";
+import { formatPrice } from "../utils/formatters";
 import PublicLayout from "../components/layout/PublicLayout";
 import CartItem from "../components/Cart/CartItem";
 import { Button } from "@/components/ui/button";

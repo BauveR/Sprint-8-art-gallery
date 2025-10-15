@@ -8,7 +8,7 @@ import PaymentForm from "../components/Checkout/PaymentForm";
 import OrderSummary from "../components/Checkout/OrderSummary";
 import OrderSuccess from "../components/Checkout/OrderSuccess";
 import { Elements } from "@stripe/react-stripe-js";
-import { stripePromise } from "../lib/stripe";
+import { stripePromise } from "../config/stripe";
 import { toast } from "sonner";
 
 function CheckoutForm() {

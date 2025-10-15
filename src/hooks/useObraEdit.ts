@@ -5,7 +5,7 @@ import {
   sendShipmentNotification,
   sendDeliveryConfirmation,
   sendThankYouEmail,
-} from "../lib/emailjs";
+} from "../config/emailjs";
 
 type EditState = { id: number; form: ObraInput } | null;
 

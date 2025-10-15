@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Check } from "lucide-react";
-import { formatPrice } from "../../lib/formatters";
+import { formatPrice } from "../../utils/formatters";
 import { ObraActionsProps } from "../../types/components";
 
 export default function ObraActions({

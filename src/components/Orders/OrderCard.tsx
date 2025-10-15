@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import ObraImage from "../common/ObraImage";
-import { formatPrice } from "../../lib/formatters";
-import { ESTADO_CONFIG } from "../../lib/estadoConfig";
+import { formatPrice } from "../../utils/formatters";
+import { ESTADO_CONFIG } from "../../config/estadoConfig";
 import { OrderCardProps } from "../../types/components";
 
 export default function OrderCard({ order }: OrderCardProps) {

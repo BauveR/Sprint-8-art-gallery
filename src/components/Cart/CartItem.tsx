@@ -1,5 +1,5 @@
 import ObraImage from "../common/ObraImage";
-import { formatPrice } from "../../lib/formatters";
+import { formatPrice } from "../../utils/formatters";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { CartItemProps } from "../../types/components";
 
