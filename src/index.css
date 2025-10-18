@@ -143,4 +143,79 @@
   .hover-orange-filter:hover {
     filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(2079%) hue-rotate(349deg) brightness(99%) contrast(92%);
   }
+
+  /* Logo loop animation */
+  @keyframes logo-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-logo-scroll {
+    animation: logo-scroll 40s linear infinite;
+  }
+
+  .animate-logo-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  /* Metallic paint effect */
+  @keyframes metallic-shine {
+    0% {
+      filter: drop-shadow(0 0 20px rgba(236, 142, 52, 0.3))
+              drop-shadow(0 0 40px rgba(236, 142, 52, 0.2))
+              brightness(1) contrast(1.1);
+    }
+    25% {
+      filter: drop-shadow(-10px 10px 30px rgba(236, 142, 52, 0.4))
+              drop-shadow(10px -10px 30px rgba(255, 255, 255, 0.3))
+              brightness(1.1) contrast(1.2);
+    }
+    50% {
+      filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.4))
+              drop-shadow(0 0 50px rgba(236, 142, 52, 0.3))
+              brightness(1.2) contrast(1.1);
+    }
+    75% {
+      filter: drop-shadow(10px -10px 30px rgba(236, 142, 52, 0.4))
+              drop-shadow(-10px 10px 30px rgba(255, 255, 255, 0.3))
+              brightness(1.1) contrast(1.2);
+    }
+    100% {
+      filter: drop-shadow(0 0 20px rgba(236, 142, 52, 0.3))
+              drop-shadow(0 0 40px rgba(236, 142, 52, 0.2))
+              brightness(1) contrast(1.1);
+    }
+  }
+
+  .metallic-paint {
+    animation: metallic-shine 4s ease-in-out infinite;
+    will-change: filter;
+  }
+
+  /* Gradient animation for background */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

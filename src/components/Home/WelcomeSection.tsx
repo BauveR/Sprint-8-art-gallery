@@ -1,128 +1,61 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { welcomeSvgElements, welcomeSvgElementsMobile } from "../../config/welcomeSvgs";
-import { getAnimationProps } from "../../utils/animations";
+import LiquidEther from "../backgrounds/LiquidEther";
 
 export default function WelcomeSection() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  const elements = isMobile ? welcomeSvgElementsMobile : welcomeSvgElements;
-
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white dark:bg-white">
-      <div className="absolute inset-0">
-        {elements.map((element, index) => {
-          if (element.coinFlipOnHover) {
-            return <CoinFlipImage key={index} element={element} isMobile={isMobile} />;
-          }
-
-          const animationProps = getAnimationProps(element.animation);
-
-          // Para pantallas grandes: bloquear posición (sin animación de entrada)
-          // Para móvil: mantener animaciones de entrada
-          const initialState = isMobile ? animationProps.initial : animationProps.whileInView;
-
-          return (
-            <motion.img
-              key={index}
-              src={element.src}
-              alt=""
-              className={`absolute ${element.position} ${element.size} ${element.opacity} ${
-                element.hoverColorChange ? "cursor-pointer hover-orange-filter transition-all duration-200" : "pointer-events-none"
-              }`}
-              initial={initialState}
-              animate={
-                element.continuousRotate
-                  ? { ...animationProps.whileInView, rotate: 360 }
-                  : element.bounceDownEffect
-                  ? { ...animationProps.whileInView, y: [0, 10, 0] }
-                  : animationProps.whileInView
-              }
-              transition={
-                element.continuousRotate
-                  ? {
-                      duration: isMobile ? 1 : 0, // Sin transición inicial en desktop
-                      delay: isMobile ? element.animation.delay : 0,
-                      rotate: {
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear",
-                        delay: isMobile ? element.animation.delay + 1 : 0,
-                      },
-                    }
-                  : element.bounceDownEffect
-                  ? {
-                      duration: isMobile ? 1 : 0, // Sin transición inicial en desktop
-                      delay: isMobile ? element.animation.delay : 0,
-                      y: {
-                        duration: 1.2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: isMobile ? element.animation.delay + 3.9 : 0,
-                      },
-                    }
-                  : isMobile
-                  ? { duration: 1, delay: element.animation.delay }
-                  : { duration: 0 } // Sin transición en desktop
-              }
-            />
-          );
-        })}
+    <section className="relative min-h-screen overflow-hidden flex items-center justify-center">
+      {/* Fondo LiquidEther */}
+      <div className="absolute inset-0 z-0">
+        <LiquidEther
+          colors={['#5227FF', '#FF9FFC', '#B19EEF']}
+          mouseForce={20}
+          cursorSize={100}
+          isViscous={false}
+          viscous={30}
+          iterationsViscous={32}
+          iterationsPoisson={32}
+          resolution={0.5}
+          isBounce={false}
+          autoDemo={true}
+          autoSpeed={0.5}
+          autoIntensity={2.2}
+          takeoverDuration={0.25}
+          autoResumeDelay={3000}
+          autoRampDuration={0.6}
+        />
       </div>
+
+      {/* Capa de degradado blanco a transparente */}
+      <div className="absolute inset-0 z-[5]
+  bg-gradient-to-t from-white/100 from-0% via-white/60
+   via-30% to-transparent to-50%" />
+
+      {/* SVG con degradado radial */}
+      <motion.div
+        className="relative z-10 w-64 h-64 md:w-96 md:h-96 lg:w-[500px] lg:h-[500px]"
+        style={{
+          maskImage: 'url(/piedra-arte-05.svg)',
+          WebkitMaskImage: 'url(/piedra-arte-05.svg)',
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+          background: 'oklch(84.1% 0.238 128.85)'
+        }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1, rotate: 360 }}
+        transition={{
+          opacity: { duration: 1 },
+          scale: { duration: 1 },
+          rotate: {
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          },
+        }}
+      />
     </section>
-  );
-}
-
-function CoinFlipImage({ element }: { element: any }) {
-  const [rotateY, setRotateY] = useState(0);
-  const [isStopping, setIsStopping] = useState(false);
-  const animationProps = getAnimationProps(element.animation);
-
-  const handleHover = () => {
-    setRotateY(0);
-    setIsStopping(false);
-
-    // Después de 1.2 segundos, detener gradualmente
-    setTimeout(() => {
-      setIsStopping(true);
-      setRotateY(360); // Completar una vuelta final
-    }, 1200);
-  };
-
-  return (
-    <motion.img
-      src={element.src}
-      alt=""
-      className={`absolute ${element.position} ${element.size} ${element.opacity} cursor-pointer`}
-      style={{ transformStyle: "preserve-3d" }}
-      initial={animationProps.initial}
-      animate={{
-        ...animationProps.whileInView,
-        rotateY: rotateY,
-      }}
-      onHoverStart={handleHover}
-      transition={{
-        ...animationProps.initial,
-        duration: 1,
-        delay: element.animation.delay,
-        rotateY: isStopping
-          ? { duration: 1.5, ease: [0.22, 1, 0.36, 1] }
-          : {
-              duration: 0.6,
-              repeat: Infinity,
-              ease: "linear",
-            },
-      }}
-    />
   );
 }
