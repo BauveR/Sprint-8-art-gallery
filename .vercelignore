@@ -1,18 +1,18 @@
-# Ignore backend directory - deployed on Railway
-api/
-api/**
+# Ignore backend directory - deployed on Railway (only root api folder)
+/api/
+/api/**
 
 # Node modules
 node_modules/
-api/node_modules/
+/api/node_modules/
 
 # Environment files
 .env
 .env.local
-api/.env
+/api/.env
 
 # Build artifacts
-api/dist/
+/api/dist/
 
 # Tests
-api/tests/
+/api/tests/
