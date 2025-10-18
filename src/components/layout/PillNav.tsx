@@ -65,7 +65,7 @@ export default function PillNav() {
   };
 
   return (
-    <header className="fixed top-[72px] left-0 right-0 z-40 transition-all duration-300">
+    <header className="fixed top-4 md:top-[72px] left-0 right-0 z-40 transition-all duration-300">
       <nav className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-end h-16 relative">
           {/* Right side actions - Posicionado a la derecha */}

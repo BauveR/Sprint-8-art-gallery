@@ -52,7 +52,7 @@ interface LiquidEtherWebGL {
   dispose: () => void;
 }
 
-const defaultColors = ['#5227FF', '#FF9FFC', '#B19EEF'];
+const defaultColors = ['#E60A62', '#077EED', '#F08E05'];
 
 export default function LiquidEther({
   mouseForce = 20,
@@ -1220,7 +1220,7 @@ export default function LiquidEther({
   return (
     <div
       ref={mountRef}
-      className={`w-full h-full relative overflow-hidden pointer-events-none touch-none ${className || ''}`}
+      className={`w-full h-full relative overflow-hidden pointer-events-auto ${className || ''}`}
       style={style}
     />
   );

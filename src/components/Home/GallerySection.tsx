@@ -25,12 +25,12 @@ export default function GallerySection({ obras }: GallerySectionProps) {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl md:text-5xl font-bold">
-            <span className="bg-gradient-to-r from-pink-500 to-primary/60 bg-clip-text text-transparent">
-              Nuestra Galería
+            <span className="bg-gradient-to-r from-orange-500 to-blue-500 bg-clip-text text-transparent">
+              artworks & exhibitions
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl">
-            Descubre obras maestras de artistas destacados. Cada pieza cuenta una historia única.
+            P_I_E_D_R_A explores this relationship through various disciplines, creating unique experiences and objects. After all, no two stones are alike.
           </p>
         </motion.div>
       </div>
