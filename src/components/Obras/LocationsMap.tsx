@@ -77,7 +77,7 @@ export default function LocationsMap({ tiendas, expos }: LocationsMapProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-[400px] w-full rounded-b-xl overflow-hidden">
+        <div className="h-[200px] w-full rounded-b-xl overflow-hidden">
           {totalLocations > 0 ? (
             <MapContainer
               center={[center.lat, center.lng]}

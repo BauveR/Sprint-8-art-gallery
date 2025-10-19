@@ -16,11 +16,23 @@ interface Props {
 }
 
 export default function ObrasUbicacionChart({ obras }: Props) {
-  const [colors, setColors] = useState({
-    en_exposicion: "#000",
-    en_tienda: "#000",
-    tienda_online: "#000",
-    almacen: "#000",
+  const [colors, setColors] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        en_exposicion: "hsl(var(--chart-1))",
+        en_tienda: "hsl(var(--chart-2))",
+        tienda_online: "hsl(var(--chart-4))",
+        almacen: "hsl(var(--chart-3))",
+      };
+    }
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    return {
+      en_exposicion: computedStyle.getPropertyValue('--chart-1').trim(),
+      en_tienda: computedStyle.getPropertyValue('--chart-2').trim(),
+      tienda_online: computedStyle.getPropertyValue('--chart-4').trim(),
+      almacen: computedStyle.getPropertyValue('--chart-3').trim(),
+    };
   });
 
   useEffect(() => {
@@ -90,8 +102,8 @@ export default function ObrasUbicacionChart({ obras }: Props) {
         <CardDescription>Por ubicación física</CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="h-[300px] w-full bg-background/50 rounded-lg">
-          <PieChart width={400} height={300}>
+        <ChartContainer config={chartConfig} className="h-[200px] w-full bg-background/50 rounded-lg">
+          <PieChart width={400} height={200}>
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend wrapperStyle={{ color: 'hsl(var(--foreground))' }} />
             <Pie
@@ -100,7 +112,7 @@ export default function ObrasUbicacionChart({ obras }: Props) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={80}
+              outerRadius={60}
               label={{ fill: 'hsl(var(--foreground))' }}
             >
               {data.map((entry) => (

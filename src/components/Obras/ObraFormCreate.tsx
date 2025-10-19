@@ -20,7 +20,7 @@ export default function ObraFormCreate({ tiendas, expos, onSuccess, onError }: O
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-card text-card-foreground p-4 rounded-xl shadow border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10"
+      className="h-full grid grid-cols-1 gap-3"
     >
       <input
         className="border rounded p-2 bg-background text-foreground"
@@ -122,7 +122,7 @@ export default function ObraFormCreate({ tiendas, expos, onSuccess, onError }: O
           </option>
         ))}
       </select>
-      <div className="col-span-2 space-y-3">
+      <div className="space-y-3">
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
             <Upload className="h-4 w-4" />

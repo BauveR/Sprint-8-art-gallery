@@ -3,6 +3,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Configurar Draco decoder para archivos comprimidos
+useGLTF.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+
 interface ModelProps {
   modelPath: string;
   autoRotate?: boolean;

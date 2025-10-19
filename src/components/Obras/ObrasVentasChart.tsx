@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useId } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -9,9 +9,23 @@ interface Props {
 }
 
 export default function ObrasVentasChart({ obras }: Props) {
-  const [colors, setColors] = useState({
-    chart1: "#000",
-    chart2: "#000",
+  const id = useId();
+  const gradientVentasId = `colorVentas-${id}`;
+  const gradientEntregasId = `colorEntregas-${id}`;
+
+  const [colors, setColors] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        chart1: "hsl(var(--chart-1))",
+        chart2: "hsl(var(--chart-2))",
+      };
+    }
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    return {
+      chart1: computedStyle.getPropertyValue('--chart-1').trim(),
+      chart2: computedStyle.getPropertyValue('--chart-2').trim(),
+    };
   });
 
   useEffect(() => {
@@ -36,69 +50,76 @@ export default function ObrasVentasChart({ obras }: Props) {
     return () => observer.disconnect();
   }, []);
   const data = useMemo(() => {
-    // Simulamos datos de ventas mensuales
-    // En producción, esto vendría de un endpoint con datos históricos reales
     const meses = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+      "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
     ];
 
+    // Contar obras según su estado de venta
     const ventasPorEstado = obras.reduce((acc, obra) => {
       const estado = obra.estado_venta;
       acc[estado] = (acc[estado] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    // Generar datos simulados para los últimos 6 meses
     const mesActual = new Date().getMonth();
 
-    return Array.from({ length: 6 }, (_, i) => {
+    // Ventas completadas = entregado
+    const totalVentas = ventasPorEstado.entregado || 0;
+
+    // En proceso = procesando_envio + enviado
+    const totalEnProceso = (ventasPorEstado.procesando_envio || 0) + (ventasPorEstado.enviado || 0);
+
+    // Crear array de 6 meses
+    const result = Array.from({ length: 6 }, (_, i) => {
       const mesIndex = (mesActual - 5 + i + 12) % 12;
-      const mes = meses[mesIndex];
-
-      // Simular ventas con alguna variación
-      const baseVentas = ventasPorEstado.entregado || 0;
-      const variation = Math.floor(Math.random() * (baseVentas / 2 + 1));
-
       return {
-        mes,
-        ventas: Math.max(0, Math.floor(baseVentas / 6) + variation),
-        entregas: Math.max(0, Math.floor((ventasPorEstado.enviado || 0) / 6) + Math.floor(Math.random() * 3)),
+        mes: meses[mesIndex],
+        ventas: 0,
+        entregas: 0,
       };
     });
+
+    // Colocar todos los datos en el mes actual (último mes del array)
+    if (result.length > 0) {
+      result[result.length - 1].ventas = totalVentas;
+      result[result.length - 1].entregas = totalEnProceso;
+    }
+
+    return result;
   }, [obras]);
 
   const chartConfig = {
     ventas: {
-      label: "Ventas",
+      label: "Vendidas (Entregadas)",
       color: colors.chart1,
     },
     entregas: {
-      label: "Entregas",
+      label: "En Proceso",
       color: colors.chart2,
     },
   };
 
   const totalVentas = data.reduce((sum, item) => sum + item.ventas, 0);
-  const totalEntregas = data.reduce((sum, item) => sum + item.entregas, 0);
+  const totalEnProceso = data.reduce((sum, item) => sum + item.entregas, 0);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Ventas Mensuales</CardTitle>
         <CardDescription>
-          Últimos 6 meses • Total: {totalVentas} ventas, {totalEntregas} entregas
+          Últimos 6 meses • {totalVentas} vendidas, {totalEnProceso} en proceso
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="h-[300px] w-full bg-background/50 rounded-lg">
-          <AreaChart data={data} width={500} height={300}>
+        <ChartContainer config={chartConfig} className="h-[200px] w-full bg-background/50 rounded-lg">
+          <AreaChart data={data} width={500} height={200}>
               <defs>
-                <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={gradientVentasId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={colors.chart1} stopOpacity={0.8} />
                   <stop offset="95%" stopColor={colors.chart1} stopOpacity={0.1} />
                 </linearGradient>
-                <linearGradient id="colorEntregas" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={gradientEntregasId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={colors.chart2} stopOpacity={0.8} />
                   <stop offset="95%" stopColor={colors.chart2} stopOpacity={0.1} />
                 </linearGradient>
@@ -125,7 +146,7 @@ export default function ObrasVentasChart({ obras }: Props) {
               dataKey="ventas"
               stroke={colors.chart1}
               fillOpacity={1}
-              fill="url(#colorVentas)"
+              fill={`url(#${gradientVentasId})`}
               strokeWidth={2}
             />
             <Area
@@ -133,7 +154,7 @@ export default function ObrasVentasChart({ obras }: Props) {
               dataKey="entregas"
               stroke={colors.chart2}
               fillOpacity={1}
-              fill="url(#colorEntregas)"
+              fill={`url(#${gradientEntregasId})`}
               strokeWidth={2}
             />
           </AreaChart>

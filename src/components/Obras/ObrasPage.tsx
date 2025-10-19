@@ -25,7 +25,7 @@ export default function ObrasPage() {
   const { toast } = useToast();
 
   // Sort y paginación
-  const { sort, page, pageSize, setPage, headerBtn } = useObraSort(10);
+  const { sort, page, pageSize, setPage, headerBtn } = useObraSort(8);
 
   // Datos del servidor
   const { data, isLoading, error } = useObras({
@@ -121,19 +121,14 @@ export default function ObrasPage() {
   };
 
   return (
-    <div className="px-4 md:px-[5%] py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[30%_1fr] gap-6">
-        {/* Columna izquierda: Charts */}
-        <div className="space-y-6">
-          <ObrasUbicacionChart obras={obras} />
-          <ObrasVentasChart obras={obras} />
-          <LocationsMap tiendas={tiendas} expos={expos} />
-        </div>
-
-        {/* Columna derecha: Formulario + Tabla */}
-        <div className="space-y-6">
-          {/* Formulario de creación */}
-          <ObraFormCreate
+    <div className="px-4 md:px-[5%] py-6 space-y-6">
+      {/* Sección superior: Formulario (izq) + Inventario (der) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
+        {/* Columna izquierda: Formulario de alta */}
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4 flex flex-col h-full">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Subir piedra</h2>
+          <div className="flex-1">
+            <ObraFormCreate
             tiendas={tiendas}
             expos={expos}
             onSuccess={() => {
@@ -151,6 +146,12 @@ export default function ObrasPage() {
               });
             }}
           />
+          </div>
+        </div>
+
+        {/* Columna derecha: Container de Inventario */}
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Inventario</h2>
 
           {/* Buscador */}
           <div className="relative">
@@ -197,6 +198,19 @@ export default function ObrasPage() {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Sección inferior: Charts horizontales (fijos) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
+        {/* Espacio vacío para alinear con el formulario */}
+        <div></div>
+
+        {/* Charts alineados con la tabla de inventario */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <ObrasUbicacionChart obras={obras} />
+          <ObrasVentasChart obras={obras} />
+          <LocationsMap tiendas={tiendas} expos={expos} />
         </div>
       </div>
 

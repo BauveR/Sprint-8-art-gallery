@@ -7,26 +7,28 @@ export default function WelcomeSection() {
   const lineOpacity = useTransform(scrollY, [0, 200], [1, 0]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center px-6">
+    <section className="relative min-h-screen w-full overflow-hidden flex flex-col items-center justify-center px-6 touch-pan-y">
       {/* Fondo LiquidEther */}
-      <div className="absolute inset-0 z-0">
-        <LiquidEther
-          colors={['#E60A62', '#077EED', '#F08E05']}
-          mouseForce={14}
-          cursorSize={90}
-          isViscous={true}
-          viscous={78}
-          iterationsViscous={32}
-          iterationsPoisson={32}
-          resolution={0.5}
-          isBounce={false}
-          autoDemo={true}
-          autoSpeed={0.4}
-          autoIntensity={1.1}
-          takeoverDuration={0.25}
-          autoResumeDelay={1000}
-          autoRampDuration={0.6}
-        />
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <div className="w-full h-full min-w-full min-h-full">
+          <LiquidEther
+            colors={['#E60A62', '#077EED', '#F08E05']}
+            mouseForce={14}
+            cursorSize={90}
+            isViscous={true}
+            viscous={78}
+            iterationsViscous={32}
+            iterationsPoisson={32}
+            resolution={0.5}
+            isBounce={false}
+            autoDemo={true}
+            autoSpeed={0.4}
+            autoIntensity={1.1}
+            takeoverDuration={0.25}
+            autoResumeDelay={1000}
+            autoRampDuration={0.6}
+          />
+        </div>
       </div>
 
       {/* Capa de degradado blanco a transparente */}
@@ -75,7 +77,7 @@ export default function WelcomeSection() {
 
       {/* Línea vertical animada para scroll */}
       <motion.div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[100] w-[2.5px] bg-gradient-to-b from-gray-300 dark:from-gray-400 to-transparent"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[100] w-[2.5px] bg-gradient-to-b from-gray-500 dark:from-blue-400 to-transparent"
         style={{
           height: '17vh',
           scaleY: lineScale,
