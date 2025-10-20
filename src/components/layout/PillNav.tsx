@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContextFirebase";
 import { useCart } from "../../context/CartContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, User, ShoppingCart, Store, Package } from "lucide-react";
+import { LogOut, User, ShoppingCart, Store, Package, Settings } from "lucide-react";
 
 export default function PillNav() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -122,6 +122,20 @@ export default function PillNav() {
               )}
             </Button>
 
+            {/* Admin Dashboard Button - Solo visible para administradores */}
+            {isAuthenticated && user?.role === 'admin' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+                className="rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300"
+                title="Ir al Dashboard de Administración"
+              >
+                <Settings className="h-5 w-5" />
+                <span className="hidden lg:inline ml-2">Admin</span>
+              </Button>
+            )}
+
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -198,6 +212,20 @@ export default function PillNav() {
                 </span>
               )}
             </Button>
+
+            {/* Admin Dashboard Button Mobile - Solo visible para administradores */}
+            {isAuthenticated && user?.role === 'admin' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+                className="rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-400"
+                title="Dashboard Admin"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            )}
+
             <ThemeToggle />
           </div>
         </div>

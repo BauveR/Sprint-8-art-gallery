@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Search } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // Hooks personalizados
 import { useObraSort } from "../../hooks/useObraSort";
@@ -122,8 +128,94 @@ export default function ObrasPage() {
 
   return (
     <div className="px-4 md:px-[5%] py-6 space-y-6">
-      {/* Sección superior: Formulario (izq) + Inventario (der) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
+      {/* Versión móvil: Accordion desplegable */}
+      <div className="lg:hidden">
+        <Accordion type="single" collapsible className="space-y-4">
+          {/* Sección Subir piedra */}
+          <AccordionItem value="subir" className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-700">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Subir piedra</h2>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <ObraFormCreate
+                tiendas={tiendas}
+                expos={expos}
+                onSuccess={() => {
+                  toast({
+                    title: "✓ Obra creada exitosamente",
+                    description: "La obra ha sido agregada a la galería",
+                    variant: "default",
+                  });
+                }}
+                onError={(error) => {
+                  toast({
+                    title: "Error al crear obra",
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Sección Inventario */}
+          <AccordionItem value="inventario" className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-700">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Inventario</h2>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6 space-y-4">
+              {/* Buscador */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Buscar por autor, título, técnica, tienda o exposición..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Tabla de obras */}
+              <ObrasTable
+                obras={filteredObras}
+                isLoading={isLoading}
+                error={error}
+                searchQuery={searchQuery}
+                headerBtn={headerBtn}
+                onEdit={handleStartEdit}
+                onDelete={handleDelete}
+                isDeleting={removeObra.isPending}
+              />
+
+              {/* Paginación */}
+              <div className="flex items-center justify-between text-sm">
+                <div>
+                  Página {page} de {totalPages} · {total} obras
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    ← Anterior
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Siguiente →
+                  </Button>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+
+      {/* Versión desktop: Layout en grid */}
+      <div className="hidden lg:grid lg:grid-cols-[1fr_2fr] gap-6">
         {/* Columna izquierda: Formulario de alta */}
         <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4 flex flex-col h-full">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Subir piedra</h2>

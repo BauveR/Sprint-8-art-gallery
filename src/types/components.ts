@@ -5,6 +5,7 @@
 import { Obra, ObraImagen } from "./index";
 import { Order } from "./orders";
 import { ReactNode } from "react";
+import { CheckoutFormData } from "./forms";
 
 // ====== Componentes de Obra ======
 
@@ -52,14 +53,8 @@ export interface ObraImageGalleryProps {
  * Props para el componente ShippingForm
  */
 export interface ShippingFormProps {
-  formData: {
-    nombre: string;
-    direccion: string;
-    ciudad: string;
-    codigoPostal: string;
-    telefono: string;
-  };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: CheckoutFormData;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }
 
 /**

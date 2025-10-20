@@ -6,6 +6,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import LocationForm from "../shared/LocationForm";
 import LocationTable from "../shared/LocationTable";
 import LocationEditModal from "../shared/LocationEditModal";
+import Model3D from "../3D/Model3D";
 
 const empty: ExpoInput = {
   nombre: "",
@@ -69,6 +70,19 @@ export default function ExposPage() {
   return (
     <div className="px-4 md:px-[5%] py-6 space-y-6">
       <h2 className="text-xl font-semibold">Exposiciones</h2>
+
+      {/* Modelo 3D centrado */}
+      <div className="w-full flex justify-center py-4">
+        <div className="w-full max-w-md h-[35vh]">
+          <Model3D
+            modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760910655/Screenshot_final_j6nnfu.glb"
+            autoRotate={true}
+            rotationSpeed={0.3}
+            scale={18}
+            className="w-full h-full"
+          />
+        </div>
+      </div>
 
       {/* Formulario de creación con campos de fecha */}
       <LocationForm

@@ -1,8 +1,9 @@
 import { useObras } from "../../query/obras";
 import { useTiendas } from "../../query/tiendas";
 import { useExpos } from "../../query/expos";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Store, Calendar } from "lucide-react";
+import Model3DGallery from "../Admin/Model3DGallery";
 
 type Tab = "admin" | "obras" | "tiendas" | "expos";
 
@@ -22,16 +23,26 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const obrasDisponibles = obrasData?.data.filter(o => o.estado_venta === "disponible").length ?? 0;
   const obrasVendidas = obrasData?.data.filter(o => ["enviado", "entregado"].includes(o.estado_venta)).length ?? 0;
 
+  // Modelos 3D para mostrar
+  const models = [
+    {
+      path: "https://res.cloudinary.com/dmweipuof/image/upload/v1760910351/Bound_Stones_compressed_myawsg.glb",
+      name: "Bound Stones"
+    },
+    {
+      path: "https://res.cloudinary.com/dmweipuof/image/upload/v1760910360/Balancing_Act_compressed_kgwxnz.glb",
+      name: "Balancing Act"
+    },
+    {
+      path: "https://res.cloudinary.com/dmweipuof/image/upload/v1760910655/Screenshot_final_j6nnfu.glb",
+      name: "Pebble Art"
+    }
+  ];
+
   return (
     <div className="px-4 md:px-[5%] py-6 space-y-8">
-      {/* Logo Section */}
-      <div className="flex justify-center pt-2.5 pb-1 md:pt-5 md:pb-7">
-        <img
-          src="/piedra-arte-02.svg"
-          alt="Art Gallery Logo"
-          className="w-[30rem] h-[30rem] md:w-[44rem] md:h-[44rem]"
-        />
-      </div>
+      {/* 3D Models Gallery */}
+      <Model3DGallery models={models} />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -83,48 +94,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Access */}
-      <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
-        <CardHeader>
-          <CardTitle>Acceso Rápido</CardTitle>
-          <CardDescription>Gestiona tu galería desde las pestañas superiores</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div
-              className="p-4 border rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-              onClick={() => onNavigate("obras")}
-            >
-              <Package className="h-8 w-8 mb-2 text-primary" />
-              <h3 className="font-semibold mb-1">Obras</h3>
-              <p className="text-sm text-muted-foreground">
-                Añade y gestiona las obras de arte de tu colección
-              </p>
-            </div>
-            <div
-              className="p-4 border rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-              onClick={() => onNavigate("tiendas")}
-            >
-              <Store className="h-8 w-8 mb-2 text-primary" />
-              <h3 className="font-semibold mb-1">Tiendas</h3>
-              <p className="text-sm text-muted-foreground">
-                Administra las ubicaciones físicas de tus tiendas
-              </p>
-            </div>
-            <div
-              className="p-4 border rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-              onClick={() => onNavigate("expos")}
-            >
-              <Calendar className="h-8 w-8 mb-2 text-primary" />
-              <h3 className="font-semibold mb-1">Exposiciones</h3>
-              <p className="text-sm text-muted-foreground">
-                Organiza y programa eventos de exposiciones
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

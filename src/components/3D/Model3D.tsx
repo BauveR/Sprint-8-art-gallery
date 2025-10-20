@@ -11,9 +11,10 @@ interface ModelProps {
   autoRotate?: boolean;
   rotationSpeed?: number;
   scrollRotation?: { x: number; y: number };
+  scale?: number;
 }
 
-function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotation }: ModelProps) {
+function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotation, scale = 80 }: ModelProps) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef<THREE.Group>(null);
 
@@ -63,13 +64,14 @@ function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotati
     }
   });
 
-  return <primitive ref={meshRef} object={scene} scale={80} />;
+  return <primitive ref={meshRef} object={scene} scale={scale} />;
 }
 
 export default function Model3D({
   modelPath,
   autoRotate = true,
   rotationSpeed = 0.5,
+  scale = 80,
   className = ''
 }: ModelProps & { className?: string }) {
   const [scrollRotation, setScrollRotation] = useState<{ x: number; y: number } | undefined>(undefined);
@@ -120,6 +122,7 @@ export default function Model3D({
           autoRotate={!scrollRotation && autoRotate}
           rotationSpeed={rotationSpeed}
           scrollRotation={scrollRotation}
+          scale={scale}
         />
         <OrbitControls
           enableZoom={false}

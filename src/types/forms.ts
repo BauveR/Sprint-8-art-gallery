@@ -6,11 +6,18 @@
  * Datos del formulario de checkout
  */
 export interface CheckoutFormData {
+  email: string;
   nombre: string;
-  direccion: string;
-  ciudad: string;
-  codigoPostal: string;
   telefono: string;
+  direccion: string;
+  numeroExterior: string;
+  numeroInterior?: string;
+  colonia: string;
+  codigoPostal: string;
+  ciudad: string;
+  estado: string;
+  pais: string;
+  referencias?: string;
 }
 
 /**
