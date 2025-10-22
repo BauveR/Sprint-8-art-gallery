@@ -1,4 +1,4 @@
-import { Expo, Tienda, EstadoVenta } from "../../types";
+import { Expo, Tienda } from "../../types";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
@@ -11,9 +11,6 @@ type EditState = {
     medidas: string | null;
     tecnica: string | null;
     precio_salida: number | null;
-    estado_venta: EstadoVenta;
-    numero_seguimiento: string | null;
-    link_seguimiento: string | null;
     id_tienda: number | null;
     id_expo: number | null;
   };
@@ -174,52 +171,6 @@ export default function ObraEditModal({
               })
             }
           />
-          <select
-            className="border rounded p-2 bg-background text-foreground"
-            value={edit.form.estado_venta ?? "disponible"}
-            onChange={(e) =>
-              onEditChange({
-                ...edit,
-                form: { ...edit.form, estado_venta: e.target.value as EstadoVenta },
-              })
-            }
-          >
-            <option value="disponible">Disponible</option>
-            <option value="en_carrito">En carrito</option>
-            <option value="procesando_envio">Procesando envío</option>
-            <option value="enviado">Enviado</option>
-            <option value="entregado">Entregado</option>
-            <option value="pendiente_devolucion">Pendiente devolución</option>
-            <option value="nunca_entregado">Nunca entregado</option>
-          </select>
-
-          {/* Campos de tracking - Solo visible si está enviado o entregado */}
-          {(edit.form.estado_venta === "enviado" || edit.form.estado_venta === "entregado") && (
-            <>
-              <input
-                className="border rounded p-2 bg-background text-foreground col-span-2"
-                placeholder="Número de seguimiento"
-                value={edit.form.numero_seguimiento ?? ""}
-                onChange={(e) =>
-                  onEditChange({
-                    ...edit,
-                    form: { ...edit.form, numero_seguimiento: e.target.value || null },
-                  })
-                }
-              />
-              <input
-                className="border rounded p-2 bg-background text-foreground col-span-2"
-                placeholder="Link de seguimiento (URL completa)"
-                value={edit.form.link_seguimiento ?? ""}
-                onChange={(e) =>
-                  onEditChange({
-                    ...edit,
-                    form: { ...edit.form, link_seguimiento: e.target.value || null },
-                  })
-                }
-              />
-            </>
-          )}
           <select
             className="border rounded p-2 bg-background text-foreground"
             value={edit.form.id_tienda ?? ""}

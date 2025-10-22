@@ -95,6 +95,8 @@ export async function updateObra(id_obra: number, body: unknown) {
     handleTiendaUpdate(id_obra, input.id_tienda, obraActual?.id_tienda),
     handleExpoUpdate(id_obra, input.id_expo, obraActual?.id_expo),
   ]);
+
+  // Nota: La gestión de estados y envío de emails está centralizada en Orders
 }
 
 export async function removeObra(id_obra: number) {

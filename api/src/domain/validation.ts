@@ -12,7 +12,7 @@ export const tiendaInputSchema = z.object({
   nombre: z.string().min(1),
   lat: z.number().finite(),
   lng: z.number().finite(),
-  url_tienda: z.string().url().optional().nullable(),
+  url_tienda: z.string().url().or(z.literal("")).nullable().optional(),
 });
 
 export const expoInputSchema = z.object({
@@ -21,7 +21,7 @@ export const expoInputSchema = z.object({
   lng: z.number().finite(),
   fecha_inicio: fechaSchema,
   fecha_fin: fechaSchema,
-  url_expo: z.string().url().optional().nullable(),
+  url_expo: z.string().url().or(z.literal("")).nullable().optional(),
 });
 
 export const estadoVentaSchema = z.enum([

@@ -10,6 +10,9 @@ import {
   uploadForObra,
   remove as removeImg,
 } from "../controllers/imagesController";
+import reservasRoutes from "./reservas";
+import direccionesRoutes from "./direcciones";
+import { optionalAuth, verifyFirebaseToken } from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -41,11 +44,28 @@ router.put("/expos/:id", expos.update);
 router.delete("/expos/:id", expos.remove);
 
 // Payments (Stripe)
-router.post("/payments/create-payment-intent", payments.createPaymentIntent);
-router.post("/payments/confirm", payments.confirmPayment);
+router.post("/payments/create-payment-intent", optionalAuth, payments.createPaymentIntent);
+router.post("/payments/confirm", optionalAuth, payments.confirmPayment);
 router.post("/payments/webhook", payments.stripeWebhook);
 
 // Orders (User purchases)
-router.get("/orders", orders.getOrdersByEmail);
+router.get("/orders", orders.getOrdersByEmail); // Legacy endpoint
+router.post("/orders", verifyFirebaseToken, orders.createOrder);
+router.get("/orders/all", orders.getAllOrders); // Admin - must be before /:id
+router.get("/orders/stats", orders.getOrderStats); // Admin - must be before /:id
+router.get("/orders/my-orders", verifyFirebaseToken, orders.getMyOrders);
+router.get("/orders/number/:orderNumber", orders.getOrderByNumber);
+router.get("/orders/:id", orders.getOrderById);
+router.get("/orders/:id/history", orders.getOrderHistory);
+router.get("/orders/:id/summary", orders.getOrderSummary);
+router.put("/orders/:id/status", orders.updateOrderStatus); // Admin
+router.post("/orders/:id/cancel", orders.cancelOrder);
+router.post("/orders/:id/mark-paid", orders.markOrderAsPaid); // Webhook
+
+// Reservas (Cart management)
+router.use("/reservas", reservasRoutes);
+
+// Direcciones (Shipping addresses)
+router.use("/direcciones", direccionesRoutes);
 
 export default router;

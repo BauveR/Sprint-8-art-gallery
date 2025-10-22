@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useCheckoutForm } from "../hooks/useCheckoutForm";
 import { useStripePayment } from "../hooks/useStripePayment";
+import { useAuth } from "../context/AuthContextFirebase";
 import PublicLayout from "../components/layout/PublicLayout";
+import AddressSelector from "../components/Checkout/AddressSelector";
 import ShippingForm from "../components/Checkout/ShippingForm";
 import PaymentForm from "../components/Checkout/PaymentForm";
 import OrderSummary from "../components/Checkout/OrderSummary";
@@ -14,7 +16,8 @@ import { toast } from "sonner";
 function CheckoutForm() {
   const { items } = useCart();
   const navigate = useNavigate();
-  const { formData, handleChange } = useCheckoutForm();
+  const { user } = useAuth();
+  const { formData, selectedAddressId, handleChange, loadAddressData } = useCheckoutForm();
   const { processPayment, isProcessing, orderComplete, canProcess } = useStripePayment();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +59,29 @@ function CheckoutForm() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Formularios de envío y pago */}
             <div className="lg:col-span-2 space-y-6">
-              <ShippingForm formData={formData} onChange={handleChange} />
+              {user ? (
+                <AddressSelector
+                  formData={formData}
+                  onChange={handleChange}
+                  onSelectAddress={loadAddressData}
+                />
+              ) : (
+                <>
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      Para guardar direcciones y tener un checkout más rápido, por favor{" "}
+                      <button
+                        type="button"
+                        onClick={() => navigate("/login")}
+                        className="underline font-semibold hover:text-yellow-900 dark:hover:text-yellow-100"
+                      >
+                        inicia sesión
+                      </button>
+                    </p>
+                  </div>
+                  <ShippingForm formData={formData} onChange={handleChange} />
+                </>
+              )}
               <PaymentForm />
             </div>
 

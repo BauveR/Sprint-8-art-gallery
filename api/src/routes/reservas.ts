@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as reservasController from "../controllers/reservasController";
-import { authMiddleware } from "../middleware/authMiddleware";
+import { verifyFirebaseToken, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -13,6 +13,6 @@ router.get("/my-cart", reservasController.getMyCart);
 router.delete("/release-all", reservasController.releaseAll);
 
 // Rutas protegidas (solo admin)
-router.post("/cleanup", authMiddleware, reservasController.cleanupExpired);
+router.post("/cleanup", verifyFirebaseToken, requireAdmin, reservasController.cleanupExpired);
 
 export default router;

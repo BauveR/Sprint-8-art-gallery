@@ -60,6 +60,7 @@ export async function sendShipmentNotification(params: {
   to_name: string;
   order_id: string;
   tracking_number: string;
+  carrier?: string;
   tracking_link: string;
   items: Array<{ titulo: string }>;
 }) {
@@ -72,6 +73,7 @@ export async function sendShipmentNotification(params: {
         to_name: params.to_name,
         order_id: params.order_id,
         tracking_number: params.tracking_number,
+        carrier: params.carrier || 'Servicio de paquetería',
         tracking_link: params.tracking_link,
         items_list: params.items.map((item) => item.titulo).join(', '),
       }

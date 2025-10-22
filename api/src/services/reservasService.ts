@@ -1,5 +1,5 @@
 import * as reservasRepo from "../repositories/reservasRepo";
-import { getObraById } from "./obrasService";
+import { findObraById } from "../repositories/obrasRepo";
 
 export interface AddToCartRequest {
   id_obra: number;
@@ -19,7 +19,7 @@ export interface CartValidationResult {
  */
 export async function addToCart(data: AddToCartRequest) {
   // 1. Verificar que la obra existe
-  const obra = await getObraById(data.id_obra);
+  const obra = await findObraById(data.id_obra);
   if (!obra) {
     throw new Error("Obra no encontrada");
   }
@@ -95,7 +95,7 @@ export async function validateObraAvailability(
   sessionId: string
 ): Promise<CartValidationResult> {
   // 1. Verificar obra
-  const obra = await getObraById(id_obra);
+  const obra = await findObraById(id_obra);
   if (!obra) {
     return { available: false, message: "Obra no encontrada" };
   }

@@ -53,11 +53,11 @@ export const createPaymentIntent = asyncHandler(
 /**
  * Confirmar pago exitoso
  * POST /api/payments/confirm
- * Body: { paymentIntentId: string, obra_ids: number[], buyer_name: string, buyer_email: string }
+ * Body: { paymentIntentId: string, obra_ids: number[], buyer_name: string, buyer_email: string, shipping_data: object }
  */
 export const confirmPayment = asyncHandler(
   async (req: Request, res: Response) => {
-    const { paymentIntentId, obra_ids, buyer_name, buyer_email } = req.body;
+    const { paymentIntentId, obra_ids, buyer_name, buyer_email, shipping_data } = req.body;
 
     if (!paymentIntentId || !obra_ids || !Array.isArray(obra_ids)) {
       return res.status(400).json({ error: "Invalid request data" });
@@ -73,6 +73,44 @@ export const confirmPayment = asyncHandler(
       });
     }
 
+    // Importar ordersService
+    const ordersService = require("../services/ordersService");
+    const obrasRepo = require("../repositories/obrasRepo");
+
+    // Obtener información de las obras para la orden
+    const obrasData = await Promise.all(
+      obra_ids.map(async (id: number) => {
+        const obra = await obrasRepo.findObraById(id);
+        return {
+          id_obra: id,
+          titulo: obra?.titulo || "N/A",
+          precio: Number(obra?.precio_salida) || 0,
+          cantidad: 1,
+        };
+      })
+    );
+
+    const subtotal = obrasData.reduce((sum, item) => sum + item.precio, 0);
+
+    // Obtener el ID del usuario autenticado (si existe)
+    const userId = req.user?.uid || "anonymous";
+
+    // Crear la orden en la tabla ordenes
+    const order = await ordersService.createOrder({
+      id_user: userId,
+      user_email: buyer_email,
+      user_name: buyer_name,
+      subtotal,
+      shipping_cost: 0,
+      tax: 0,
+      total: subtotal,
+      payment_method: "stripe",
+      payment_id: paymentIntentId,
+      shipping_snapshot: shipping_data,
+      items: obrasData,
+      status: "paid",
+    });
+
     // Actualizar el estado de las obras a "procesando_envio" con info del comprador
     for (const obraId of obra_ids) {
       await obrasService.updateObra(Number(obraId), {
@@ -85,11 +123,15 @@ export const confirmPayment = asyncHandler(
 
     res.json({
       success: true,
-      message: "Payment confirmed and orders created",
+      message: "Payment confirmed and order created",
       paymentIntent: {
         id: paymentIntent.id,
         amount: paymentIntent.amount / 100,
         status: paymentIntent.status,
+      },
+      order: {
+        id: order.id_orden,
+        order_number: order.order_number,
       },
     });
   }

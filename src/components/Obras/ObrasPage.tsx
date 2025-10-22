@@ -50,7 +50,7 @@ export default function ObrasPage() {
   const { searchQuery, setSearchQuery, filteredObras } = useObraSearch(obras);
 
   // Edición
-  const obraEdit = useObraEdit(obras);
+  const obraEdit = useObraEdit();
 
   // Imágenes para el modal de edición
   const editImages = useObraImages();
@@ -78,24 +78,15 @@ export default function ObrasPage() {
       ev,
       () => {
         editImages.resetImages();
+        toast({
+          title: "Obra actualizada",
+          description: "La obra se actualizó correctamente",
+        });
       },
       (error) => {
         toast({
           title: "Error al actualizar obra",
           description: error.message,
-          variant: "destructive",
-        });
-      },
-      (message) => {
-        toast({
-          title: "Email enviado",
-          description: message,
-        });
-      },
-      (message) => {
-        toast({
-          title: "Error al enviar email",
-          description: message,
           variant: "destructive",
         });
       }

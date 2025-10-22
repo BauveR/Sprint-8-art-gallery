@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContextFirebase";
-import { useOrders } from "../query/orders";
+import { useMyOrders } from "../hooks/useOrders";
 import PublicLayout from "../components/layout/PublicLayout";
-import OrderCard from "../components/Orders/OrderCard";
+import NewOrderCard from "../components/Orders/NewOrderCard";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
 
 export default function MyOrdersPage() {
-  const { user, isAuthenticated } = useAuth();
-  const { data: orders = [], isLoading } = useOrders(user?.email);
+  const { isAuthenticated } = useAuth();
+  const { data: orders = [], isLoading } = useMyOrders(isAuthenticated);
   const navigate = useNavigate();
 
   if (!isAuthenticated) {
@@ -64,7 +64,7 @@ export default function MyOrdersPage() {
           /* Orders List */
           <div className="space-y-6">
             {orders.map((order) => (
-              <OrderCard key={order.id_obra} order={order} />
+              <NewOrderCard key={order.id_orden} order={order} />
             ))}
           </div>
         )}

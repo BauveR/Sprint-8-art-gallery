@@ -6,7 +6,6 @@ import PublicLayout from "../components/layout/PublicLayout";
 import ObraCard from "../components/Shop/ObraCard";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { toast } from "sonner";
 
 export default function ShopPage() {
   const { data, isLoading } = useObras({ sort: { key: "id_obra", dir: "desc" }, page: 1, pageSize: 100 });
@@ -35,7 +34,6 @@ export default function ShopPage() {
 
   const handleAddToCart = (obra: any) => {
     addToCart(obra);
-    toast.success(`${obra.titulo} agregado al carrito`);
   };
 
   return (

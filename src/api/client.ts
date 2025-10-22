@@ -41,35 +41,35 @@ function toQuery(params?: Record<string, any>): string {
 }
 
 export const api = {
-  async get<T>(url: string, params?: Record<string, any>): Promise<T> {
+  async get<T>(url: string, params?: Record<string, any>, headers?: Record<string, string>): Promise<T> {
     const fullUrl = `${BASE}${url}${toQuery(params)}`;
     console.log(`[API GET] ${fullUrl}`);
-    const res = await fetch(fullUrl);
+    const res = await fetch(fullUrl, { headers });
     console.log(`[API GET] Response status: ${res.status}`);
     return handle<T>(res);
   },
-  async post<T>(url: string, body: any): Promise<T> {
+  async post<T>(url: string, body: any, headers?: Record<string, string>): Promise<T> {
     console.log(`[API POST] ${BASE}${url}`, body);
     const res = await fetch(`${BASE}${url}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...headers },
       body: JSON.stringify(body),
     });
     console.log(`[API POST] Response status:`, res.status);
     return handle<T>(res);
   },
-  async put<T>(url: string, body: any): Promise<T> {
+  async put<T>(url: string, body: any, headers?: Record<string, string>): Promise<T> {
     console.log(`[API PUT] ${BASE}${url}`, body);
     const res = await fetch(`${BASE}${url}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...headers },
       body: JSON.stringify(body),
     });
     console.log(`[API PUT] Response status:`, res.status);
     return handle<T>(res);
   },
-  async del(url: string): Promise<void> {
-    const res = await fetch(`${BASE}${url}`, { method: "DELETE" });
+  async del(url: string, headers?: Record<string, string>): Promise<void> {
+    const res = await fetch(`${BASE}${url}`, { method: "DELETE", headers });
     return handle<void>(res);
   },
   async postForm<T>(url: string, form: FormData): Promise<T> {

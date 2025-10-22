@@ -1,4 +1,5 @@
 import { pool } from "../db/pool";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
 
 export interface Reserva {
   id_reserva: number;
@@ -21,52 +22,57 @@ export interface CreateReservaInput {
  * Falla si la obra ya está reservada o vendida
  */
 export async function createReserva(data: CreateReservaInput): Promise<Reserva> {
-  const client = await pool.connect();
+  const connection = await pool.getConnection();
 
   try {
-    await client.query('BEGIN');
+    await connection.beginTransaction();
 
     // 1. Verificar que la obra existe y está disponible
-    const obraCheck = await client.query(
-      `SELECT estado_venta FROM obras WHERE id_obra = $1`,
+    const [obraCheck] = await connection.query<RowDataPacket[]>(
+      `SELECT estado_venta FROM obras WHERE id_obra = ?`,
       [data.id_obra]
     );
 
-    if (obraCheck.rows.length === 0) {
+    if (obraCheck.length === 0) {
       throw new Error('Obra no encontrada');
     }
 
-    if (obraCheck.rows[0].estado_venta !== 'disponible') {
+    if (obraCheck[0].estado_venta !== 'disponible') {
       throw new Error('Obra no disponible');
     }
 
     // 2. Verificar que no existe una reserva activa
-    const reservaCheck = await client.query(
+    const [reservaCheck] = await connection.query<RowDataPacket[]>(
       `SELECT id_reserva FROM reservas
-       WHERE id_obra = $1 AND expires_at > NOW()`,
+       WHERE id_obra = ? AND expires_at > NOW()`,
       [data.id_obra]
     );
 
-    if (reservaCheck.rows.length > 0) {
+    if (reservaCheck.length > 0) {
       throw new Error('Obra ya reservada por otro usuario');
     }
 
     // 3. Crear la reserva
     const minutes = data.minutes || 15;
-    const result = await client.query(
+    const [result] = await connection.query<ResultSetHeader>(
       `INSERT INTO reservas (id_obra, id_user, session_id, expires_at)
-       VALUES ($1, $2, $3, NOW() + INTERVAL '${minutes} minutes')
-       RETURNING *`,
-      [data.id_obra, data.id_user, data.session_id]
+       VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))`,
+      [data.id_obra, data.id_user, data.session_id, minutes]
     );
 
-    await client.query('COMMIT');
-    return result.rows[0];
+    // 4. Obtener la reserva creada
+    const [newReserva] = await connection.query<RowDataPacket[]>(
+      `SELECT * FROM reservas WHERE id_reserva = ?`,
+      [result.insertId]
+    );
+
+    await connection.commit();
+    return newReserva[0] as Reserva;
   } catch (error) {
-    await client.query('ROLLBACK');
+    await connection.rollback();
     throw error;
   } finally {
-    client.release();
+    connection.release();
   }
 }
 
@@ -74,30 +80,29 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
  * Libera una reserva (cuando se elimina del carrito)
  */
 export async function deleteReserva(id_obra: number, userId: string, sessionId: string): Promise<boolean> {
-  const result = await pool.query(
+  const [result] = await pool.query<ResultSetHeader>(
     `DELETE FROM reservas
-     WHERE id_obra = $1 AND (id_user = $2 OR session_id = $3)
-     RETURNING id_reserva`,
+     WHERE id_obra = ? AND (id_user = ? OR session_id = ?)`,
     [id_obra, userId, sessionId]
   );
 
-  return result.rows.length > 0;
+  return result.affectedRows > 0;
 }
 
 /**
  * Obtiene todas las reservas activas de un usuario
  */
 export async function findUserReservas(userId: string, sessionId: string): Promise<Reserva[]> {
-  const result = await pool.query(
+  const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT r.*, o.titulo, o.precio_salida
      FROM reservas r
      JOIN obras o ON r.id_obra = o.id_obra
-     WHERE (r.id_user = $1 OR r.session_id = $2) AND r.expires_at > NOW()
+     WHERE (r.id_user = ? OR r.session_id = ?) AND r.expires_at > NOW()
      ORDER BY r.created_at DESC`,
     [userId, sessionId]
   );
 
-  return result.rows;
+  return rows as Reserva[];
 }
 
 /**
@@ -108,16 +113,16 @@ export async function isObraReservedByOther(
   userId: string,
   sessionId: string
 ): Promise<boolean> {
-  const result = await pool.query(
+  const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT id_reserva FROM reservas
-     WHERE id_obra = $1
+     WHERE id_obra = ?
        AND expires_at > NOW()
-       AND id_user != $2
-       AND session_id != $3`,
+       AND id_user != ?
+       AND session_id != ?`,
     [id_obra, userId, sessionId]
   );
 
-  return result.rows.length > 0;
+  return rows.length > 0;
 }
 
 /**
@@ -128,26 +133,26 @@ export async function isObraReservedByUser(
   userId: string,
   sessionId: string
 ): Promise<boolean> {
-  const result = await pool.query(
+  const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT id_reserva FROM reservas
-     WHERE id_obra = $1
+     WHERE id_obra = ?
        AND expires_at > NOW()
-       AND (id_user = $2 OR session_id = $3)`,
+       AND (id_user = ? OR session_id = ?)`,
     [id_obra, userId, sessionId]
   );
 
-  return result.rows.length > 0;
+  return rows.length > 0;
 }
 
 /**
  * Limpia reservas expiradas (llamado periódicamente)
  */
 export async function cleanupExpiredReservas(): Promise<number> {
-  const result = await pool.query(
-    `DELETE FROM reservas WHERE expires_at < NOW() RETURNING id_reserva`
+  const [result] = await pool.query<ResultSetHeader>(
+    `DELETE FROM reservas WHERE expires_at < NOW()`
   );
 
-  return result.rows.length;
+  return result.affectedRows;
 }
 
 /**
@@ -159,27 +164,25 @@ export async function extendReserva(
   sessionId: string,
   additionalMinutes: number = 10
 ): Promise<boolean> {
-  const result = await pool.query(
+  const [result] = await pool.query<ResultSetHeader>(
     `UPDATE reservas
-     SET expires_at = NOW() + INTERVAL '${additionalMinutes} minutes'
-     WHERE id_obra = $1 AND (id_user = $2 OR session_id = $3) AND expires_at > NOW()
-     RETURNING id_reserva`,
-    [id_obra, userId, sessionId]
+     SET expires_at = DATE_ADD(NOW(), INTERVAL ? MINUTE)
+     WHERE id_obra = ? AND (id_user = ? OR session_id = ?) AND expires_at > NOW()`,
+    [additionalMinutes, id_obra, userId, sessionId]
   );
 
-  return result.rows.length > 0;
+  return result.affectedRows > 0;
 }
 
 /**
  * Libera todas las reservas de un usuario/sesión (al completar compra o abandonar)
  */
 export async function releaseAllUserReservas(userId: string, sessionId: string): Promise<number> {
-  const result = await pool.query(
+  const [result] = await pool.query<ResultSetHeader>(
     `DELETE FROM reservas
-     WHERE (id_user = $1 OR session_id = $2)
-     RETURNING id_reserva`,
+     WHERE (id_user = ? OR session_id = ?)`,
     [userId, sessionId]
   );
 
-  return result.rows.length;
+  return result.affectedRows;
 }

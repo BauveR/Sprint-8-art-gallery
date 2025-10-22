@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContextFirebase";
-import { api } from "../api/client";
+import { api } from "../api/clientWithAuth";
 import { sendPaymentConfirmation } from "../config/emailjs";
 import { CheckoutFormData } from "../types/forms";
 
@@ -64,12 +64,26 @@ export function useStripePayment() {
       }
 
       if (paymentIntent?.status === "succeeded") {
-        // 3. Confirmar en el backend y actualizar estado de obras
+        // 3. Confirmar en el backend, crear orden y actualizar estado de obras
         await api.post("/payments/confirm", {
           paymentIntentId: paymentData.paymentIntentId,
           obra_ids: items.map((item) => item.obra.id_obra),
           buyer_name: formData.nombre,
-          buyer_email: user?.email || "",
+          buyer_email: user?.email || formData.email,
+          shipping_data: {
+            nombre_completo: formData.nombre,
+            telefono: formData.telefono,
+            email: formData.email,
+            direccion: formData.direccion,
+            numero_exterior: formData.numeroExterior,
+            numero_interior: formData.numeroInterior,
+            colonia: formData.colonia,
+            codigo_postal: formData.codigoPostal,
+            ciudad: formData.ciudad,
+            estado: formData.estado,
+            pais: formData.pais,
+            referencias: formData.referencias,
+          },
         });
 
         // 4. Enviar email de confirmación de pago

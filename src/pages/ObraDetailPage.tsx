@@ -9,7 +9,6 @@ import ObraInfo from "../components/Obra/ObraInfo";
 import ObraActions from "../components/Obra/ObraActions";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
 import { imagenesService } from "../services/imageService";
 import { ObraImagen } from "../types";
 
@@ -48,7 +47,6 @@ export default function ObraDetailPage() {
   const handleAddToCart = () => {
     if (isAvailable) {
       addToCart(obra);
-      toast.success(`${obra.titulo} agregado al carrito`);
     }
   };
 

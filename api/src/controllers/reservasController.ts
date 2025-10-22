@@ -1,5 +1,15 @@
 import { Request, Response } from "express";
 import * as reservasService from "../services/reservasService";
+import { randomBytes } from "crypto";
+
+// Helper para obtener o generar session ID
+function getSessionId(req: Request): string {
+  const headerSessionId = req.headers["x-session-id"] as string;
+  if (headerSessionId) return headerSessionId;
+
+  // Si no hay header, generar un ID único para esta request
+  return `session_${Date.now()}_${randomBytes(4).toString("hex")}`;
+}
 
 /**
  * POST /api/reservas/add
@@ -9,7 +19,7 @@ export async function addToCart(req: Request, res: Response) {
   try {
     const { id_obra } = req.body;
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     if (!id_obra) {
       return res.status(400).json({ error: "id_obra es requerido" });
@@ -36,7 +46,7 @@ export async function removeFromCart(req: Request, res: Response) {
   try {
     const { id_obra } = req.params;
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     const result = await reservasService.removeFromCart({
       id_obra: Number(id_obra),
@@ -59,7 +69,7 @@ export async function validateAvailability(req: Request, res: Response) {
   try {
     const { id_obra } = req.body;
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     if (!id_obra) {
       return res.status(400).json({ error: "id_obra es requerido" });
@@ -86,7 +96,7 @@ export async function validateCart(req: Request, res: Response) {
   try {
     const { obra_ids } = req.body;
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     if (!Array.isArray(obra_ids) || obra_ids.length === 0) {
       return res.status(400).json({ error: "obra_ids debe ser un array no vacío" });
@@ -116,11 +126,11 @@ export async function validateCart(req: Request, res: Response) {
 export async function getMyCart(req: Request, res: Response) {
   try {
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     const reservas = await reservasService.getUserCart(userId, sessionId);
 
-    res.json({ reservas });
+    res.json({ data: reservas });
   } catch (error: any) {
     console.error("Error getting cart:", error);
     res.status(500).json({ error: "Error al obtener carrito" });
@@ -153,7 +163,7 @@ export async function cleanupExpired(req: Request, res: Response) {
 export async function releaseAll(req: Request, res: Response) {
   try {
     const userId = req.user?.uid || "anonymous";
-    const sessionId = req.headers["x-session-id"] as string || req.sessionID;
+    const sessionId = getSessionId(req);
 
     const result = await reservasService.releaseAllReservations(userId, sessionId);
 

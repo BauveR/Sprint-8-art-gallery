@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContextFirebase";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, Home, User, Package, Store, Calendar } from "lucide-react";
+import { LogOut, Home, User, Package, Store, Calendar, ShoppingCart } from "lucide-react";
 
-type Tab = "admin" | "obras" | "tiendas" | "expos";
+type Tab = "admin" | "obras" | "tiendas" | "expos" | "orders";
 
 interface AdminNavProps {
   activeTab: Tab;
@@ -24,6 +24,7 @@ export default function AdminNav({ activeTab, onTabChange }: AdminNavProps) {
   const navItems = [
     { tab: "admin" as Tab, label: "Dashboard", icon: Home },
     { tab: "obras" as Tab, label: "Obras", icon: Package },
+    { tab: "orders" as Tab, label: "Órdenes", icon: ShoppingCart },
     { tab: "tiendas" as Tab, label: "Tiendas", icon: Store },
     { tab: "expos" as Tab, label: "Exposiciones", icon: Calendar },
   ];

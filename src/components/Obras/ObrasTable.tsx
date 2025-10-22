@@ -1,7 +1,18 @@
+import { useState } from "react";
 import { Obra } from "../../types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ESTADO_CONFIG } from "../../config/estadoConfig";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type ObrasTableProps = {
   obras: Obra[];
@@ -29,6 +40,7 @@ export default function ObrasTable({
   onDelete,
   isDeleting,
 }: ObrasTableProps) {
+  const [obraToDelete, setObraToDelete] = useState<Obra | null>(null);
   return (
     <div className="bg-card text-card-foreground rounded-xl shadow overflow-x-auto border dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
       <table className="min-w-full text-sm">
@@ -91,7 +103,7 @@ export default function ObrasTable({
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => onDelete(o.id_obra)}
+                  onClick={() => setObraToDelete(o)}
                   disabled={isDeleting}
                   className="text-red-600"
                 >
@@ -116,6 +128,32 @@ export default function ObrasTable({
           Error: {error instanceof Error ? error.message : String(error)}
         </div>
       )}
+
+      <AlertDialog open={!!obraToDelete} onOpenChange={(open) => !open && setObraToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la obra{" "}
+              <strong>"{obraToDelete?.titulo}"</strong> de {obraToDelete?.autor}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (obraToDelete) {
+                  onDelete(obraToDelete.id_obra);
+                  setObraToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
