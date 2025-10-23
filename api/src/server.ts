@@ -38,12 +38,18 @@ app.use(
       // Permitir requests sin origin (como mobile apps o curl)
       if (!origin) return callback(null, true);
 
+      // Permitir localhost y URLs configuradas
       if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`[CORS] Blocked request from origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+
+      // Permitir todas las URLs de Vercel del proyecto
+      if (origin.includes("sprint-8-art-gallery") && origin.includes("vercel.app")) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
