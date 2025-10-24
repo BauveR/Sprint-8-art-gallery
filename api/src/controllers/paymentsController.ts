@@ -3,7 +3,15 @@ import Stripe from "stripe";
 import { asyncHandler } from "../utils/helpers";
 import * as obrasService from "../services/obrasService";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+// Validar que existe la clave de Stripe
+const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+if (!stripeKey) {
+  console.error("[Stripe] STRIPE_SECRET_KEY no está configurada");
+} else {
+  console.log(`[Stripe] Clave configurada (termina en: ...${stripeKey.slice(-4)})`);
+}
+
+const stripe = new Stripe(stripeKey || "", {
   apiVersion: "2025-09-30.clover",
 });
 
