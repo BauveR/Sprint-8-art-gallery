@@ -27,7 +27,13 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
   try {
     await connection.beginTransaction();
 
-    // 1. Verificar que no existe una reserva activa
+    // 1. Limpiar reservas expiradas de esta obra
+    await connection.query(
+      `DELETE FROM reservas WHERE id_obra = ? AND expires_at <= NOW()`,
+      [data.id_obra]
+    );
+
+    // 2. Verificar que no existe una reserva activa
     const [reservaCheck] = await connection.query<RowDataPacket[]>(
       `SELECT id_reserva FROM reservas
        WHERE id_obra = ? AND expires_at > NOW()`,
@@ -38,7 +44,7 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
       throw new Error('Obra ya reservada por otro usuario');
     }
 
-    // 2. Crear la reserva
+    // 3. Crear la reserva
     const minutes = data.minutes || 15;
     const [result] = await connection.query<ResultSetHeader>(
       `INSERT INTO reservas (id_obra, id_user, session_id, expires_at)
@@ -46,7 +52,7 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
       [data.id_obra, data.id_user, data.session_id, minutes]
     );
 
-    // 3. Obtener la reserva creada
+    // 4. Obtener la reserva creada
     const [newReserva] = await connection.query<RowDataPacket[]>(
       `SELECT * FROM reservas WHERE id_reserva = ?`,
       [result.insertId]
