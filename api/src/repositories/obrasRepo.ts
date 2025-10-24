@@ -25,6 +25,8 @@ export interface ObraRow extends RowDataPacket {
   medidas: string | null;
   tecnica: string | null;
   precio_salida: string | null; // DECIMAL como string
+  estado_venta: "disponible" | "en_carrito" | "procesando_envio" | "enviado" | "entregado" | "pendiente_devolucion" | "nunca_entregado";
+  ubicacion?: "en_exposicion" | "en_tienda" | "tienda_online" | "almacen" | null;
 }
 
 export interface ObraEstadoActualRow extends RowDataPacket {

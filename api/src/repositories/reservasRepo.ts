@@ -27,21 +27,7 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
   try {
     await connection.beginTransaction();
 
-    // 1. Verificar que la obra existe y está disponible
-    const [obraCheck] = await connection.query<RowDataPacket[]>(
-      `SELECT estado_venta FROM obras WHERE id_obra = ?`,
-      [data.id_obra]
-    );
-
-    if (obraCheck.length === 0) {
-      throw new Error('Obra no encontrada');
-    }
-
-    if (obraCheck[0].estado_venta !== 'disponible') {
-      throw new Error('Obra no disponible');
-    }
-
-    // 2. Verificar que no existe una reserva activa
+    // 1. Verificar que no existe una reserva activa
     const [reservaCheck] = await connection.query<RowDataPacket[]>(
       `SELECT id_reserva FROM reservas
        WHERE id_obra = ? AND expires_at > NOW()`,
@@ -52,7 +38,7 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
       throw new Error('Obra ya reservada por otro usuario');
     }
 
-    // 3. Crear la reserva
+    // 2. Crear la reserva
     const minutes = data.minutes || 15;
     const [result] = await connection.query<ResultSetHeader>(
       `INSERT INTO reservas (id_obra, id_user, session_id, expires_at)
@@ -60,7 +46,7 @@ export async function createReserva(data: CreateReservaInput): Promise<Reserva> 
       [data.id_obra, data.id_user, data.session_id, minutes]
     );
 
-    // 4. Obtener la reserva creada
+    // 3. Obtener la reserva creada
     const [newReserva] = await connection.query<RowDataPacket[]>(
       `SELECT * FROM reservas WHERE id_reserva = ?`,
       [result.insertId]
