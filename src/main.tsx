@@ -7,7 +7,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { queryClient } from "./config/queryClient";
 
-import { Toaster } from "sonner";
+import { Toaster as SonnerToaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 
 createRoot(document.getElementById("root")!).render(
@@ -16,7 +17,8 @@ createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <App />
         <ReactQueryDevtools initialIsOpen={false} />
-        <Toaster richColors position="top-right" />
+        <SonnerToaster richColors position="top-right" />
+        <Toaster />
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>
