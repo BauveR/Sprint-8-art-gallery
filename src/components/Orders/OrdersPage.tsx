@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useOrders, useOrderStats, useUpdateOrderStatus, type OrderStatus } from "@/hooks/useOrders";
+import { useOrdersFilters } from "@/hooks/useOrdersFilters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useNotifications } from "@/hooks/useNotifications";
 import { Search, Package, TrendingUp, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import {
   sendShipmentNotification,
@@ -36,27 +37,29 @@ const STATUS_OPTIONS = [
 ];
 
 export default function OrdersPage() {
-  const { toast } = useToast();
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const notifications = useNotifications();
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-  const [page, setPage] = useState(1);
-  const pageSize = 20;
+
+  // Filtros y paginación centralizados
+  const {
+    filters,
+    setStatusFilter,
+    setSearch,
+    setPage,
+    resetFilters,
+    queryParams,
+    pagination,
+  } = useOrdersFilters();
 
   // Datos del servidor
-  const { data: ordersData, isLoading } = useOrders({
-    status: selectedStatus !== "all" ? (selectedStatus as OrderStatus) : undefined,
-    search: searchQuery || undefined,
-    limit: pageSize,
-    offset: (page - 1) * pageSize,
-  });
+  const { data: ordersData, isLoading } = useOrders(queryParams);
 
   const { data: stats } = useOrderStats();
   const updateStatus = useUpdateOrderStatus();
 
   const orders = ordersData?.data ?? [];
   const total = ordersData?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = pagination.getTotalPages(total);
 
   const handleUpdateStatus = async (
     orderId: number,
@@ -80,10 +83,10 @@ export default function OrdersPage() {
         ...additionalData,
       });
 
-      toast({
-        title: "Estado actualizado",
-        description: `La orden ha sido actualizada a: ${STATUS_OPTIONS.find((s) => s.value === status)?.label}`,
-      });
+      notifications.success(
+        "Estado actualizado",
+        `La orden ha sido actualizada a: ${STATUS_OPTIONS.find((s) => s.value === status)?.label}`
+      );
 
       // Enviar emails según el cambio de estado
       if (currentOrder?.user_email) {
@@ -100,10 +103,10 @@ export default function OrdersPage() {
                 tracking_link: additionalData.tracking_link,
                 items: currentOrder.items.map((item: any) => ({ titulo: item.titulo })),
               });
-              toast({
-                title: "Email enviado",
-                description: "Se ha notificado al cliente sobre el envío",
-              });
+              notifications.success(
+                "Email enviado",
+                "Se ha notificado al cliente sobre el envío"
+              );
             }
           }
 
@@ -115,19 +118,17 @@ export default function OrdersPage() {
           }
         } catch (emailError) {
           console.error("Error enviando email:", emailError);
-          toast({
-            title: "Advertencia",
-            description: "La orden se actualizó pero no se pudo enviar el email",
-            variant: "default",
-          });
+          notifications.warning(
+            "Advertencia",
+            "La orden se actualizó pero no se pudo enviar el email"
+          );
         }
       }
     } catch (error: any) {
-      toast({
-        title: "Error al actualizar",
-        description: error.message || "No se pudo actualizar el estado",
-        variant: "destructive",
-      });
+      notifications.error(
+        "Error al actualizar",
+        error.message || "No se pudo actualizar el estado"
+      );
     }
   };
 
@@ -221,11 +222,8 @@ export default function OrdersPage() {
                   </label>
                   <Input
                     placeholder="Buscar por número de orden, email o nombre..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setPage(1);
-                    }}
+                    value={filters.search || ""}
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
 
@@ -235,11 +233,8 @@ export default function OrdersPage() {
                     Estado
                   </label>
                   <Select
-                    value={selectedStatus}
-                    onValueChange={(value) => {
-                      setSelectedStatus(value);
-                      setPage(1);
-                    }}
+                    value={filters.statusFilter}
+                    onValueChange={setStatusFilter}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar estado" />
@@ -258,11 +253,7 @@ export default function OrdersPage() {
               <div className="flex justify-end mt-4">
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedStatus("all");
-                    setPage(1);
-                  }}
+                  onClick={resetFilters}
                 >
                   Limpiar filtros
                 </Button>
@@ -284,25 +275,25 @@ export default function OrdersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-zinc-700">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)} de {total} órdenes
+                Mostrando {(pagination.page - 1) * pagination.pageSize + 1} - {Math.min(pagination.page * pagination.pageSize, total)} de {total} órdenes
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => setPage(pagination.page - 1)}
+                  disabled={pagination.page === 1}
                 >
                   Anterior
                 </Button>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Página {page} de {totalPages}
+                  Página {pagination.page} de {totalPages}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => setPage(pagination.page + 1)}
+                  disabled={pagination.page === totalPages}
                 >
                   Siguiente
                 </Button>

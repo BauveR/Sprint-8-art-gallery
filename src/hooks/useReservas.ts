@@ -1,25 +1,22 @@
+/**
+ * Hooks para manejo de reservas (carrito de compras)
+ * Refactorizado para usar utilidades centralizadas (DRY)
+ */
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api as apiClient } from "@/api/client";
 import type { Reserva } from "@/types/domain";
+import { getOrCreateSessionId, clearSessionId } from "@/utils/session";
+import { CACHE_TIMES } from "@/constants/cache";
 
 /**
  * Hook para obtener el carrito (reservas) del usuario
  */
 export function useMyCart() {
-  // Obtener o crear session_id para usuarios anónimos
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useQuery({
     queryKey: ["reservas", "my-cart"],
     queryFn: async () => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.get<{ data: Reserva[] }>(
         "/reservas/my-cart",
         undefined,
@@ -27,7 +24,7 @@ export function useMyCart() {
       );
       return data.data as Reserva[];
     },
-    refetchInterval: 60000, // Refetch cada minuto para verificar expiración
+    refetchInterval: CACHE_TIMES.CART_REFETCH_INTERVAL,
   });
 }
 
@@ -37,18 +34,9 @@ export function useMyCart() {
 export function useAddToCart() {
   const queryClient = useQueryClient();
 
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useMutation({
     mutationFn: async (id_obra: number) => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.post<{ data: any }>(
         "/reservas/add",
         { id_obra },
@@ -68,18 +56,9 @@ export function useAddToCart() {
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
 
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useMutation({
     mutationFn: async (id_obra: number) => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.del(
         `/reservas/remove/${id_obra}`,
         { "x-session-id": sessionId }
@@ -96,18 +75,9 @@ export function useRemoveFromCart() {
  * Hook para validar disponibilidad de una obra
  */
 export function useValidateAvailability() {
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useMutation({
     mutationFn: async (id_obra: number) => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.post<{ data: any }>(
         "/reservas/validate",
         { id_obra },
@@ -122,18 +92,9 @@ export function useValidateAvailability() {
  * Hook para validar todo el carrito antes del checkout
  */
 export function useValidateCart() {
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useMutation({
     mutationFn: async (items: number[]) => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.post<{ data: any }>(
         "/reservas/validate-cart",
         { items },
@@ -150,18 +111,9 @@ export function useValidateCart() {
 export function useReleaseAllReservas() {
   const queryClient = useQueryClient();
 
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem("cart_session_id");
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem("cart_session_id", sessionId);
-    }
-    return sessionId;
-  };
-
   return useMutation({
     mutationFn: async () => {
-      const sessionId = getSessionId();
+      const sessionId = getOrCreateSessionId();
       const data = await apiClient.del(
         "/reservas/release-all",
         { "x-session-id": sessionId }
@@ -170,8 +122,8 @@ export function useReleaseAllReservas() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservas"] });
-      // Limpiar session ID después de liberar
-      localStorage.removeItem("cart_session_id");
+      // Limpiar session ID después de liberar (usar utility)
+      clearSessionId();
     },
   });
 }

@@ -4,7 +4,7 @@ import { useExpos } from "../../query/expos";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useNotifications } from "@/hooks/useNotifications";
 import { Search } from "lucide-react";
 import {
   Accordion,
@@ -28,7 +28,7 @@ import ObrasTable from "./ObrasTable";
 import ObraEditModal from "./ObraEditModal";
 
 export default function ObrasPage() {
-  const { toast } = useToast();
+  const notifications = useNotifications();
 
   // Sort y paginación
   const { sort, page, pageSize, setPage, headerBtn } = useObraSort(8);
@@ -78,17 +78,10 @@ export default function ObrasPage() {
       ev,
       () => {
         editImages.resetImages();
-        toast({
-          title: "Obra actualizada",
-          description: "La obra se actualizó correctamente",
-        });
+        notifications.success("Obra actualizada", "La obra se actualizó correctamente");
       },
       (error) => {
-        toast({
-          title: "Error al actualizar obra",
-          description: error.message,
-          variant: "destructive",
-        });
+        notifications.error("Error al actualizar obra", error.message);
       }
     );
   };
@@ -132,18 +125,10 @@ export default function ObrasPage() {
                 tiendas={tiendas}
                 expos={expos}
                 onSuccess={() => {
-                  toast({
-                    title: "✓ Obra creada exitosamente",
-                    description: "La obra ha sido agregada a la galería",
-                    variant: "default",
-                  });
+                  notifications.success("Obra creada exitosamente", "La obra ha sido agregada a la galería");
                 }}
                 onError={(error) => {
-                  toast({
-                    title: "Error al crear obra",
-                    description: error.message,
-                    variant: "destructive",
-                  });
+                  notifications.error("Error al crear obra", error.message);
                 }}
               />
             </AccordionContent>
@@ -215,18 +200,10 @@ export default function ObrasPage() {
             tiendas={tiendas}
             expos={expos}
             onSuccess={() => {
-              toast({
-                title: "✓ Obra creada exitosamente",
-                description: "La obra ha sido agregada a la galería",
-                variant: "default",
-              });
+              notifications.success("Obra creada exitosamente", "La obra ha sido agregada a la galería");
             }}
             onError={(error) => {
-              toast({
-                title: "Error al crear obra",
-                description: error.message,
-                variant: "destructive",
-              });
+              notifications.error("Error al crear obra", error.message);
             }}
           />
           </div>

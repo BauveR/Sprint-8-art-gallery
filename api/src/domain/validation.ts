@@ -37,7 +37,7 @@ export const estadoVentaSchema = z.enum([
 export const obraInputSchema = z.object({
   autor: z.string().min(1),
   titulo: z.string().min(1),
-  anio: z.number().int().min(0).max(3000).nullable().optional(),
+  anio: z.number().int().min(0).max(2100).nullable().optional(),
   medidas: z.string().nullable().optional(),
   tecnica: z.string().nullable().optional(),
   precio_salida: z.number().nonnegative().nullable().optional(),
@@ -55,7 +55,7 @@ export const obraInputSchema = z.object({
 export const obraUpdateSchema = z.object({
   autor: z.string().min(1).optional(),
   titulo: z.string().min(1).optional(),
-  anio: z.number().int().min(0).max(3000).nullable().optional(),
+  anio: z.number().int().min(0).max(2100).nullable().optional(),
   medidas: z.string().nullable().optional(),
   tecnica: z.string().nullable().optional(),
   precio_salida: z.number().nonnegative().nullable().optional(),

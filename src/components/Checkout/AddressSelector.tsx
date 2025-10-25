@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { MapPin, Plus, CheckCircle2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useNotifications } from "@/hooks/useNotifications";
 import ShippingForm from "./ShippingForm";
 import type { CheckoutFormData } from "../../types/forms";
 
@@ -21,7 +21,7 @@ interface AddressSelectorProps {
 }
 
 export default function AddressSelector({ formData, onChange, onSelectAddress }: AddressSelectorProps) {
-  const { toast } = useToast();
+  const notifications = useNotifications();
   const { data: direcciones = [], isLoading } = useDirecciones();
   const createDireccion = useCreateDireccion();
   const setDefault = useSetDefaultDireccion();
@@ -72,16 +72,15 @@ export default function AddressSelector({ formData, onChange, onSelectAddress }:
         referencias: formData.referencias,
       });
 
-      toast({
-        title: "Dirección guardada",
-        description: "Tu dirección ha sido guardada para futuras compras",
-      });
+      notifications.success(
+        "Dirección guardada",
+        "Tu dirección ha sido guardada para futuras compras"
+      );
     } catch (error: any) {
-      toast({
-        title: "Error al guardar",
-        description: error.message || "No se pudo guardar la dirección",
-        variant: "destructive",
-      });
+      notifications.error(
+        "Error al guardar",
+        error.message || "No se pudo guardar la dirección"
+      );
     }
   };
 
@@ -213,16 +212,12 @@ export default function AddressSelector({ formData, onChange, onSelectAddress }:
             onClick={async () => {
               try {
                 await setDefault.mutateAsync(selectedId);
-                toast({
-                  title: "Dirección actualizada",
-                  description: "Se estableció como dirección predeterminada",
-                });
+                notifications.success(
+                  "Dirección actualizada",
+                  "Se estableció como dirección predeterminada"
+                );
               } catch (error: any) {
-                toast({
-                  title: "Error",
-                  description: error.message,
-                  variant: "destructive",
-                });
+                notifications.error("Error", error.message);
               }
             }}
             className="w-full"
