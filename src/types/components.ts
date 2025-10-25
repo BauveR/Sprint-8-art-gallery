@@ -2,10 +2,10 @@
  * Types de props para componentes reutilizables
  */
 
-import { Obra, ObraImagen } from "./index";
-import { Order } from "./orders";
 import { ReactNode } from "react";
-import { CheckoutFormData } from "./forms";
+import type { Obra, ObraImagen } from "./domain";
+import type { Order } from "./orders";
+import type { CheckoutFormData } from "./forms";
 
 // ====== Componentes de Obra ======
 

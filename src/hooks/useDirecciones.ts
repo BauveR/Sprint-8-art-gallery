@@ -1,47 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api as apiClient } from "@/api/clientWithAuth";
-
-export interface DireccionEnvio {
-  id_direccion: number;
-  id_user: string;
-  nombre_completo: string;
-  telefono: string;
-  email?: string;
-  direccion: string;
-  numero_exterior: string;
-  numero_interior?: string;
-  colonia: string;
-  codigo_postal: string;
-  ciudad: string;
-  estado: string;
-  pais: string;
-  referencias?: string;
-  es_predeterminada: boolean;
-  alias?: string;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface CreateDireccionInput {
-  nombre_completo: string;
-  telefono: string;
-  email?: string;
-  direccion: string;
-  numero_exterior: string;
-  numero_interior?: string;
-  colonia: string;
-  codigo_postal: string;
-  ciudad: string;
-  estado: string;
-  pais?: string;
-  referencias?: string;
-  es_predeterminada?: boolean;
-  alias?: string;
-}
-
-interface ApiResponse<T> {
-  data: T;
-}
+import type { DireccionEnvio, CreateDireccionInput } from "@/types/domain";
+import type { ApiResponse } from "@/types/api";
 
 /**
  * Hook para obtener todas las direcciones del usuario

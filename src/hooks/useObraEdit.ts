@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Obra, ObraInput } from "../types";
 import { useUpdateObra } from "../query/obras";
+import type { EditState } from "@/types/forms";
 
-type EditState = { id: number; form: Omit<ObraInput, 'estado_venta' | 'numero_seguimiento' | 'link_seguimiento'> } | null;
+type ObraEditState = EditState<Omit<ObraInput, 'estado_venta' | 'numero_seguimiento' | 'link_seguimiento'>> | null;
 
 type EditSuccessCallback = () => void;
 type EditErrorCallback = (error: Error) => void;
 
 export function useObraEdit() {
-  const [edit, setEdit] = useState<EditState>(null);
+  const [edit, setEdit] = useState<ObraEditState>(null);
   const updateObra = useUpdateObra();
 
   const startEdit = (o: Obra) => {

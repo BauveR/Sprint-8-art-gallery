@@ -1,16 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api as apiClient } from "@/api/client";
-
-export interface Reserva {
-  id_reserva: number;
-  id_obra: number;
-  id_user: string;
-  session_id: string;
-  expires_at: Date;
-  created_at: Date;
-  titulo?: string;
-  precio_salida?: number;
-}
+import type { Reserva } from "@/types/domain";
 
 /**
  * Hook para obtener el carrito (reservas) del usuario

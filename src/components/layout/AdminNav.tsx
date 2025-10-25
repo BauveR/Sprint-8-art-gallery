@@ -4,8 +4,7 @@ import { useAuth } from "../../context/AuthContextFirebase";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogOut, Home, User, Package, Store, Calendar, ShoppingCart } from "lucide-react";
-
-type Tab = "admin" | "obras" | "tiendas" | "expos" | "orders";
+import type { Tab } from "@/types/navigation";
 
 interface AdminNavProps {
   activeTab: Tab;

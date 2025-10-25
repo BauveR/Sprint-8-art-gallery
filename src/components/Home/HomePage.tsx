@@ -4,11 +4,10 @@ import { useExpos } from "../../query/expos";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Store, Calendar } from "lucide-react";
 import Model3DGallery from "../Admin/Model3DGallery";
-
-type Tab = "admin" | "obras" | "tiendas" | "expos";
+import type { HomeTab } from "@/types/navigation";
 
 interface HomePageProps {
-  onNavigate: (tab: Tab) => void;
+  onNavigate: (tab: HomeTab) => void;
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {

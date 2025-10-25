@@ -5,8 +5,7 @@ import TiendasPage from "../components/Tiendas/TiendasPage";
 import ExposPage from "../components/Expos/ExposPage";
 import OrdersPage from "../components/Orders/OrdersPage";
 import AdminNav from "../components/layout/AdminNav";
-
-type Tab = "admin" | "obras" | "tiendas" | "expos" | "orders";
+import type { Tab } from "@/types/navigation";
 
 export default function DashboardPage() {
   const [tab, setTab] = useState<Tab>("admin");

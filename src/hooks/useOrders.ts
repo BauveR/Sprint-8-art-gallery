@@ -1,67 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api as apiClient } from "@/api/clientWithAuth";
-
-interface ApiResponse<T> {
-  data: T;
-}
-
-export type OrderStatus =
-  | "pending"
-  | "paid"
-  | "processing_shipment"
-  | "shipped"
-  | "delivered"
-  | "pending_return"
-  | "never_delivered"
-  | "cancelled";
-
-export interface Order {
-  id_orden: number;
-  order_number: string;
-  id_user: string;
-  user_email: string;
-  user_name: string;
-  id_direccion?: number;
-  shipping_snapshot: any;
-  items: any[];
-  subtotal: number;
-  shipping_cost: number;
-  tax: number;
-  total: number;
-  status: OrderStatus;
-  payment_intent_id?: string;
-  tracking_number?: string;
-  carrier?: string;
-  tracking_link?: string;
-  estimated_delivery?: Date;
-  delivered_at?: Date;
-  admin_notes?: string;
-  return_reason?: string;
-  customer_notes?: string;
-  created_at: Date;
-  updated_at: Date;
-  paid_at?: Date;
-  shipped_at?: Date;
-}
-
-export interface OrderStatusHistory {
-  id_history: number;
-  id_orden: number;
-  status_from?: OrderStatus;
-  status_to: OrderStatus;
-  changed_by?: string;
-  notes?: string;
-  created_at: Date;
-}
-
-export interface OrdersFilters {
-  status?: OrderStatus;
-  search?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  limit?: number;
-  offset?: number;
-}
+import type {
+  Order,
+  OrderStatus,
+  OrderStatusHistory,
+  OrdersFilters,
+  OrderStats
+} from "@/types/orders";
+import type { ApiResponse } from "@/types/api";
 
 /**
  * Hook para obtener todas las órdenes (admin)
@@ -88,18 +34,6 @@ export function useOrders(filters?: OrdersFilters) {
       return response || { data: [], total: 0, page: 1, pages: 1 };
     },
   });
-}
-
-export interface OrderStats {
-  total: number;
-  pending: number;
-  paid: number;
-  processing: number;
-  shipped: number;
-  delivered: number;
-  cancelled: number;
-  total_revenue: number;
-  recent_orders: Order[];
 }
 
 /**
