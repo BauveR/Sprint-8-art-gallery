@@ -17,6 +17,7 @@ declare global {
 /**
  * Middleware para verificar el token de Firebase
  * El token debe venir en el header Authorization como "Bearer <token>"
+ * Extrae el rol desde Custom Claims de Firebase (NO desde el frontend)
  */
 export async function verifyFirebaseToken(
   req: Request,
@@ -41,12 +42,18 @@ export async function verifyFirebaseToken(
     // Verificar el token con Firebase Admin SDK
     const decodedToken = await getAuth().verifyIdToken(token);
 
+    // IMPORTANTE: Obtener rol desde Custom Claims (backend), NO desde frontend
+    // Los Custom Claims son seguros porque solo el backend puede modificarlos
+    const role = (decodedToken.role as string) || "user";
+
     // Agregar información del usuario al request
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
-      role: decodedToken.role || "user", // Puedes agregar custom claims en Firebase
+      role: role,
     };
+
+    console.log(`[Auth] User ${decodedToken.email} authenticated with role: ${role}`);
 
     next();
   } catch (error) {
@@ -86,6 +93,7 @@ export async function optionalAuth(
 
 /**
  * Middleware para verificar que el usuario es admin
+ * Debe usarse DESPUÉS de verifyFirebaseToken
  */
 export function requireAdmin(
   req: Request,
@@ -98,9 +106,14 @@ export function requireAdmin(
   }
 
   if (req.user.role !== "admin") {
-    res.status(403).json({ error: "Admin access required" });
+    console.warn(`[Security] Non-admin user ${req.user.email} attempted to access admin endpoint`);
+    res.status(403).json({
+      error: "Admin access required",
+      message: "You don't have permission to access this resource"
+    });
     return;
   }
 
+  console.log(`[Auth] Admin access granted to ${req.user.email}`);
   next();
 }

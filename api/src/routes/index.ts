@@ -12,36 +12,36 @@ import {
 } from "../controllers/imagesController";
 import reservasRoutes from "./reservas";
 import direccionesRoutes from "./direcciones";
-import { optionalAuth, verifyFirebaseToken } from "../middleware/authMiddleware";
+import { optionalAuth, verifyFirebaseToken, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Obras
-router.get("/obras", obras.list);
-router.post("/obras", obras.create);
-router.put("/obras/:id", obras.update);
-router.delete("/obras/:id", obras.remove);
-router.post("/obras/:id/asignar-tienda", obras.asignarTienda);
-router.post("/obras/:id/sacar-tienda", obras.sacarTienda);
-router.post("/obras/:id/asignar-expo", obras.asignarExpo);
-router.post("/obras/:id/quitar-expo", obras.quitarExpo);
+// Obras - Public: GET (list), Admin: POST/PUT/DELETE
+router.get("/obras", obras.list); // Público - ver obras
+router.post("/obras", verifyFirebaseToken, requireAdmin, obras.create); // Solo admin
+router.put("/obras/:id", verifyFirebaseToken, requireAdmin, obras.update); // Solo admin
+router.delete("/obras/:id", verifyFirebaseToken, requireAdmin, obras.remove); // Solo admin
+router.post("/obras/:id/asignar-tienda", verifyFirebaseToken, requireAdmin, obras.asignarTienda); // Solo admin
+router.post("/obras/:id/sacar-tienda", verifyFirebaseToken, requireAdmin, obras.sacarTienda); // Solo admin
+router.post("/obras/:id/asignar-expo", verifyFirebaseToken, requireAdmin, obras.asignarExpo); // Solo admin
+router.post("/obras/:id/quitar-expo", verifyFirebaseToken, requireAdmin, obras.quitarExpo); // Solo admin
 
-// Imágenes de obras
-router.get("/obras/:id/imagenes", listImgs);
-router.post("/obras/:id/imagenes", upload.single("file"), uploadForObra);
-router.delete("/imagenes/:id", removeImg);
+// Imágenes de obras - Admin only
+router.get("/obras/:id/imagenes", listImgs); // Público - ver imágenes
+router.post("/obras/:id/imagenes", verifyFirebaseToken, requireAdmin, upload.single("file"), uploadForObra); // Solo admin
+router.delete("/imagenes/:id", verifyFirebaseToken, requireAdmin, removeImg); // Solo admin
 
-// Tiendas
-router.get("/tiendas", tiendas.list);
-router.post("/tiendas", tiendas.create);
-router.put("/tiendas/:id", tiendas.update);
-router.delete("/tiendas/:id", tiendas.remove);
+// Tiendas - Public: GET (list), Admin: POST/PUT/DELETE
+router.get("/tiendas", tiendas.list); // Público - ver tiendas
+router.post("/tiendas", verifyFirebaseToken, requireAdmin, tiendas.create); // Solo admin
+router.put("/tiendas/:id", verifyFirebaseToken, requireAdmin, tiendas.update); // Solo admin
+router.delete("/tiendas/:id", verifyFirebaseToken, requireAdmin, tiendas.remove); // Solo admin
 
-// Expos
-router.get("/expos", expos.list);
-router.post("/expos", expos.create);
-router.put("/expos/:id", expos.update);
-router.delete("/expos/:id", expos.remove);
+// Expos - Public: GET (list), Admin: POST/PUT/DELETE
+router.get("/expos", expos.list); // Público - ver exposiciones
+router.post("/expos", verifyFirebaseToken, requireAdmin, expos.create); // Solo admin
+router.put("/expos/:id", verifyFirebaseToken, requireAdmin, expos.update); // Solo admin
+router.delete("/expos/:id", verifyFirebaseToken, requireAdmin, expos.remove); // Solo admin
 
 // Payments (Stripe)
 router.post("/payments/create-payment-intent", optionalAuth, payments.createPaymentIntent);
@@ -49,18 +49,18 @@ router.post("/payments/confirm", optionalAuth, payments.confirmPayment);
 router.post("/payments/webhook", payments.stripeWebhook);
 
 // Orders (User purchases)
-router.get("/orders", orders.getOrdersByEmail); // Legacy endpoint
-router.post("/orders", verifyFirebaseToken, orders.createOrder);
-router.get("/orders/all", orders.getAllOrders); // Admin - must be before /:id
-router.get("/orders/stats", orders.getOrderStats); // Admin - must be before /:id
-router.get("/orders/my-orders", verifyFirebaseToken, orders.getMyOrders);
-router.get("/orders/number/:orderNumber", orders.getOrderByNumber);
-router.get("/orders/:id", orders.getOrderById);
-router.get("/orders/:id/history", orders.getOrderHistory);
-router.get("/orders/:id/summary", orders.getOrderSummary);
-router.put("/orders/:id/status", orders.updateOrderStatus); // Admin
-router.post("/orders/:id/cancel", orders.cancelOrder);
-router.post("/orders/:id/mark-paid", orders.markOrderAsPaid); // Webhook
+router.get("/orders", orders.getOrdersByEmail); // Legacy endpoint - deprecar
+router.post("/orders", verifyFirebaseToken, orders.createOrder); // Usuario autenticado
+router.get("/orders/all", verifyFirebaseToken, requireAdmin, orders.getAllOrders); // Solo admin
+router.get("/orders/stats", verifyFirebaseToken, requireAdmin, orders.getOrderStats); // Solo admin
+router.get("/orders/my-orders", verifyFirebaseToken, orders.getMyOrders); // Usuario ve sus órdenes
+router.get("/orders/number/:orderNumber", orders.getOrderByNumber); // Público (para tracking)
+router.get("/orders/:id", verifyFirebaseToken, orders.getOrderById); // Usuario autenticado
+router.get("/orders/:id/history", verifyFirebaseToken, requireAdmin, orders.getOrderHistory); // Solo admin
+router.get("/orders/:id/summary", orders.getOrderSummary); // Público (para checkout)
+router.put("/orders/:id/status", verifyFirebaseToken, requireAdmin, orders.updateOrderStatus); // Solo admin
+router.post("/orders/:id/cancel", verifyFirebaseToken, orders.cancelOrder); // Usuario puede cancelar
+router.post("/orders/:id/mark-paid", orders.markOrderAsPaid); // Webhook interno (sin auth)
 
 // Reservas (Cart management)
 router.use("/reservas", reservasRoutes);

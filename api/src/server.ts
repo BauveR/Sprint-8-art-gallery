@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import routes from "./routes";
 import dotenv from "dotenv";
 import path from "path";
@@ -22,29 +24,68 @@ try {
 
 const app = express();
 
-// CORS Configuration
+// Security: Helmet - Configure security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Permite imágenes de Cloudinary
+  })
+);
+
+// Security: Rate Limiting - Prevent brute force and DDoS
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Límite de 100 requests por IP
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // Solo 5 intentos de login por IP
+  message: "Too many login attempts, please try again later.",
+  skipSuccessfulRequests: true,
+});
+
+app.use("/api/", limiter);
+app.use("/api/auth/", authLimiter); // Más restrictivo para auth
+
+// CORS Configuration - Whitelist específica de dominios
 const allowedOrigins = [
   "http://localhost:5173", // Vite dev
   "http://localhost:5174", // Vite dev alternate
   "http://localhost:5175", // Vite dev alternate
   "http://localhost:5176", // Vite dev alternate
   "http://localhost:3000", // Local testing
-  process.env.FRONTEND_URL || "", // URL de producción (configurar en Railway)
+  process.env.FRONTEND_URL || "", // URL de producción configurada
+  // Agregar URLs específicas de Vercel aquí (no wildcards)
+  "https://sprint-8-art-gallery.vercel.app",
+  "https://sprint-8-art-gallery-git-main.vercel.app",
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Permitir requests sin origin (como mobile apps o curl)
-      if (!origin) return callback(null, true);
-
-      // Permitir localhost y URLs configuradas
-      if (allowedOrigins.includes(origin)) {
+      // Permitir requests sin origin solo en desarrollo
+      if (!origin && process.env.NODE_ENV !== "production") {
         return callback(null, true);
       }
 
-      // Permitir todas las URLs de Vercel del proyecto
-      if (origin.includes("sprint-8-art-gallery") && origin.includes("vercel.app")) {
+      // Verificar whitelist estricta
+      if (allowedOrigins.includes(origin || "")) {
         return callback(null, true);
       }
 
@@ -55,7 +96,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" })); // Limitar tamaño de payload
 
 // Servir /uploads como estático
 const UPLOAD_DIR = path.resolve(__dirname, "../uploads");
