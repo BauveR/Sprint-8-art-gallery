@@ -286,34 +286,33 @@ export default function WelcomeSection() {
             <motion.img
               src="/piedra  svgs-20.png"
               alt="Background layer"
-              className="layer-1 absolute h-auto object-contain"
+              className="layer-1 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer1.position?.mobile,
                 zIndex: 3,
                 transform: `translateY(-${parallaxOffset}px)`,
                 opacity: parallaxOffset > 0 ? Math.max(1 - (parallaxOffset / 300), 0) : 1
               }}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0, ease: "easeOut" }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             />
 
             {/* Capa 2 - Piedra art home page-16.svg - Revelado suave de abajo a arriba (segundo lugar) */}
             <motion.img
               src="/Piedra art home page-16.svg"
               alt="Second layer"
-              className="layer-2 absolute h-auto object-contain"
+              className="layer-2 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer2.position?.mobile,
                 zIndex: 4
               }}
-              initial={{ opacity: 0, clipPath: 'inset(0% 0% 100% 0%)' }}
-              animate={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 1.5,
-                delay: 0.5,
-                ease: [0.25, 0.1, 0.25, 1],
-                opacity: { duration: 1.8 }
+                duration: 0.6,
+                delay: 0.2,
+                ease: [0.25, 0.1, 0.25, 1]
               }}
             />
 
@@ -321,34 +320,33 @@ export default function WelcomeSection() {
             <motion.img
               src="/piedra  svgs-21.png"
               alt="Third layer"
-              className="layer-3 absolute h-auto object-contain"
+              className="layer-3 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer3.position?.mobile,
                 zIndex: 5,
                 transform: `translateY(-${parallaxOffset}px)`,
                 opacity: parallaxOffset > 0 ? Math.max(1 - (parallaxOffset / 300), 0) : 1
               }}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0, ease: "easeOut" }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             />
 
             {/* Capa 4 (Frente) - piedra svgs-15.svg - Revelado suave de abajo a arriba (tercer lugar) */}
             <motion.img
               src="/piedra  svgs-15.svg"
               alt="Front layer"
-              className="layer-4 absolute h-auto object-contain"
+              className="layer-4 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer4.position?.mobile,
                 zIndex: 6
               }}
-              initial={{ opacity: 0, clipPath: 'inset(0% 0% 100% 0%)', y: 20 }}
-              animate={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0%)', y: 0 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 1.5,
-                delay: 1.2,
-                ease: [0.25, 0.1, 0.25, 1],
-                opacity: { duration: 1.8 }
+                duration: 0.6,
+                delay: 0.4,
+                ease: [0.25, 0.1, 0.25, 1]
               }}
             />
 
@@ -358,10 +356,10 @@ export default function WelcomeSection() {
         {/* Columna Derecha - 30% con SVG y texto */}
         <div className="w-full md:w-[35%] flex items-center justify-center md:justify-start px-[5%] order-2 md:order-2">
           <motion.div
-            className="max-w-md"
-            initial={{ opacity: 0, x: 50 }}
+            className="max-w-md gpu-accelerated"
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             {/* SVG con efecto de rotación en color secundario */}
             <motion.img

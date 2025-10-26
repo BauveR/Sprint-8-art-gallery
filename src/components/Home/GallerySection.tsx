@@ -57,10 +57,10 @@ export default function GallerySection({ obras }: GallerySectionProps) {
         <div className="relative h-screen flex flex-col overflow-hidden">
           {/* SVG Superior */}
           <motion.div
-            className="flex-1 flex items-center justify-center p-4"
-            initial={{ x: '-100%', opacity: 0 }}
-            animate={isVisible ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="flex-1 flex items-center justify-center p-4 gpu-accelerated"
+            initial={{ x: '-50%', opacity: 0 }}
+            animate={isVisible ? { x: 0, opacity: 1 } : { x: '-50%', opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <img
               src="/Piedra art home page-18.svg"
@@ -71,10 +71,10 @@ export default function GallerySection({ obras }: GallerySectionProps) {
 
           {/* SVG Inferior */}
           <motion.div
-            className="flex-1 flex items-center justify-center p-4"
-            initial={{ x: '-100%', opacity: 0 }}
-            animate={isVisible ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
-            transition={{ duration: 1, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className="flex-1 flex items-center justify-center p-4 gpu-accelerated"
+            initial={{ x: '-50%', opacity: 0 }}
+            animate={isVisible ? { x: 0, opacity: 1 } : { x: '-50%', opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <img
               src="/Piedra art home page-19.svg"
@@ -88,11 +88,11 @@ export default function GallerySection({ obras }: GallerySectionProps) {
         <div className="flex flex-col justify-center space-y-12 pr-[5%]">
           {/* Texto alineado a la derecha */}
           <motion.div
-            className="flex flex-col items-end text-right space-y-6"
-            initial={{ opacity: 0, y: 30 }}
+            className="flex flex-col items-end text-right space-y-6 gpu-accelerated"
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <p className="text-3xl md:text-4xl font-bold max-w-2xl" style={{ color: '#919191' }}>
               P_I_E_D_R_A explores this relationship through various disciplines, creating unique experiences and objects. After all, no two stones are alike.
@@ -101,11 +101,11 @@ export default function GallerySection({ obras }: GallerySectionProps) {
 
           {/* Slider Horizontal */}
           <motion.div
-            className="w-full"
+            className="w-full gpu-accelerated"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.4 }}
           >
             <div
               className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 scrollbar-hide"
@@ -118,18 +118,18 @@ export default function GallerySection({ obras }: GallerySectionProps) {
               {obrasEnExposicion.map((obra, index) => (
                 <motion.div
                   key={obra.id_obra}
-                  className="relative flex-none w-[85vw] md:w-[70vw] lg:w-[40vw] h-[60vh] snap-center cursor-pointer overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl"
-                  initial={{ opacity: 0, x: 100 }}
+                  className="relative flex-none w-[85vw] md:w-[70vw] lg:w-[40vw] h-[60vh] snap-center cursor-pointer overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl gpu-accelerated"
+                  initial={{ opacity: 0, x: 50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{
-                    duration: 0.8,
-                    delay: index * 0.15,
+                    duration: 0.4,
+                    delay: Math.min(index * 0.1, 0.3),
                     ease: [0.25, 0.1, 0.25, 1]
                   }}
                   whileHover={{
                     scale: 1.02,
-                    transition: { duration: 0.3, ease: "easeOut" }
+                    transition: { duration: 0.2, ease: "easeOut" }
                   }}
                   onClick={() => navigate(`/obra/${obra.id_obra}`)}
                 >

@@ -16,11 +16,11 @@ export default function HeroSection() {
 
         {/* Columna Izquierda - Available in stores */}
         <motion.div
-          className="flex flex-col items-center lg:items-end justify-center space-y-4"
-          initial={{ opacity: 0, x: -100 }}
+          className="flex flex-col items-center lg:items-end justify-center space-y-4 gpu-accelerated"
+          initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <h3 className="text-xl md:text-2xl font-semibold text-gray-300 dark:text-gray-200 text-center lg:text-right">
             available now in stores CDMX:
@@ -87,11 +87,11 @@ export default function HeroSection() {
 
           {/* Botón */}
           <motion.div
-            className="flex justify-center w-full"
-            initial={{ opacity: 0, y: 20 }}
+            className="flex justify-center w-full gpu-accelerated"
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <Magnet padding={100} strength={0.4}>
               <Button

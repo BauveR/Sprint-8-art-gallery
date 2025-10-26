@@ -98,8 +98,8 @@ export default function Model3D({
       // Normalizar el scroll entre 0 y 1
       const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
-      // Rotación Y: gira continuamente
-      const rotationY = (scrollY / 900) * Math.PI;
+      // Rotación Y: gira continuamente (más lento)
+      const rotationY = (scrollY / 2500) * Math.PI;
 
       // Rotación X: empieza en 0 y termina inclinado en diagonal (máximo 45 grados = Math.PI/4)
       const rotationX = scrollProgress * (Math.PI / 4);
@@ -116,10 +116,13 @@ export default function Model3D({
       <Canvas
         gl={{
           alpha: true,
-          antialias: true,
+          antialias: false, // Desactivar para mejor rendimiento
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2
+          toneMappingExposure: 1.2,
+          powerPreference: "high-performance", // Optimizar para performance
         }}
+        dpr={Math.min(window.devicePixelRatio, 2)} // Limitar pixel ratio
+        performance={{ min: 0.5 }} // Degradar calidad si FPS es bajo
         style={{ background: 'transparent' }}
       >
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />

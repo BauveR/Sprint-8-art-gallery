@@ -120,6 +120,8 @@
     overflow-x: hidden;
     width: 100%;
     min-width: 100%;
+    /* Optimización de scroll */
+    scroll-behavior: smooth;
   }
 
   body {
@@ -129,6 +131,11 @@
     min-width: 100%;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
+    /* Aceleración por GPU */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Liquid glass effect for inputs in dark mode */
@@ -168,10 +175,22 @@
 
   .animate-logo-scroll {
     animation: logo-scroll 40s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .animate-logo-scroll:hover {
     animation-play-state: paused;
+  }
+
+  /* Optimización GPU para elementos animados */
+  .gpu-accelerated {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Metallic paint effect */
