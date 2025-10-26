@@ -11,7 +11,7 @@ export default function ObraCard({ obra, onAddToCart, onViewDetails }: ObraCardP
   return (
     <div className="group cursor-pointer" onClick={onViewDetails}>
       {/* Imagen */}
-      <div className="aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-gray-800 mb-4">
+      <div className="aspect-[3/4] overflow-hidden mb-4">
         <ObraImage
           obraId={obra.id_obra}
           alt={obra.titulo}
@@ -20,32 +20,32 @@ export default function ObraCard({ obra, onAddToCart, onViewDetails }: ObraCardP
       </div>
 
       {/* Información del producto */}
-      <div className="space-y-2 px-1">
+      <div className="space-y-1 px-1">
         {/* Título y Autor */}
-        <div className="space-y-1">
-          <h3 className="font-medium text-base tracking-wide uppercase text-foreground/90">
+        <div className="space-y-0.5">
+          <h3 className="font-bold text-sm tracking-wide uppercase text-white">
             {obra.titulo}
           </h3>
-          <p className="text-sm text-muted-foreground tracking-wide">{obra.autor}</p>
+          <p className="text-xs text-white font-bold tracking-wide">{obra.autor}</p>
         </div>
 
         {/* Técnica si existe */}
         {obra.tecnica && (
-          <p className="text-xs text-muted-foreground/70 tracking-wide">{obra.tecnica}</p>
+          <p className="text-xs text-white/80 font-bold tracking-wide">{obra.tecnica}</p>
         )}
 
         {/* Precio */}
-        <div className="pt-2">
-          <p className="text-lg font-light tracking-wide text-foreground">
+        <div className="pt-1">
+          <p className="text-base font-bold tracking-wide text-white">
             ${formatPrice(obra.precio_salida)}
           </p>
         </div>
 
         {/* Botón de agregar al carrito */}
-        <div className="pt-3">
+        <div className="pt-2">
           <Button
-            variant="outline"
-            className="w-full border-foreground/20 hover:bg-foreground hover:text-background transition-all duration-300"
+            className="w-full font-bold transition-colors duration-300"
+            style={{ backgroundColor: '#8ADA00', color: '#191E2C' }}
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart(obra);

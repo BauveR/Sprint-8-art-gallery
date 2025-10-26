@@ -12,11 +12,21 @@ interface ModelProps {
   rotationSpeed?: number;
   scrollRotation?: { x: number; y: number };
   scale?: number;
+  initialRotation?: { x?: number; y?: number; z?: number };
 }
 
-function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotation, scale = 80 }: ModelProps) {
+function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotation, scale = 80, initialRotation }: ModelProps) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef<THREE.Group>(null);
+
+  // Aplicar rotación inicial
+  useEffect(() => {
+    if (meshRef.current && initialRotation) {
+      if (initialRotation.x !== undefined) meshRef.current.rotation.x = initialRotation.x;
+      if (initialRotation.y !== undefined) meshRef.current.rotation.y = initialRotation.y;
+      if (initialRotation.z !== undefined) meshRef.current.rotation.z = initialRotation.z;
+    }
+  }, [initialRotation]);
 
   // Modificar materiales para que sea menos plástico
   useEffect(() => {
@@ -45,20 +55,23 @@ function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotati
 
   useFrame((_state, delta) => {
     if (meshRef.current) {
+      const initialX = initialRotation?.x ?? 0;
+      const initialY = initialRotation?.y ?? 0;
+
       if (scrollRotation) {
-        // Rotación basada en scroll (diagonal) - más suave
+        // Rotación basada en scroll (diagonal) - más suave, sumando la rotación inicial
         meshRef.current.rotation.x = THREE.MathUtils.lerp(
           meshRef.current.rotation.x,
-          scrollRotation.x,
+          scrollRotation.x + initialX,
           0.03
         );
         meshRef.current.rotation.y = THREE.MathUtils.lerp(
           meshRef.current.rotation.y,
-          scrollRotation.y,
+          scrollRotation.y + initialY,
           0.03
         );
       } else if (autoRotate) {
-        // Auto-rotación normal
+        // Auto-rotación normal, manteniendo la rotación inicial en Y
         meshRef.current.rotation.y += delta * rotationSpeed;
       }
     }
@@ -72,6 +85,7 @@ export default function Model3D({
   autoRotate = true,
   rotationSpeed = 0.5,
   scale = 80,
+  initialRotation,
   className = ''
 }: ModelProps & { className?: string }) {
   const [scrollRotation, setScrollRotation] = useState<{ x: number; y: number } | undefined>(undefined);
@@ -123,8 +137,10 @@ export default function Model3D({
           rotationSpeed={rotationSpeed}
           scrollRotation={scrollRotation}
           scale={scale}
+          initialRotation={initialRotation}
         />
         <OrbitControls
+          enabled={false}
           enableZoom={false}
           enablePan={false}
           autoRotate={false}

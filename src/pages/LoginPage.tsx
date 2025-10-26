@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContextFirebase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail } from "lucide-react";
+import { X } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,6 +42,10 @@ export default function LoginPage() {
     }
   };
 
+  const handleClose = () => {
+    navigate(-1);
+  };
+
   // Redirigir cuando el usuario esté autenticado
   if (user) {
     if (user.role === "admin") {
@@ -52,10 +57,92 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 px-4">
-      <Card className="w-full max-w-md dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
-        <CardHeader className="text-center">
+    <motion.div
+      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{ backgroundColor: '#5F6D9A' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      {/* Logo loop de fondo */}
+      <div className="absolute inset-0 flex items-center pointer-events-none">
+        <div className="w-full overflow-hidden">
+          <div className="flex animate-logo-scroll">
+            {/* Duplicamos el contenido para el efecto de loop infinito */}
+            {[...Array(2)].map((_, index) => (
+              <div key={index} className="flex items-center gap-16 pr-16 shrink-0">
+                <img
+                  src="/Piedra art home page-17.svg"
+                  alt="Piedra logo"
+                  className="w-auto object-contain shrink-0"
+                  style={{ height: '100rem' }}
+                />
+                <img
+                  src="/Piedra art home page-17.svg"
+                  alt="Piedra logo"
+                  className="w-auto object-contain shrink-0"
+                  style={{ height: '100rem' }}
+                />
+                <img
+                  src="/Piedra art home page-17.svg"
+                  alt="Piedra logo"
+                  className="w-auto object-contain shrink-0"
+                  style={{ height: '100rem' }}
+                />
+                <img
+                  src="/Piedra art home page-17.svg"
+                  alt="Piedra logo"
+                  className="w-auto object-contain shrink-0"
+                  style={{ height: '100rem' }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10, filter: "blur(10px)" }}
+        animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, scale: 0.95, y: 10, filter: "blur(10px)" }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full max-w-md relative z-10"
+      >
+        {/* Botón de cerrar */}
+        <button
+          onClick={handleClose}
+          className="absolute -top-4 -right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Cerrar"
+        >
+          <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+        </button>
+
+        <Card className="w-full dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
+          <CardHeader className="text-center">
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+
+          {/* Logo giratorio */}
+          <motion.img
+            src="/piedra  svgs-05.svg"
+            alt="Decorative rotating element"
+            className="w-32 h-32 md:w-40 md:h-40 mx-auto my-6 object-contain"
+            style={{
+              filter: 'brightness(0) saturate(100%) invert(42%) sepia(13%) saturate(1018%) hue-rotate(198deg) brightness(94%) contrast(90%)'
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1, rotate: 360 }}
+            transition={{
+              opacity: { duration: 1 },
+              scale: { duration: 1 },
+              rotate: {
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
+              },
+            }}
+          />
+
           <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
         </CardHeader>
         <CardContent>
@@ -146,6 +233,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
