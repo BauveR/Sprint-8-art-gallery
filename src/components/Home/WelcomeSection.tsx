@@ -17,7 +17,7 @@ const initialLayerConfig: LayerConfig = {
       desktop: '120%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { top: '14%', left: '-4%' } as Position,     // 📱 Posición móvil (igual que desktop)
+      mobile: { top: '20%', left: '1%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '14%', left: '-4%' } as Position,     // 📱 Posición tablet (igual que desktop)
       desktop: { top: '14%', left: '-4%' } as Position    // 🖥️ Posición desktop
     }
@@ -31,7 +31,7 @@ const initialLayerConfig: LayerConfig = {
       desktop: '110%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { top: '18%', right: '-9%' } as Position,   // 📱 Posición móvil (igual que desktop)
+      mobile: { top: '20%', right: '5%' } as Position,   // 📱 Posición móvil (igual que desktop)
       tablet: { top: '18%', right: '-9%' } as Position,   // 📱 Posición tablet (igual que desktop)
       desktop: { top: '18%', right: '-9%' } as Position   // 🖥️ Posición desktop
     }
@@ -40,12 +40,12 @@ const initialLayerConfig: LayerConfig = {
   // 📱 CAPA 3 - TERCERA CAPA (piedra svgs-21.png)
   layer3: {
     size: {
-      mobile: '100%',    // 📱 Tamaño en móvil (similar a desktop)
+      mobile: '110%',    // 📱 Tamaño en móvil (similar a desktop)
       tablet: '110%',    // 📱 Tamaño en tablet (similar a desktop)
       desktop: '122%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { bottom: '-15%', left: '-5%' } as Position,   // 📱 Posición móvil (igual que desktop)
+      mobile: { bottom: '-20%', left: '-5%' } as Position,   // 📱 Posición móvil (igual que desktop)
       tablet: { bottom: '-15%', left: '-5%' } as Position,   // 📱 Posición tablet (igual que desktop)
       desktop: { bottom: '-15%', left: '-5%' } as Position   // 🖥️ Posición desktop
     }
@@ -59,7 +59,7 @@ const initialLayerConfig: LayerConfig = {
       desktop: '28%'    // 🖥️ Tamaño en desktop
     },
    position: {
-      mobile: { bottom: '17%', left: '61%' } as Position,   // 📱 Posición móvil (igual que desktop)
+      mobile: { bottom: '12%', left: '53%' } as Position,   // 📱 Posición móvil (igual que desktop)
       tablet: { bottom: '17%', left: '61%' } as Position,   // 📱 Posición tablet (igual que desktop)
       desktop: { bottom: '17%', left: '61%' } as Position   // 🖥️ Posición desktop
     }
@@ -365,7 +365,7 @@ export default function WelcomeSection() {
             <motion.img
               src="/piedra  svgs-05.svg"
               alt="Decorative rotating element"
-              className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto mb-8 object-contain pointer-events-auto"
+              className="hidden md:block w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto mb-8 object-contain pointer-events-auto"
               style={{
                 filter: 'brightness(0) saturate(100%) invert(42%) sepia(13%) saturate(1018%) hue-rotate(198deg) brightness(94%) contrast(90%)'
               }}
@@ -383,7 +383,7 @@ export default function WelcomeSection() {
             />
 
             {/* Texto descriptivo */}
-            <p className="text-sm md:text-base text-gray-300 leading-relaxed text-justify pointer-events-auto">
+            <p className="text-sm md:text-base font-bold text-gray-300 leading-relaxed text-center pointer-events-auto">
               Stone is a material we've lived alongside in countless ways—from dwelling in caves and adorning our bodies to venerating monoliths. It's been a constant thread throughout human history and culture since our earliest days.
             </p>
           </motion.div>

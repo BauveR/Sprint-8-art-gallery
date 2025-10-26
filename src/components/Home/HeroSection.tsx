@@ -74,8 +74,8 @@ export default function HeroSection() {
         {/* Columna Derecha - Modelo 3D y Botón */}
         <div className="flex flex-col items-center justify-center space-y-6">
           {/* Modelo 3D */}
-          <div className="w-[120%] md:w-full h-[80vh] md:h-[50vh] flex items-center justify-center overflow-visible">
-            <div className="w-[100%] md:w-[100%] h-[200%]" style={{ transform: 'rotate(-90deg) translateX(-5%) translateY(-5%)' }}>
+          <div className="w-full md:w-full h-[50vh] md:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
+            <div className="w-[80%] md:w-[100%] h-[140%] md:h-[200%] model-3d-container">
               <Model3D
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
                 autoRotate={true}

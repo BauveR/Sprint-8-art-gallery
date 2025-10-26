@@ -131,11 +131,6 @@
     min-width: 100%;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
-    /* Aceleración por GPU */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
   }
 
   /* Liquid glass effect for inputs in dark mode */
@@ -248,5 +243,17 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Model 3D transform responsive */
+  .model-3d-container {
+    transform: rotate(-90deg) translateX(0%) translateY(0%) scale(0.9);
+    transform-origin: center;
+  }
+
+  @media (min-width: 768px) {
+    .model-3d-container {
+      transform: rotate(-90deg) translateX(-5%) translateY(-5%) scale(1);
+    }
   }
 }
