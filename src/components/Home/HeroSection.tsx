@@ -74,13 +74,7 @@ export default function HeroSection() {
         {/* Columna Derecha - Modelo 3D y Botón */}
         <div className="flex flex-col items-center justify-center space-y-6">
           {/* Modelo 3D */}
-          <motion.div
-            className="w-[120%] md:w-full h-[80vh] md:h-[50vh] flex items-center justify-center overflow-visible"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-          >
+          <div className="w-[120%] md:w-full h-[80vh] md:h-[50vh] flex items-center justify-center overflow-visible">
             <div className="w-[100%] md:w-[100%] h-[200%]" style={{ transform: 'rotate(-90deg) translateX(-5%) translateY(-5%)' }}>
               <Model3D
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
@@ -89,7 +83,7 @@ export default function HeroSection() {
                 className="w-full h-full"
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Botón */}
           <motion.div
