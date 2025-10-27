@@ -402,5 +402,5 @@ Desarrollado por **Ricardo bauve** - [IT ACADEMY](https://www.barcelonactiva.cat
 - [Stripe](https://stripe.com/) - Procesamiento de pagos
 - [Cloudinary](https://cloudinary.com/) - CDN de imágenes
 - [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) - Renderizado 3D
-- [Manuela Grajales](https://www.linkedin.com/in/mgduque/) - Mentora Semior developer IT ACADEMY
+- [Manuela Grajales](https://www.linkedin.com/in/mgduque/) - Front-end Development Mentor
 
