@@ -4,7 +4,8 @@ import { useAuth } from "../../context/AuthContextFirebase";
 import { useCart } from "../../context/CartContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, User, ShoppingCart, Store, Package, Settings } from "lucide-react";
+import { LogOut, User, ShoppingCart, Store, Package, Settings, Home } from "lucide-react";
+import MobileDock from "@/components/ui/mobile-dock";
 
 export default function PillNav() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -64,6 +65,54 @@ export default function PillNav() {
     navigate(path);
   };
 
+  // Mobile Dock Items
+  const mobileDockItems = [
+    {
+      icon: <Home size={20} />,
+      label: "Inicio",
+      onClick: () => navigate("/")
+    },
+    {
+      icon: <Store size={20} />,
+      label: "Tienda",
+      onClick: () => navigate("/shop")
+    },
+    {
+      icon: <ShoppingCart size={20} />,
+      label: "Carrito",
+      onClick: () => navigate("/cart")
+    },
+    ...(isAuthenticated
+      ? [
+          {
+            icon: <Package size={20} />,
+            label: "Mis Compras",
+            onClick: () => navigate("/my-orders")
+          },
+          {
+            icon: <User size={20} />,
+            label: user?.name || "Perfil",
+            onClick: () => navigate("/")
+          }
+        ]
+      : [
+          {
+            icon: <User size={20} />,
+            label: "Login",
+            onClick: () => navigate("/login")
+          }
+        ]),
+    ...(isAuthenticated && user?.role === 'admin'
+      ? [
+          {
+            icon: <Settings size={20} />,
+            label: "Admin",
+            onClick: () => navigate("/dashboard")
+          }
+        ]
+      : [])
+  ];
+
   return (
     <header className="fixed top-4 md:top-[72px] left-0 right-0 z-40 transition-all duration-300">
       <nav className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
@@ -94,7 +143,7 @@ export default function PillNav() {
                     key={item.path}
                     ref={(el) => { itemsRef.current[index] = el; }}
                     onClick={() => handleNavClick(item.path, index)}
-                    className={`relative z-10 px-4 py-2 rounded-full font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
+                    className={`relative z-10 px-4 py-1 md:py-2 rounded-full font-medium text-sm transition-colors duration-200 flex items-center gap-2 ${
                       isActive
                         ? "text-gray-900 dark:text-white"
                         : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -172,62 +221,14 @@ export default function PillNav() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden pb-3 flex justify-between items-center">
-          {/* Nav items mobile centrados */}
-          <div className="flex justify-center gap-2 flex-1">
-            {navItems.map((item, index) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    isActive
-                      ? "bg-orange-500 text-white shadow-md"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  {Icon && <Icon className="h-4 w-4" />}
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Mobile actions a la derecha */}
-          <div className="flex md:hidden items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/cart")}
-              className="relative rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
-
-            {/* Admin Dashboard Button Mobile - Solo visible para administradores */}
-            {isAuthenticated && user?.role === 'admin' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-400"
-                title="Dashboard Admin"
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
-            )}
-
-            <ThemeToggle />
-          </div>
+        {/* Mobile Dock Navigation */}
+        <div className="md:hidden">
+          <MobileDock
+            items={mobileDockItems}
+            panelHeight={68}
+            baseItemSize={50}
+            magnification={70}
+          />
         </div>
       </nav>
     </header>

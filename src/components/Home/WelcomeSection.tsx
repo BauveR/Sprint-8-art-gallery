@@ -19,7 +19,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '20%', left: '1%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '14%', left: '-4%' } as Position,     // 📱 Posición tablet (igual que desktop)
-      desktop: { top: '14%', left: '-4%' } as Position    // 🖥️ Posición desktop
+      desktop: { top: '14%', left: '-1%' } as Position    // 🖥️ Posición desktop
     }
   },
 
@@ -47,7 +47,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { bottom: '-20%', left: '-5%' } as Position,   // 📱 Posición móvil (igual que desktop)
       tablet: { bottom: '-15%', left: '-5%' } as Position,   // 📱 Posición tablet (igual que desktop)
-      desktop: { bottom: '-15%', left: '-5%' } as Position   // 🖥️ Posición desktop
+      desktop: { bottom: '-13%', left: '-3%' } as Position   // 🖥️ Posición desktop
     }
   },
 
@@ -131,7 +131,7 @@ export default function WelcomeSection() {
       style={{ backgroundColor: '#191E2C' }}
     >
       {/* Panel de Control Visual - Solo en desarrollo */}
-      {process.env.NODE_ENV === 'development' && (
+      {false && process.env.NODE_ENV === 'development' && (
         <LayerControls
           initialConfig={layerConfig}
           onConfigChange={(config) => setLayerConfig(config)}
@@ -375,7 +375,7 @@ export default function WelcomeSection() {
                 opacity: { duration: 1 },
                 scale: { duration: 1 },
                 rotate: {
-                  duration: 20,
+                  duration: 120,
                   repeat: Infinity,
                   ease: "linear",
                 },

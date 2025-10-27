@@ -91,6 +91,14 @@ export default function Model3D({
   const [scrollRotation, setScrollRotation] = useState<{ x: number; y: number } | undefined>(undefined);
 
   useEffect(() => {
+    // Solo activar scroll rotation en desktop (pantallas >= 768px)
+    const isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+      // En móvil, no activar scroll rotation
+      return;
+    }
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const maxScroll = 1000; // Scroll máximo para alcanzar posición diagonal completa
@@ -126,14 +134,9 @@ export default function Model3D({
         style={{ background: 'transparent' }}
       >
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-        <ambientLight intensity={1.8} />
+        <ambientLight intensity={2} />
         <hemisphereLight intensity={1.2} color="#ffffff" groundColor="#808080" />
         <directionalLight position={[10, 10, 5]} intensity={1.2} castShadow={false} />
-        <directionalLight position={[-10, -10, -5]} intensity={0.8} castShadow={false} />
-        <directionalLight position={[5, 0, 5]} intensity={0.6} castShadow={false} />
-        <directionalLight position={[0, 15, 0]} intensity={1} castShadow={false} />
-        <pointLight position={[0, 8, 0]} intensity={1.5} />
-        <pointLight position={[0, -5, 0]} intensity={0.8} />
         <Model
           modelPath={modelPath}
           autoRotate={!scrollRotation && autoRotate}

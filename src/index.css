@@ -188,6 +188,16 @@
     -webkit-backface-visibility: hidden;
   }
 
+  /* Infinite rotation animation for SVG */
+  @keyframes spin-infinite {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   /* Metallic paint effect */
   @keyframes metallic-shine {
     0% {
@@ -245,7 +255,7 @@
     scrollbar-width: none;
   }
 
-  /* Model 3D transform responsive */
+  /* Model 3D transform responsive - Valores conservadores estables */
   .model-3d-container {
     transform: rotate(-90deg) translateX(0%) translateY(0%) scale(0.9);
     transform-origin: center;

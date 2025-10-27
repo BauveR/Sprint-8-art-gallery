@@ -16,7 +16,7 @@ export default function HeroSection() {
 
         {/* Columna Izquierda - Available in stores */}
         <motion.div
-          className="flex flex-col items-center lg:items-end justify-center space-y-4 gpu-accelerated"
+          className="flex flex-col items-center lg:items-end justify-center space-y-2 md:space-y-4 gpu-accelerated"
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -73,7 +73,7 @@ export default function HeroSection() {
 
         {/* Columna Derecha - Modelo 3D y Botón */}
         <div className="flex flex-col items-center justify-center space-y-6">
-          {/* Modelo 3D */}
+          {/* Modelo 3D - Contenedor con valores conservadores */}
           <div className="w-full md:w-full h-[50vh] md:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
             <div className="w-[80%] md:w-[100%] h-[140%] md:h-[200%] model-3d-container">
               <Model3D

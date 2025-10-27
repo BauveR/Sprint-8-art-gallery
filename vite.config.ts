@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      "framer-motion": path.resolve(__dirname, "src/lib/framer-motion-mock.ts"),
     },
   },
   server: {
@@ -24,6 +25,10 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1000,
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
     rollupOptions: {
       output: {
         manualChunks: {

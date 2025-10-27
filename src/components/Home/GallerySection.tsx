@@ -47,17 +47,17 @@ export default function GallerySection({ obras }: GallerySectionProps) {
   return (
     <section
       ref={sectionRef}
-      className="min-h-screen w-screen py-16 transition-colors duration-1000 overflow-x-hidden"
+      className="min-h-screen w-screen py-8 md:py-16 transition-colors duration-1000 overflow-x-hidden"
       style={{ backgroundColor: isVisible ? '#ffffff' : '#FF1E56' }}
     >
       {/* Grid de 2 columnas */}
-      <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-8 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-4 md:gap-8 h-full">
 
         {/* Columna Izquierda - 2 SVG */}
-        <div className="relative h-screen flex flex-col overflow-hidden">
+        <div className="relative h-auto lg:h-screen flex flex-row lg:flex-col overflow-visible">
           {/* SVG Superior */}
           <motion.div
-            className="flex-1 flex items-center justify-center p-4 gpu-accelerated"
+            className="flex-1 flex items-center justify-end lg:justify-center p-2 lg:p-4 gpu-accelerated"
             initial={{ x: '-50%', opacity: 0 }}
             animate={isVisible ? { x: 0, opacity: 1 } : { x: '-50%', opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
@@ -65,13 +65,13 @@ export default function GallerySection({ obras }: GallerySectionProps) {
             <img
               src="/Piedra art home page-18.svg"
               alt="Piedra decorative"
-              className="w-[80%] h-auto object-contain"
+              className="w-[60%] lg:w-[80%] h-auto object-contain -translate-x-6 lg:translate-x-0"
             />
           </motion.div>
 
           {/* SVG Inferior */}
           <motion.div
-            className="flex-1 flex items-center justify-center p-4 gpu-accelerated"
+            className="flex-1 flex items-center justify-start lg:justify-center p-2 lg:p-4 gpu-accelerated"
             initial={{ x: '-50%', opacity: 0 }}
             animate={isVisible ? { x: 0, opacity: 1 } : { x: '-50%', opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
@@ -79,22 +79,22 @@ export default function GallerySection({ obras }: GallerySectionProps) {
             <img
               src="/Piedra art home page-19.svg"
               alt="Piedra decorative"
-              className="w-[80%] h-auto object-contain"
+              className="w-[90%] lg:w-[80%] h-auto object-contain -translate-x-10 lg:translate-x-0"
             />
           </motion.div>
         </div>
 
         {/* Columna Derecha - Texto y Galería */}
-        <div className="flex flex-col justify-center space-y-12 pr-[5%]">
+        <div className="flex flex-col justify-center space-y-6 md:space-y-12 px-4 md:pr-[5%] md:px-0 -ml-4 lg:ml-0">
           {/* Texto alineado a la derecha */}
           <motion.div
-            className="flex flex-col items-end text-right space-y-6 gpu-accelerated"
+            className="flex flex-col items-center md:items-end text-center md:text-right space-y-4 md:space-y-6 gpu-accelerated"
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <p className="text-3xl md:text-4xl font-bold max-w-2xl" style={{ color: '#919191' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl font-bold max-w-2xl px-4 md:px-0" style={{ color: '#919191' }}>
               P_I_E_D_R_A explores this relationship through various disciplines, creating unique experiences and objects. After all, no two stones are alike.
             </p>
           </motion.div>
@@ -108,7 +108,7 @@ export default function GallerySection({ obras }: GallerySectionProps) {
             transition={{ duration: 0.4 }}
           >
             <div
-              className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 scrollbar-hide"
+              className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 scrollbar-hide pl-4 lg:pl-0"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
