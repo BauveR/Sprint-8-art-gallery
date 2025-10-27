@@ -1,0 +1,291 @@
+═══════════════════════════════════════════════════════════════════
+  PIEDRA ARTE GALLERY - COMANDOS DE INSTALACIÓN
+═══════════════════════════════════════════════════════════════════
+
+📋 REQUISITOS PREVIOS
+═══════════════════════════════════════════════════════════════════
+
+Verificar que tienes instalado:
+  ✓ Node.js 20.x o superior
+  ✓ npm 10.x o superior
+  ✓ MySQL 8.0 o superior
+  ✓ Git
+
+Comandos para verificar:
+  node --version
+  npm --version
+  mysql --version
+  git --version
+
+
+🚀 PASO 1: CLONAR REPOSITORIO
+═══════════════════════════════════════════════════════════════════
+
+git clone <repository-url>
+cd Sprint-8-art-gallery
+
+
+📦 PASO 2: INSTALAR DEPENDENCIAS
+═══════════════════════════════════════════════════════════════════
+
+--- Opción A: Instalación automática (recomendado) ---
+npm run install-all
+
+--- Opción B: Instalación manual ---
+
+# Frontend
+npm install
+
+# Backend
+cd api
+npm install
+cd ..
+
+
+🔧 PASO 3: CONFIGURAR VARIABLES DE ENTORNO
+═══════════════════════════════════════════════════════════════════
+
+--- Frontend: Crear archivo .env en la raíz ---
+
+# Copiar template
+cp .env.example .env
+
+# Editar con tus credenciales
+nano .env    # o usa tu editor favorito
+
+Variables requeridas:
+  VITE_API_URL=http://localhost:3000
+  VITE_FIREBASE_API_KEY=
+  VITE_FIREBASE_AUTH_DOMAIN=
+  VITE_FIREBASE_PROJECT_ID=
+  VITE_FIREBASE_STORAGE_BUCKET=
+  VITE_FIREBASE_MESSAGING_SENDER_ID=
+  VITE_FIREBASE_APP_ID=
+  VITE_STRIPE_PUBLISHABLE_KEY=
+  VITE_CLOUDINARY_CLOUD_NAME=
+  VITE_CLOUDINARY_UPLOAD_PRESET=
+  VITE_EMAILJS_SERVICE_ID=
+  VITE_EMAILJS_TEMPLATE_ID=
+  VITE_EMAILJS_PUBLIC_KEY=
+
+
+--- Backend: Crear archivo api/.env ---
+
+# Copiar template
+cp api/.env.example api/.env
+
+# Editar con tus credenciales
+nano api/.env    # o usa tu editor favorito
+
+Variables requeridas:
+  PORT=3000
+  NODE_ENV=development
+  DB_HOST=localhost
+  DB_PORT=3306
+  DB_NAME=art_gallery
+  DB_USER=root
+  DB_PASSWORD=
+  FIREBASE_PROJECT_ID=
+  FIREBASE_PRIVATE_KEY=
+  FIREBASE_CLIENT_EMAIL=
+  STRIPE_SECRET_KEY=
+  CLOUDINARY_CLOUD_NAME=
+  CLOUDINARY_API_KEY=
+  CLOUDINARY_API_SECRET=
+
+
+🗄️ PASO 4: CONFIGURAR BASE DE DATOS MYSQL
+═══════════════════════════════════════════════════════════════════
+
+--- Opción A: Desde línea de comandos ---
+
+# 1. Conectarse a MySQL
+mysql -u root -p
+
+# 2. Crear base de datos (en MySQL shell)
+CREATE DATABASE art_gallery;
+USE art_gallery;
+
+# 3. Ejecutar schema
+source api/schema.sql;
+
+# 4. Verificar tablas
+SHOW TABLES;
+
+# 5. Salir de MySQL
+EXIT;
+
+
+--- Opción B: Usando script (desde terminal) ---
+
+cd api
+mysql -u root -p art_gallery < schema.sql
+cd ..
+
+
+--- Verificar que las tablas se crearon ---
+
+mysql -u root -p -e "USE art_gallery; SHOW TABLES;"
+
+Deberías ver:
+  +------------------------+
+  | Tables_in_art_gallery  |
+  +------------------------+
+  | direcciones            |
+  | expos                  |
+  | imagenes               |
+  | obras                  |
+  | ordenes                |
+  | reservas               |
+  | tiendas                |
+  +------------------------+
+
+
+▶️ PASO 5: INICIAR EL PROYECTO
+═══════════════════════════════════════════════════════════════════
+
+--- Opción A: Desarrollo concurrente (recomendado) ---
+
+# Inicia frontend y backend simultáneamente
+npm run dev
+
+
+--- Opción B: Terminales separadas ---
+
+# Terminal 1 - Frontend (Puerto 5173)
+npm run dev
+
+# Terminal 2 - Backend (Puerto 3000)
+cd api
+npm run dev
+
+
+🌐 ACCEDER A LA APLICACIÓN
+═══════════════════════════════════════════════════════════════════
+
+Frontend:  http://localhost:5173
+Backend:   http://localhost:3000
+API Docs:  http://localhost:3000/api/health
+
+
+🧪 PASO 6 (OPCIONAL): EJECUTAR TESTS
+═══════════════════════════════════════════════════════════════════
+
+--- Frontend tests ---
+npm run test
+npm run test:ui
+npm run test:coverage
+
+--- Backend tests ---
+cd api
+npm run test
+npm run test:coverage
+
+
+📦 COMANDOS ÚTILES
+═══════════════════════════════════════════════════════════════════
+
+--- Desarrollo ---
+npm run dev              # Frontend dev server
+npm run build            # Build para producción
+npm run preview          # Preview del build
+npm run lint             # Ejecutar linter
+
+cd api
+npm run dev              # Backend dev server
+npm run build            # Compilar TypeScript
+npm run start            # Producción
+
+
+--- Limpiar instalación ---
+rm -rf node_modules package-lock.json
+rm -rf api/node_modules api/package-lock.json
+npm install
+cd api && npm install
+
+
+--- Reiniciar base de datos ---
+mysql -u root -p -e "DROP DATABASE IF EXISTS art_gallery; CREATE DATABASE art_gallery;"
+mysql -u root -p art_gallery < api/schema.sql
+
+
+🔥 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════
+
+❌ Error: "Cannot connect to MySQL"
+  → Verifica que MySQL esté corriendo: mysql.server status
+  → Inicia MySQL: mysql.server start
+  → Verifica credenciales en api/.env
+
+❌ Error: "Port 3000 already in use"
+  → Mata el proceso: lsof -ti:3000 | xargs kill -9
+  → O cambia el puerto en api/.env
+
+❌ Error: "Module not found"
+  → Reinstala dependencias: rm -rf node_modules && npm install
+  → Verifica Node.js version: node --version
+
+❌ Error: "Firebase auth failed"
+  → Verifica credenciales de Firebase en .env
+  → Regenera el service account key en Firebase Console
+
+❌ Error: "Stripe payment failed"
+  → Verifica API keys de Stripe (test mode)
+  → Revisa que VITE_STRIPE_PUBLISHABLE_KEY comience con pk_test_
+
+❌ Error al subir imágenes
+  → Verifica credenciales de Cloudinary
+  → Revisa permisos del preset de upload
+
+
+📚 RECURSOS
+═══════════════════════════════════════════════════════════════════
+
+Documentación completa:
+  - README.md                    → Guía general del proyecto
+  - ARQUITECTURA-PROYECTO.md     → Documentación técnica completa
+  - DIAGRAMA-ARQUITECTURA.md     → Diagramas de arquitectura
+
+Servicios externos:
+  - Firebase Console: https://console.firebase.google.com
+  - Stripe Dashboard: https://dashboard.stripe.com
+  - Cloudinary Console: https://cloudinary.com/console
+  - EmailJS Dashboard: https://dashboard.emailjs.com
+
+
+✅ CHECKLIST DE INSTALACIÓN COMPLETA
+═══════════════════════════════════════════════════════════════════
+
+□ Node.js, npm, MySQL y Git instalados
+□ Repositorio clonado
+□ Dependencias instaladas (frontend + backend)
+□ Variables de entorno configuradas (.env + api/.env)
+□ Base de datos creada y schema ejecutado
+□ Frontend corriendo en http://localhost:5173
+□ Backend corriendo en http://localhost:3000
+□ Puedes hacer login y ver la galería
+□ (Admin) Puedes acceder al dashboard y ver modelos 3D
+
+
+🎉 ¡INSTALACIÓN COMPLETA!
+═══════════════════════════════════════════════════════════════════
+
+Si todo funcionó correctamente, deberías poder:
+  ✓ Ver la página principal con la galería
+  ✓ Registrarte/iniciar sesión
+  ✓ Agregar obras al carrito
+  ✓ Realizar una compra de prueba (con tarjeta test de Stripe)
+  ✓ (Admin) Acceder al dashboard
+  ✓ (Admin) Crear, editar y eliminar obras
+  ✓ (Admin) Ver modelos 3D interactivos
+
+Tarjeta de prueba Stripe:
+  Número: 4242 4242 4242 4242
+  Vencimiento: Cualquier fecha futura
+  CVC: Cualquier 3 dígitos
+  ZIP: Cualquier 5 dígitos
+
+
+═══════════════════════════════════════════════════════════════════
+  Happy Coding! 🚀
+═══════════════════════════════════════════════════════════════════
