@@ -76,53 +76,7 @@ export default function WelcomeSection() {
   // Estado para controlar la configuración de capas en tiempo real
   const [layerConfig, setLayerConfig] = useState(initialLayerConfig);
 
-  // Estado para el efecto parallax
   const sectionRef = useRef<HTMLElement>(null);
-  const [parallaxOffset, setParallaxOffset] = useState(0);
-
-  // Observer combinado: observa Welcome saliendo Y Hero entrando
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-
-      const welcomeRect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      // Buscar la Hero Section (siguiente sección)
-      const heroSection = sectionRef.current.nextElementSibling as HTMLElement;
-
-      if (!heroSection) return;
-
-      const heroRect = heroSection.getBoundingClientRect();
-
-      // Calcular visibilidad de Hero Section (0 a 1)
-      const heroVisible = Math.max(0, Math.min(1, (windowHeight - heroRect.top) / windowHeight));
-
-      // Calcular cuánto del Welcome ha salido (0 a 1)
-      const welcomeScrolledOut = Math.abs(Math.min(welcomeRect.top, 0));
-      const welcomeHeight = welcomeRect.height;
-      const welcomeExitProgress = Math.min(1, welcomeScrolledOut / (welcomeHeight * 0.8));
-
-      // Activar parallax cuando:
-      // 1. Hero Section es visible al menos 30%
-      // 2. Welcome está saliendo (más del 50%)
-      if (heroVisible >= 0.3 && welcomeExitProgress >= 0.5) {
-        // Calcular intensidad del parallax basado en ambos factores
-        const intensity = Math.min(heroVisible, welcomeExitProgress);
-        const maxOffset = 600;
-        setParallaxOffset(intensity * maxOffset);
-      } else {
-        setParallaxOffset(0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   return (
     <section
@@ -282,23 +236,21 @@ export default function WelcomeSection() {
         <div className="w-full md:w-[60%] h-[50vh] md:h-screen relative order-1 md:order-1 px-4 md:px-0">
           <div className="absolute inset-0 flex items-center justify-center">
 
-            {/* Capa 1 (Fondo) - piedra svgs-20.png - Aparece de inmediato */}
+            {/* Capa 1 (Fondo) - piedra_svgs-20 - Aparece suavemente */}
             <motion.img
-              src="/piedra  svgs-20.png"
+              src="https://res.cloudinary.com/dmweipuof/image/upload/f_auto,q_auto/v1761525149/piedra_svgs-20_z4icw9.png"
               alt="Background layer"
               className="layer-1 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer1.position?.mobile,
-                zIndex: 3,
-                transform: `translateY(-${parallaxOffset}px)`,
-                opacity: parallaxOffset > 0 ? Math.max(1 - (parallaxOffset / 300), 0) : 1
+                zIndex: 3
               }}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
-            {/* Capa 2 - Piedra art home page-16.svg - Revelado suave de abajo a arriba (segundo lugar) */}
+            {/* Capa 2 - Piedra art home page-16.svg - Efecto cortina de arriba hacia abajo */}
             <motion.img
               src="/Piedra art home page-16.svg"
               alt="Second layer"
@@ -307,32 +259,30 @@ export default function WelcomeSection() {
                 ...layerConfig.layer2.position?.mobile,
                 zIndex: 4
               }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
+              animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
               transition={{
-                duration: 0.6,
-                delay: 0.2,
-                ease: [0.25, 0.1, 0.25, 1]
+                duration: 1.2,
+                delay: 0.3,
+                ease: [0.16, 1, 0.3, 1]
               }}
             />
 
-            {/* Capa 3 - piedra svgs-21.png - Aparece de inmediato (coordinado con capa 1) */}
+            {/* Capa 3 - piedra_svgs-21 - Aparece de inmediato junto con capa 1 */}
             <motion.img
-              src="/piedra  svgs-21.png"
+              src="https://res.cloudinary.com/dmweipuof/image/upload/f_auto,q_auto/v1761525166/piedra_svgs-21_eicqd2.png"
               alt="Third layer"
               className="layer-3 absolute h-auto object-contain gpu-accelerated"
               style={{
                 ...layerConfig.layer3.position?.mobile,
-                zIndex: 5,
-                transform: `translateY(-${parallaxOffset}px)`,
-                opacity: parallaxOffset > 0 ? Math.max(1 - (parallaxOffset / 300), 0) : 1
+                zIndex: 5
               }}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
-            {/* Capa 4 (Frente) - piedra svgs-15.svg - Revelado suave de abajo a arriba (tercer lugar) */}
+            {/* Capa 4 (Frente) - piedra svgs-15.svg - Efecto cortina de arriba hacia abajo (a destiempo) */}
             <motion.img
               src="/piedra  svgs-15.svg"
               alt="Front layer"
@@ -341,12 +291,12 @@ export default function WelcomeSection() {
                 ...layerConfig.layer4.position?.mobile,
                 zIndex: 6
               }}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
+              animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
               transition={{
-                duration: 0.6,
-                delay: 0.4,
-                ease: [0.25, 0.1, 0.25, 1]
+                duration: 1.2,
+                delay: 0.6,
+                ease: [0.16, 1, 0.3, 1]
               }}
             />
 
@@ -390,7 +340,7 @@ export default function WelcomeSection() {
         </div>
       </div>
 
-      {/* Línea vertical animada para scroll */}
+      {/* Línea vertical animada para scroll - Efecto cortina de arriba hacia abajo */}
       <motion.div
         className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[100] w-[2.5px] bg-gradient-to-b from-[#5F6D9A] to-transparent"
         style={{
@@ -399,9 +349,9 @@ export default function WelcomeSection() {
           opacity: lineOpacity,
           originY: 1
         }}
-        initial={{ scaleY: 0, originY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 2, delay: 1.5, ease: "easeInOut" }}
+        initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
+        animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+        transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
       />
     </section>
   );

@@ -89,6 +89,8 @@ export const motion = new Proxy({} as any, {
         ...style,
         ...(cssAnimation ? { animation: cssAnimation } : { transition: cssTransition }),
         opacity: targetAnimation?.opacity !== undefined ? targetAnimation.opacity : (style?.opacity || 1),
+        filter: targetAnimation?.filter !== undefined ? targetAnimation.filter : (style?.filter || undefined),
+        clipPath: targetAnimation?.clipPath !== undefined ? targetAnimation.clipPath : (style?.clipPath || undefined),
         transform: [
           style?.transform,
           targetAnimation?.x !== undefined ? `translateX(${targetAnimation.x}px)` : '',
