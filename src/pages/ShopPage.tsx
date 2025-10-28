@@ -25,10 +25,10 @@ export default function ShopPage() {
 
   return (
     <PublicLayout noPadding={true}>
-      <div className="min-h-screen w-screen flex flex-col" style={{ backgroundColor: '#5F6D9A' }}>
+      <div className="w-screen flex flex-col" style={{ backgroundColor: '#5F6D9A' }}>
 
         {/* FILA SUPERIOR - Cards de tienda con scroll horizontal */}
-        <div className="flex-1 px-[10%] pt-42">
+        <div className="px-[10%] pt-42 pb-8 md:pb-0">
           {/* Scroll horizontal de obras */}
           {isLoading ? (
             <div className="text-center py-20">
@@ -63,7 +63,7 @@ export default function ShopPage() {
         </div>
 
         {/* FILA INFERIOR - Logo loop */}
-        <div className="w-full overflow-hidden py-12 bg-[#5F6D9A]">
+        <div className="w-full overflow-hidden py-6 md:py-12 bg-[#5F6D9A]">
           <div className="flex animate-logo-scroll">
             {/* Duplicamos el contenido para el efecto de loop infinito */}
             {[...Array(2)].map((_, index) => (

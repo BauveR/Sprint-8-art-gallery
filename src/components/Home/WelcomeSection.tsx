@@ -12,12 +12,12 @@ const initialLayerConfig: LayerConfig = {
   // Esta es la capa más atrás
   layer1: {
     size: {
-      mobile: '100%',    // 📱 Tamaño en móvil (similar a desktop)
+      mobile: '110%',    // 📱 Tamaño en móvil (similar a desktop)
       tablet: '110%',    // 📱 Tamaño en tablet (similar a desktop)
       desktop: '120%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { top: '20%', left: '1%' } as Position,     // 📱 Posición móvil (igual que desktop)
+      mobile: { top: '20%', left: '-6%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '14%', left: '-4%' } as Position,     // 📱 Posición tablet (igual que desktop)
       desktop: { top: '14%', left: '-1%' } as Position    // 🖥️ Posición desktop
     }

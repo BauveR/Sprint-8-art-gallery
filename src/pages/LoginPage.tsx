@@ -58,39 +58,35 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center px-4 py-8 md:py-0 relative overflow-hidden"
       style={{ backgroundColor: '#5F6D9A' }}
     >
-      {/* Logo loop de fondo */}
-      <div className="absolute inset-0 flex items-center pointer-events-none">
+      {/* Logo loop de fondo - Responsive height */}
+      <div className="absolute inset-0 flex items-center pointer-events-none opacity-20 md:opacity-100">
         <div className="w-full overflow-hidden">
           <div className="flex animate-logo-scroll">
             {/* Duplicamos el contenido para el efecto de loop infinito */}
             {[...Array(2)].map((_, index) => (
-              <div key={index} className="flex items-center gap-16 pr-16 shrink-0">
+              <div key={index} className="flex items-center gap-8 md:gap-16 pr-8 md:pr-16 shrink-0">
                 <img
                   src="/Piedra art home page-17.svg"
                   alt="Piedra logo"
-                  className="w-auto object-contain shrink-0"
-                  style={{ height: '100rem' }}
+                  className="w-auto object-contain shrink-0 h-[40rem] md:h-[100rem]"
                 />
                 <img
                   src="/Piedra art home page-17.svg"
                   alt="Piedra logo"
-                  className="w-auto object-contain shrink-0"
-                  style={{ height: '100rem' }}
+                  className="w-auto object-contain shrink-0 h-[40rem] md:h-[100rem]"
                 />
                 <img
                   src="/Piedra art home page-17.svg"
                   alt="Piedra logo"
-                  className="w-auto object-contain shrink-0"
-                  style={{ height: '100rem' }}
+                  className="w-auto object-contain shrink-0 h-[40rem] md:h-[100rem]"
                 />
                 <img
                   src="/Piedra art home page-17.svg"
                   alt="Piedra logo"
-                  className="w-auto object-contain shrink-0"
-                  style={{ height: '100rem' }}
+                  className="w-auto object-contain shrink-0 h-[40rem] md:h-[100rem]"
                 />
               </div>
             ))}
@@ -99,83 +95,80 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Botón de cerrar */}
+        {/* Botón de cerrar - Better positioning for mobile */}
         <button
           onClick={handleClose}
-          className="absolute -top-4 -right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="absolute top-2 right-2 md:-top-4 md:-right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           aria-label="Cerrar"
         >
           <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
         </button>
 
-        <Card className="w-full dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
-          <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+        <Card className="w-full bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl">
+          <CardHeader className="text-center pb-4 md:pb-6">
+            <CardTitle className="text-xl md:text-2xl text-white">Iniciar Sesión</CardTitle>
 
-          {/* Logo giratorio */}
-          <motion.img
-            src="/piedra  svgs-05.svg"
-            alt="Decorative rotating element"
-            className="w-32 h-32 md:w-40 md:h-40 mx-auto my-6 object-contain"
-            style={{
-              filter: 'brightness(0) invert(1)'
-            }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1, rotate: 360 }}
-            transition={{
-              opacity: { duration: 1 },
-              scale: { duration: 1 },
-              rotate: {
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear",
-              },
-            }}
-          />
+            {/* Logo giratorio - Smaller on mobile */}
+            <motion.img
+              src="/piedra  svgs-05.svg"
+              alt="Decorative rotating element"
+              className="w-24 h-24 md:w-40 md:h-40 mx-auto my-4 md:my-6 object-contain brightness-0 invert"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 360 }}
+              transition={{
+                opacity: { duration: 1 },
+                scale: { duration: 1 },
+                rotate: {
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear",
+                },
+              }}
+            />
 
-          <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+            <CardDescription className="text-sm text-white/80">Ingresa tus credenciales para continuar</CardDescription>
+          </CardHeader>
+        <CardContent className="pt-0 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+              <label className="block text-sm font-medium mb-1.5 text-white">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border rounded-lg p-2 bg-background text-foreground"
+                className="w-full border border-white/30 rounded-lg p-2.5 md:p-2 bg-white/5 text-white placeholder:text-white/50 text-base focus:border-white/50 focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="email@ejemplo.com"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Contraseña</label>
+              <label className="block text-sm font-medium mb-1.5 text-white">Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border rounded-lg p-2 bg-background text-foreground"
+                className="w-full border border-white/30 rounded-lg p-2.5 md:p-2 bg-white/5 text-white placeholder:text-white/50 text-base focus:border-white/50 focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="••••••••"
                 required
               />
             </div>
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+              <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-white p-2.5 md:p-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+            <Button type="submit" className="w-full h-11 md:h-10 bg-white text-[#5F6D9A] hover:bg-white/90 font-semibold" disabled={isLoading || isGoogleLoading}>
               {isLoading ? "Ingresando..." : "Ingresar"}
             </Button>
           </form>
 
-          <div className="mt-4">
+          <div className="mt-3 md:mt-4">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
+                <span className="bg-transparent px-2 text-white/70">
                   O continúa con
                 </span>
               </div>
@@ -184,12 +177,12 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full mt-4"
+              className="w-full mt-3 md:mt-4 h-11 md:h-10 bg-white/5 border-white/30 text-white hover:bg-white/10"
               onClick={handleGoogleLogin}
               disabled={isLoading || isGoogleLoading}
             >
               {isGoogleLoading ? (
-                "Conectando con Google..."
+                "Conectando..."
               ) : (
                 <>
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -210,16 +203,18 @@ export default function LoginPage() {
                       fill="#EA4335"
                     />
                   </svg>
-                  Continuar con Google
+                  <span className="hidden sm:inline">Continuar con Google</span>
+                  <span className="sm:hidden">Google</span>
                 </>
               )}
             </Button>
           </div>
 
-          <div className="mt-6 p-4 bg-secondary/50 rounded-lg text-sm space-y-2">
-            <p className="font-semibold">Credenciales de prueba (Email/Password):</p>
-            <p><strong>Admin:</strong> admin@gallery.com / admin123</p>
-            <p><strong>Usuario:</strong> user@gallery.com / user123</p>
+          {/* Credenciales de prueba - Glassmorphism */}
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-xs md:text-sm space-y-1 md:space-y-2">
+            <p className="font-semibold text-sm md:text-base text-white">Credenciales de prueba:</p>
+            <p className="leading-relaxed text-white/80"><strong>Admin:</strong> admin@gallery.com / admin123</p>
+            <p className="leading-relaxed text-white/80"><strong>Usuario:</strong> user@gallery.com / user123</p>
           </div>
         </CardContent>
       </Card>

@@ -4,8 +4,7 @@ import { useAuth } from "../../context/AuthContextFirebase";
 import { useCart } from "../../context/CartContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, User, ShoppingCart, Store, Package, Settings, Home } from "lucide-react";
-import MobileDock from "@/components/ui/mobile-dock";
+import { LogOut, User, ShoppingCart, Store, Package, Settings } from "lucide-react";
 
 export default function PillNav() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -64,54 +63,6 @@ export default function PillNav() {
     setActiveIndex(index);
     navigate(path);
   };
-
-  // Mobile Dock Items
-  const mobileDockItems = [
-    {
-      icon: <Home size={20} />,
-      label: "Inicio",
-      onClick: () => navigate("/")
-    },
-    {
-      icon: <Store size={20} />,
-      label: "Tienda",
-      onClick: () => navigate("/shop")
-    },
-    {
-      icon: <ShoppingCart size={20} />,
-      label: "Carrito",
-      onClick: () => navigate("/cart")
-    },
-    ...(isAuthenticated
-      ? [
-          {
-            icon: <Package size={20} />,
-            label: "Mis Compras",
-            onClick: () => navigate("/my-orders")
-          },
-          {
-            icon: <User size={20} />,
-            label: user?.name || "Perfil",
-            onClick: () => navigate("/")
-          }
-        ]
-      : [
-          {
-            icon: <User size={20} />,
-            label: "Login",
-            onClick: () => navigate("/login")
-          }
-        ]),
-    ...(isAuthenticated && user?.role === 'admin'
-      ? [
-          {
-            icon: <Settings size={20} />,
-            label: "Admin",
-            onClick: () => navigate("/dashboard")
-          }
-        ]
-      : [])
-  ];
 
   return (
     <header className="fixed top-4 md:top-[72px] left-0 right-0 z-40 transition-all duration-300">
@@ -221,15 +172,6 @@ export default function PillNav() {
           </div>
         </div>
 
-        {/* Mobile Dock Navigation */}
-        <div className="md:hidden">
-          <MobileDock
-            items={mobileDockItems}
-            panelHeight={68}
-            baseItemSize={50}
-            magnification={70}
-          />
-        </div>
       </nav>
     </header>
   );

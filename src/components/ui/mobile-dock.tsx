@@ -1,20 +1,15 @@
-'use client';
-
 import {
   motion,
-  MotionValue,
   useMotionValue,
   useSpring,
   useTransform,
   AnimatePresence
 } from 'framer-motion';
-
-type SpringOptions = Parameters<typeof useSpring>[1];
-import React, { Children, cloneElement, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 export type DockItemData = {
   icon: React.ReactNode;
-  label: React.ReactNode;
+  label: string;
   onClick: () => void;
   className?: string;
 };
@@ -22,170 +17,78 @@ export type DockItemData = {
 export type DockProps = {
   items: DockItemData[];
   className?: string;
-  distance?: number;
-  panelHeight?: number;
-  baseItemSize?: number;
-  dockHeight?: number;
-  magnification?: number;
-  spring?: SpringOptions;
-};
-
-type DockItemProps = {
-  className?: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-  mouseX: MotionValue<number>;
-  spring: SpringOptions;
-  distance: number;
-  baseItemSize: number;
-  magnification: number;
 };
 
 function DockItem({
-  children,
-  className = '',
+  icon,
+  label,
   onClick,
   mouseX,
-  spring,
-  distance,
-  magnification,
-  baseItemSize
-}: DockItemProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isHovered = useMotionValue(0);
+  className = ''
+}: DockItemData & { mouseX: ReturnType<typeof useMotionValue<number>> }) {
+  const ref = useRef<HTMLButtonElement>(null);
 
-  const mouseDistance = useTransform(mouseX, val => {
-    const rect = ref.current?.getBoundingClientRect() ?? {
-      x: 0,
-      width: baseItemSize
-    };
-    return val - rect.x - baseItemSize / 2;
+  const distance = useTransform(mouseX, (val: number) => {
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    return val - bounds.x - bounds.width / 2;
   });
 
-  const targetSize = useTransform(mouseDistance, [-distance, 0, distance], [baseItemSize, magnification, baseItemSize]);
-  const size = useSpring(targetSize, spring);
+  const widthSync = useTransform(distance, [-100, 0, 100], [48, 72, 48]);
+  const width = useSpring(widthSync, {
+    mass: 0.1,
+    stiffness: 200,
+    damping: 15
+  });
+
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div
+    <motion.button
       ref={ref}
-      style={{
-        width: size,
-        height: size
-      }}
-      onHoverStart={() => isHovered.set(1)}
-      onHoverEnd={() => isHovered.set(0)}
-      onFocus={() => isHovered.set(1)}
-      onBlur={() => isHovered.set(0)}
+      style={{ width }}
       onClick={onClick}
-      className={`relative inline-flex items-center justify-center rounded-full bg-[#5F6D9A] border-white/30 border-2 shadow-lg ${className}`}
-      tabIndex={0}
-      role="button"
-      aria-haspopup="true"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`group relative flex aspect-square cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors ${className}`}
     >
-      {Children.map(children, child =>
-        React.isValidElement(child)
-          ? cloneElement(child as React.ReactElement<{ isHovered?: MotionValue<number> }>, { isHovered })
-          : child
-      )}
-    </motion.div>
+      {/* Icon */}
+      <div className="flex items-center justify-center text-white">
+        {icon}
+      </div>
+
+      {/* Label Tooltip */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/90 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white shadow-xl"
+          >
+            {label}
+            {/* Arrow */}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-black/90" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.button>
   );
 }
 
-type DockLabelProps = {
-  className?: string;
-  children: React.ReactNode;
-  isHovered?: MotionValue<number>;
-};
-
-function DockLabel({ children, className = '', isHovered }: DockLabelProps) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (!isHovered) return;
-    const unsubscribe = isHovered.on('change', latest => {
-      setIsVisible(latest === 1);
-    });
-    return () => unsubscribe();
-  }, [isHovered]);
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: 0 }}
-          animate={{ opacity: 1, y: -10 }}
-          exit={{ opacity: 0, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className={`${className} absolute -top-6 left-1/2 w-fit whitespace-pre rounded-md border border-white/30 bg-[#5F6D9A] px-2 py-0.5 text-xs text-white shadow-lg`}
-          role="tooltip"
-          style={{ x: '-50%' }}
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-type DockIconProps = {
-  className?: string;
-  children: React.ReactNode;
-  isHovered?: MotionValue<number>;
-};
-
-function DockIcon({ children, className = '' }: DockIconProps) {
-  return <div className={`flex items-center justify-center text-white ${className}`}>{children}</div>;
-}
-
-export default function MobileDock({
-  items,
-  className = '',
-  spring = { mass: 0.1, stiffness: 150, damping: 12 },
-  magnification = 70,
-  distance = 200,
-  panelHeight = 64,
-  dockHeight = 256,
-  baseItemSize = 50
-}: DockProps) {
+export default function MobileDock({ items, className = '' }: DockProps) {
   const mouseX = useMotionValue(Infinity);
-  const isHovered = useMotionValue(0);
-
-  const maxHeight = useMemo(() => Math.max(dockHeight, magnification + magnification / 2 + 4), [magnification, dockHeight]);
-  const heightRow = useTransform(isHovered, [0, 1], [panelHeight, maxHeight]);
-  const height = useSpring(heightRow, spring);
 
   return (
-    <motion.div style={{ height, scrollbarWidth: 'none' }} className="mx-2 flex max-w-full items-center">
+    <div className="w-full flex justify-center px-4 pb-4">
       <motion.div
-        onMouseMove={({ pageX }) => {
-          isHovered.set(1);
-          mouseX.set(pageX);
-        }}
-        onMouseLeave={() => {
-          isHovered.set(0);
-          mouseX.set(Infinity);
-        }}
-        className={`${className} absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-end w-fit gap-4 rounded-2xl border-white/30 border-2 pb-2 px-4 bg-[#5F6D9A]/95 backdrop-blur-md shadow-2xl`}
-        style={{ height: panelHeight }}
-        role="toolbar"
-        aria-label="Mobile navigation dock"
+        onMouseMove={(e) => mouseX.set(e.pageX)}
+        onMouseLeave={() => mouseX.set(Infinity)}
+        className={`flex gap-3 items-center rounded-2xl bg-black/20 backdrop-blur-xl border border-white/20 px-4 py-3 shadow-2xl ${className}`}
       >
         {items.map((item, index) => (
-          <DockItem
-            key={index}
-            onClick={item.onClick}
-            className={item.className}
-            mouseX={mouseX}
-            spring={spring}
-            distance={distance}
-            magnification={magnification}
-            baseItemSize={baseItemSize}
-          >
-            <DockIcon>{item.icon}</DockIcon>
-            <DockLabel>{item.label}</DockLabel>
-          </DockItem>
+          <DockItem key={index} mouseX={mouseX} {...item} />
         ))}
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
