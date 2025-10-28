@@ -12,11 +12,11 @@ export default function HeroSection() {
     <section className="relative min-h-screen flex flex-col" style={{ backgroundColor: '#5F6D9A' }}>
 
       {/* FILA SUPERIOR - 2 columnas */}
-      <div className="relative z-[20] flex-1 grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0 md:gap-8 items-center px-4 pt-16 md:pt-2 pb-8">
+      <div className="relative z-[20] flex-1 grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0 md:gap-2 lg:gap-8 items-center px-4 pt-16 md:pt-8 lg:pt-2 pb-8">
 
         {/* Columna Izquierda - Available in stores */}
         <motion.div
-          className="flex flex-col items-center lg:items-end justify-center space-y-2 md:space-y-4 gpu-accelerated"
+          className="flex flex-col items-center lg:items-end justify-center space-y-2 md:space-y-1 lg:space-y-4 gpu-accelerated"
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -74,8 +74,8 @@ export default function HeroSection() {
         {/* Columna Derecha - Modelo 3D y Botón */}
         <div className="flex flex-col items-center justify-center space-y-6">
           {/* Modelo 3D - Contenedor con valores conservadores */}
-          <div className="w-[50vh] md:w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
-            <div className="w-[100%] md:w-[100%] h-[120%] md:h-[200%] model-3d-container">
+          <div className="w-[50vh] md:w-full lg:w-full h-[40vh] md:h-[45vh] lg:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
+            <div className="w-[100%] md:w-[100%] lg:w-[100%] h-[120%] md:h-[140%] lg:h-[200%] model-3d-container">
               <Model3D
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
                 autoRotate={true}
