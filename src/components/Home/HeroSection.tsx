@@ -12,7 +12,7 @@ export default function HeroSection() {
     <section className="relative min-h-screen flex flex-col" style={{ backgroundColor: '#5F6D9A' }}>
 
       {/* FILA SUPERIOR - 2 columnas */}
-      <div className="relative z-[20] flex-1 grid grid-cols-1 lg:grid-cols-[40%_60%] gap-8 items-center px-4 pt-16 md:pt-2 pb-8">
+      <div className="relative z-[20] flex-1 grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0 md:gap-8 items-center px-4 pt-16 md:pt-2 pb-8">
 
         {/* Columna Izquierda - Available in stores */}
         <motion.div
@@ -74,8 +74,8 @@ export default function HeroSection() {
         {/* Columna Derecha - Modelo 3D y Botón */}
         <div className="flex flex-col items-center justify-center space-y-6">
           {/* Modelo 3D - Contenedor con valores conservadores */}
-          <div className="w-full md:w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
-            <div className="w-[100%] md:w-[100%] h-[100%] md:h-[200%] model-3d-container">
+          <div className="w-[50vh] md:w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
+            <div className="w-[100%] md:w-[100%] h-[120%] md:h-[200%] model-3d-container">
               <Model3D
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
                 autoRotate={true}
@@ -97,11 +97,11 @@ export default function HeroSection() {
               <Button
                 variant="glass"
                 onClick={() => navigate("/shop")}
-                className="text-lg md:text-3xl px-12 md:px-10 py-1.5 md:py-2 border-0 mb-20"
+                className="text-3xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-4"
                 style={{ backgroundColor: '#8FDF00' }}
               >
                 BUY NOW!
-                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+                <ArrowRight className="ml-2 h-6 w-6 md:h-5 md:w-5" />
               </Button>
             </Magnet>
           </motion.div>
