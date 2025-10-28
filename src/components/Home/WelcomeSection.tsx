@@ -12,13 +12,13 @@ const initialLayerConfig: LayerConfig = {
   // Esta es la capa más atrás
   layer1: {
     size: {
-      mobile: '110%',    // 📱 Tamaño en móvil (similar a desktop)
-      tablet: '110%',    // 📱 Tamaño en tablet (similar a desktop)
+      mobile: '100%',    // 📱 Tamaño en móvil (similar a desktop)
+      tablet: '120%',    // 📱 Tamaño en tablet (similar a desktop)
       desktop: '120%'    // 🖥️ Tamaño en desktop
     },
     position: {
       mobile: { top: '20%', left: '-6%' } as Position,     // 📱 Posición móvil (igual que desktop)
-      tablet: { top: '14%', left: '-4%' } as Position,     // 📱 Posición tablet (igual que desktop)
+      tablet: { top: '33%', left: '-5%' } as Position,     // 📱 Posición tablet (igual que desktop)
       desktop: { top: '14%', left: '-1%' } as Position    // 🖥️ Posición desktop
     }
   },
@@ -31,37 +31,37 @@ const initialLayerConfig: LayerConfig = {
       desktop: '110%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { top: '20%', right: '5%' } as Position,   // 📱 Posición móvil (igual que desktop)
-      tablet: { top: '18%', right: '-9%' } as Position,   // 📱 Posición tablet (igual que desktop)
-      desktop: { top: '18%', right: '-9%' } as Position   // 🖥️ Posición desktop
+      mobile: { top: '20%', left: '5%' } as Position,   // 📱 Posición móvil - Ajustar valor
+      tablet: { top: '35%', left: '0%' } as Position,   // 📱 Posición tablet - Ajustar valor
+      desktop: { top: '18%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
   // 📱 CAPA 3 - TERCERA CAPA (piedra svgs-21.png)
   layer3: {
     size: {
-      mobile: '110%',    // 📱 Tamaño en móvil (similar a desktop)
-      tablet: '110%',    // 📱 Tamaño en tablet (similar a desktop)
+      mobile: '100%',    // 📱 Tamaño en móvil (similar a desktop)
+      tablet: '120%',    // 📱 Tamaño en tablet (similar a desktop)
       desktop: '122%'    // 🖥️ Tamaño en desktop
     },
     position: {
-      mobile: { bottom: '-20%', left: '-5%' } as Position,   // 📱 Posición móvil (igual que desktop)
-      tablet: { bottom: '-15%', left: '-5%' } as Position,   // 📱 Posición tablet (igual que desktop)
-      desktop: { bottom: '-13%', left: '-3%' } as Position   // 🖥️ Posición desktop
+      mobile: { top: '15%', left: '0%' } as Position,   // 📱 Posición móvil - Ajustar valor
+      tablet: { top: '33%', left: '-5%' } as Position,   // 📱 Posición tablet - Ajustar valor
+      desktop: { top: '10%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
   // 📱 CAPA 4 - FRENTE (piedra svgs-15.svg) - SIEMPRE CENTRADO
   layer4: {
     size: {
-      mobile: '26%',    // 📱 Tamaño en móvil (similar a desktop)
+      mobile: '23%',    // 📱 Tamaño en móvil (similar a desktop)
       tablet: '27%',    // 📱 Tamaño en tablet (similar a desktop)
       desktop: '28%'    // 🖥️ Tamaño en desktop
     },
    position: {
-      mobile: { bottom: '12%', left: '53%' } as Position,   // 📱 Posición móvil (igual que desktop)
-      tablet: { bottom: '17%', left: '61%' } as Position,   // 📱 Posición tablet (igual que desktop)
-      desktop: { bottom: '17%', left: '61%' } as Position   // 🖥️ Posición desktop
+      mobile: { top: '20%', left: '55%' } as Position,   // 📱 Posición móvil - Ajustar valor
+      tablet: { top: '35%', left: '55%' } as Position,   // 📱 Posición tablet - Ajustar valor
+      desktop: { top: '18%', left: '62%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 };
@@ -101,6 +101,9 @@ export default function WelcomeSection() {
           max-height: none !important;
           pointer-events: none !important;
           transform-origin: center center !important;
+          ${layerConfig.layer1.position?.mobile.top !== undefined ? `top: ${layerConfig.layer1.position.mobile.top} !important;` : ''}
+          ${layerConfig.layer1.position?.mobile.bottom !== undefined ? `bottom: ${layerConfig.layer1.position.mobile.bottom} !important;` : ''}
+          ${layerConfig.layer1.position?.mobile.left !== undefined ? `left: ${layerConfig.layer1.position.mobile.left} !important;` : ''}
         }
         @media (min-width: 768px) {
           .layer-1 {
@@ -108,7 +111,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer1.position?.tablet.top !== undefined ? `top: ${layerConfig.layer1.position.tablet.top} !important;` : ''}
             ${layerConfig.layer1.position?.tablet.bottom !== undefined ? `bottom: ${layerConfig.layer1.position.tablet.bottom} !important;` : ''}
             ${layerConfig.layer1.position?.tablet.left !== undefined ? `left: ${layerConfig.layer1.position.tablet.left} !important;` : ''}
-            ${layerConfig.layer1.position?.tablet.right !== undefined ? `right: ${layerConfig.layer1.position.tablet.right} !important;` : ''}
           }
         }
         @media (min-width: 1024px) {
@@ -117,7 +119,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer1.position?.desktop.top !== undefined ? `top: ${layerConfig.layer1.position.desktop.top} !important;` : ''}
             ${layerConfig.layer1.position?.desktop.bottom !== undefined ? `bottom: ${layerConfig.layer1.position.desktop.bottom} !important;` : ''}
             ${layerConfig.layer1.position?.desktop.left !== undefined ? `left: ${layerConfig.layer1.position.desktop.left} !important;` : ''}
-            ${layerConfig.layer1.position?.desktop.right !== undefined ? `right: ${layerConfig.layer1.position.desktop.right} !important;` : ''}
           }
         }
 
@@ -128,6 +129,9 @@ export default function WelcomeSection() {
           max-height: none !important;
           pointer-events: none !important;
           transform-origin: center center !important;
+          ${layerConfig.layer2.position?.mobile.top !== undefined ? `top: ${layerConfig.layer2.position.mobile.top} !important;` : ''}
+          ${layerConfig.layer2.position?.mobile.bottom !== undefined ? `bottom: ${layerConfig.layer2.position.mobile.bottom} !important;` : ''}
+          ${layerConfig.layer2.position?.mobile.left !== undefined ? `left: ${layerConfig.layer2.position.mobile.left} !important;` : ''}
         }
         @media (min-width: 768px) {
           .layer-2 {
@@ -135,7 +139,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer2.position?.tablet.top !== undefined ? `top: ${layerConfig.layer2.position.tablet.top} !important;` : ''}
             ${layerConfig.layer2.position?.tablet.bottom !== undefined ? `bottom: ${layerConfig.layer2.position.tablet.bottom} !important;` : ''}
             ${layerConfig.layer2.position?.tablet.left !== undefined ? `left: ${layerConfig.layer2.position.tablet.left} !important;` : ''}
-            ${layerConfig.layer2.position?.tablet.right !== undefined ? `right: ${layerConfig.layer2.position.tablet.right} !important;` : ''}
           }
         }
         @media (min-width: 1024px) {
@@ -144,7 +147,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer2.position?.desktop.top !== undefined ? `top: ${layerConfig.layer2.position.desktop.top} !important;` : ''}
             ${layerConfig.layer2.position?.desktop.bottom !== undefined ? `bottom: ${layerConfig.layer2.position.desktop.bottom} !important;` : ''}
             ${layerConfig.layer2.position?.desktop.left !== undefined ? `left: ${layerConfig.layer2.position.desktop.left} !important;` : ''}
-            ${layerConfig.layer2.position?.desktop.right !== undefined ? `right: ${layerConfig.layer2.position.desktop.right} !important;` : ''}
           }
         }
 
@@ -155,6 +157,9 @@ export default function WelcomeSection() {
           max-height: none !important;
           pointer-events: none !important;
           transform-origin: center center !important;
+          ${layerConfig.layer3.position?.mobile.top !== undefined ? `top: ${layerConfig.layer3.position.mobile.top} !important;` : ''}
+          ${layerConfig.layer3.position?.mobile.bottom !== undefined ? `bottom: ${layerConfig.layer3.position.mobile.bottom} !important;` : ''}
+          ${layerConfig.layer3.position?.mobile.left !== undefined ? `left: ${layerConfig.layer3.position.mobile.left} !important;` : ''}
         }
         @media (min-width: 768px) {
           .layer-3 {
@@ -162,7 +167,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer3.position?.tablet.top !== undefined ? `top: ${layerConfig.layer3.position.tablet.top} !important;` : ''}
             ${layerConfig.layer3.position?.tablet.bottom !== undefined ? `bottom: ${layerConfig.layer3.position.tablet.bottom} !important;` : ''}
             ${layerConfig.layer3.position?.tablet.left !== undefined ? `left: ${layerConfig.layer3.position.tablet.left} !important;` : ''}
-            ${layerConfig.layer3.position?.tablet.right !== undefined ? `right: ${layerConfig.layer3.position.tablet.right} !important;` : ''}
           }
         }
         @media (min-width: 1024px) {
@@ -171,7 +175,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer3.position?.desktop.top !== undefined ? `top: ${layerConfig.layer3.position.desktop.top} !important;` : ''}
             ${layerConfig.layer3.position?.desktop.bottom !== undefined ? `bottom: ${layerConfig.layer3.position.desktop.bottom} !important;` : ''}
             ${layerConfig.layer3.position?.desktop.left !== undefined ? `left: ${layerConfig.layer3.position.desktop.left} !important;` : ''}
-            ${layerConfig.layer3.position?.desktop.right !== undefined ? `right: ${layerConfig.layer3.position.desktop.right} !important;` : ''}
           }
         }
 
@@ -182,6 +185,9 @@ export default function WelcomeSection() {
           max-height: none !important;
           pointer-events: none !important;
           transform-origin: center center !important;
+          ${layerConfig.layer4.position?.mobile.top !== undefined ? `top: ${layerConfig.layer4.position.mobile.top} !important;` : ''}
+          ${layerConfig.layer4.position?.mobile.bottom !== undefined ? `bottom: ${layerConfig.layer4.position.mobile.bottom} !important;` : ''}
+          ${layerConfig.layer4.position?.mobile.left !== undefined ? `left: ${layerConfig.layer4.position.mobile.left} !important;` : ''}
         }
         @media (min-width: 768px) {
           .layer-4 {
@@ -189,7 +195,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer4.position?.tablet.top !== undefined ? `top: ${layerConfig.layer4.position.tablet.top} !important;` : ''}
             ${layerConfig.layer4.position?.tablet.bottom !== undefined ? `bottom: ${layerConfig.layer4.position.tablet.bottom} !important;` : ''}
             ${layerConfig.layer4.position?.tablet.left !== undefined ? `left: ${layerConfig.layer4.position.tablet.left} !important;` : ''}
-            ${layerConfig.layer4.position?.tablet.right !== undefined ? `right: ${layerConfig.layer4.position.tablet.right} !important;` : ''}
           }
         }
         @media (min-width: 1024px) {
@@ -198,7 +203,6 @@ export default function WelcomeSection() {
             ${layerConfig.layer4.position?.desktop.top !== undefined ? `top: ${layerConfig.layer4.position.desktop.top} !important;` : ''}
             ${layerConfig.layer4.position?.desktop.bottom !== undefined ? `bottom: ${layerConfig.layer4.position.desktop.bottom} !important;` : ''}
             ${layerConfig.layer4.position?.desktop.left !== undefined ? `left: ${layerConfig.layer4.position.desktop.left} !important;` : ''}
-            ${layerConfig.layer4.position?.desktop.right !== undefined ? `right: ${layerConfig.layer4.position.desktop.right} !important;` : ''}
           }
         }
       `}</style>
@@ -242,7 +246,6 @@ export default function WelcomeSection() {
               alt="Background layer"
               className="layer-1 absolute h-auto object-contain gpu-accelerated"
               style={{
-                ...layerConfig.layer1.position?.mobile,
                 zIndex: 3
               }}
               initial={{ opacity: 0 }}
@@ -256,7 +259,6 @@ export default function WelcomeSection() {
               alt="Second layer"
               className="layer-2 absolute h-auto object-contain gpu-accelerated"
               style={{
-                ...layerConfig.layer2.position?.mobile,
                 zIndex: 4
               }}
               initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
@@ -274,7 +276,6 @@ export default function WelcomeSection() {
               alt="Third layer"
               className="layer-3 absolute h-auto object-contain gpu-accelerated"
               style={{
-                ...layerConfig.layer3.position?.mobile,
                 zIndex: 5
               }}
               initial={{ opacity: 0 }}
@@ -288,7 +289,6 @@ export default function WelcomeSection() {
               alt="Front layer"
               className="layer-4 absolute h-auto object-contain gpu-accelerated"
               style={{
-                ...layerConfig.layer4.position?.mobile,
                 zIndex: 6
               }}
               initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}

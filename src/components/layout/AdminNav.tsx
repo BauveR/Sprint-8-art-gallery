@@ -64,13 +64,16 @@ export default function AdminNav({ activeTab, onTabChange }: AdminNavProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border-b border-gray-200/50 dark:border-zinc-800/50">
       <nav className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+        <div className="flex items-center justify-center md:justify-between h-20 gap-4">
           {/* Logo - Solo para admin */}
-          <div className="flex items-center gap-4 flex-shrink-0 ml-16">
+          <div
+            className="flex items-center gap-4 flex-shrink-0 ml-0 md:ml-16 cursor-pointer"
+            onClick={() => onTabChange("admin")}
+          >
             <img
               src="/piedra-arte-03.svg"
               alt="Piedra Arte"
-              className="h-32 w-auto dark:invert transition-all duration-300"
+              className="h-32 w-auto dark:invert transition-all duration-300 hover:opacity-80"
             />
           </div>
 

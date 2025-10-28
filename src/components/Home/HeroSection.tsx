@@ -97,7 +97,7 @@ export default function HeroSection() {
               <Button
                 variant="glass"
                 onClick={() => navigate("/shop")}
-                className="text-3xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-4"
+                className="text-3xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0"
                 style={{ backgroundColor: '#8FDF00' }}
               >
                 BUY NOW!
