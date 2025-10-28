@@ -70,8 +70,10 @@ const initialLayerConfig: LayerConfig = {
 
 export default function WelcomeSection() {
   const { scrollY } = useScroll();
-  const lineScale = useTransform(scrollY, [0, 200], [1, 0]);
-  const lineOpacity = useTransform(scrollY, [0, 200], [1, 0]);
+
+  // Desaparecer la línea cuando se acerca al final de la sección (aproximadamente 100vh - 5vh)
+  const lineScale = useTransform(scrollY, [window.innerHeight * 0.95, window.innerHeight], [1, 0]);
+  const lineOpacity = useTransform(scrollY, [window.innerHeight * 0.95, window.innerHeight], [1, 0]);
 
   // Estado para controlar la configuración de capas en tiempo real
   const [layerConfig, setLayerConfig] = useState(initialLayerConfig);
@@ -340,9 +342,9 @@ export default function WelcomeSection() {
         </div>
       </div>
 
-      {/* Línea vertical animada para scroll - Efecto cortina de arriba hacia abajo */}
+      {/* Línea vertical animada para scroll - desaparece al salir de WelcomeSection */}
       <motion.div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[100] w-[2.5px] bg-gradient-to-b from-[#5F6D9A] to-transparent"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[40] w-[2.5px] bg-gradient-to-b from-[#5F6D9A] to-transparent"
         style={{
           height: '10vh',
           scaleY: lineScale,

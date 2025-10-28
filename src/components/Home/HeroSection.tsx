@@ -75,7 +75,7 @@ export default function HeroSection() {
         <div className="flex flex-col items-center justify-center space-y-6">
           {/* Modelo 3D - Contenedor con valores conservadores */}
           <div className="w-[50vh] md:w-full lg:w-full h-[40vh] md:h-[45vh] lg:h-[50vh] flex items-center justify-center overflow-hidden md:overflow-visible">
-            <div className="w-[100%] md:w-[100%] lg:w-[100%] h-[120%] md:h-[140%] lg:h-[200%] model-3d-container">
+            <div className="w-[100%] md:w-[100%] lg:w-[100%] h-[140%] md:h-[140%] lg:h-[200%] model-3d-container">
               <Model3D
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
                 autoRotate={true}
