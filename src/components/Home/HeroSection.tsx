@@ -81,11 +81,11 @@ export default function HeroSection() {
                 autoRotate={true}
                 rotationSpeed={0.5}
                 position={{
-                  mobile: [0.2, -1.4, 1],
+                  mobile: [0.5, -0.1, .7],
                   tablet: [0.8, 0, 0],
                   desktop: [0.5, 0, 0]
                 }}
-                scale={{ mobile: 120, tablet: 80, desktop: 80 }}
+                scale={{ mobile: 70, tablet: 80, desktop: 80 }}
                 className="w-full h-full"
               />
             </div>
