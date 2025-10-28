@@ -11,9 +11,9 @@ interface ModelProps {
   autoRotate?: boolean;
   rotationSpeed?: number;
   scrollRotation?: { x: number; y: number };
-  scale?: number;
+  scale?: number | { mobile?: number; tablet?: number; desktop?: number };
   initialRotation?: { x?: number; y?: number; z?: number };
-  position?: [number, number, number];
+  position?: [number, number, number] | { mobile?: [number, number, number]; tablet?: [number, number, number]; desktop?: [number, number, number] };
 }
 
 function Model({ modelPath, autoRotate = true, rotationSpeed = 0.5, scrollRotation, scale = 80, initialRotation, position = [0, 0, 0] }: ModelProps) {
@@ -91,6 +91,45 @@ export default function Model3D({
   className = ''
 }: ModelProps & { className?: string }) {
   const [scrollRotation, setScrollRotation] = useState<{ x: number; y: number } | undefined>(undefined);
+  const [currentScale, setCurrentScale] = useState<number>(80);
+  const [currentPosition, setCurrentPosition] = useState<[number, number, number]>([0, 0, 0]);
+
+  // Calcular scale y position responsive
+  useEffect(() => {
+    const updateResponsiveProps = () => {
+      const width = window.innerWidth;
+
+      // Calcular scale
+      if (typeof scale === 'object') {
+        if (width < 768) {
+          setCurrentScale(scale.mobile ?? 60);
+        } else if (width < 1024) {
+          setCurrentScale(scale.tablet ?? 70);
+        } else {
+          setCurrentScale(scale.desktop ?? 80);
+        }
+      } else {
+        setCurrentScale(scale);
+      }
+
+      // Calcular position
+      if (Array.isArray(position)) {
+        setCurrentPosition(position);
+      } else {
+        if (width < 768) {
+          setCurrentPosition(position.mobile ?? [0, 0, 0]);
+        } else if (width < 1024) {
+          setCurrentPosition(position.tablet ?? [0, 0, 0]);
+        } else {
+          setCurrentPosition(position.desktop ?? [0, 0, 0]);
+        }
+      }
+    };
+
+    updateResponsiveProps();
+    window.addEventListener('resize', updateResponsiveProps);
+    return () => window.removeEventListener('resize', updateResponsiveProps);
+  }, [scale, position]);
 
   useEffect(() => {
     // Solo activar scroll rotation en desktop (pantallas >= 768px)
@@ -144,9 +183,9 @@ export default function Model3D({
           autoRotate={!scrollRotation && autoRotate}
           rotationSpeed={rotationSpeed}
           scrollRotation={scrollRotation}
-          scale={scale}
+          scale={currentScale}
           initialRotation={initialRotation}
-          position={position}
+          position={currentPosition}
         />
         <OrbitControls
           enabled={false}

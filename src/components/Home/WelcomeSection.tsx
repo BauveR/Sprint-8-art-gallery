@@ -14,12 +14,12 @@ const initialLayerConfig: LayerConfig = {
     size: {
       mobile: '100%',    // 📱 Tamaño en móvil (similar a desktop)
       tablet: '120%',    // 📱 Tamaño en tablet (similar a desktop)
-      desktop: '120%'    // 🖥️ Tamaño en desktop
+      desktop: '122%'    // 🖥️ Tamaño en desktop
     },
     position: {
       mobile: { top: '20%', left: '-6%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '33%', left: '-5%' } as Position,     // 📱 Posición tablet (igual que desktop)
-      desktop: { top: '14%', left: '-1%' } as Position    // 🖥️ Posición desktop
+      desktop: { top: '10%', left: '0%' } as Position    // 🖥️ Posición desktop
     }
   },
 

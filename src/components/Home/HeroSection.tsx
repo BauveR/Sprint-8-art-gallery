@@ -80,7 +80,12 @@ export default function HeroSection() {
                 modelPath="https://res.cloudinary.com/dmweipuof/image/upload/v1760810430/piedra-draco_r3razb.glb"
                 autoRotate={true}
                 rotationSpeed={0.5}
-                position={[0.5, 0, 0]}
+                position={{
+                  mobile: [0.2, -1.4, 1],
+                  tablet: [0.8, 0, 0],
+                  desktop: [0.5, 0, 0]
+                }}
+                scale={{ mobile: 120, tablet: 80, desktop: 80 }}
                 className="w-full h-full"
               />
             </div>
