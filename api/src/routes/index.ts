@@ -12,6 +12,7 @@ import {
 } from "../controllers/imagesController";
 import reservasRoutes from "./reservas";
 import direccionesRoutes from "./direcciones";
+import adminSetupRoutes from "./admin-setup";
 import { optionalAuth, verifyFirebaseToken, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
@@ -67,5 +68,9 @@ router.use("/reservas", reservasRoutes);
 
 // Direcciones (Shipping addresses)
 router.use("/direcciones", direccionesRoutes);
+
+// TEMPORAL: Admin Setup (solo para configuración inicial)
+// ⚠️ ELIMINAR después de configurar el primer admin
+router.use("/admin-setup", adminSetupRoutes);
 
 export default router;
