@@ -20,7 +20,12 @@ interface OrderDetailModalProps {
   onUpdateStatus: (
     orderId: number,
     status: OrderStatus,
-    additionalData?: { tracking_number?: string; carrier?: string; admin_notes?: string }
+    additionalData?: {
+      tracking_number?: string;
+      carrier?: string;
+      tracking_link?: string;
+      admin_notes?: string;
+    }
   ) => void;
 }
 

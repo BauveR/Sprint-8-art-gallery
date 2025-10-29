@@ -18,6 +18,7 @@ import MyOrdersPage from "@/pages/MyOrdersPage";
 // Páginas protegidas
 import DashboardPage from "@/pages/DashboardPage";
 import CheckoutPage from "@/pages/CheckoutPage";
+import EmailTest from "@/pages/EmailTest";
 
 /**
  * Componente de rutas de la aplicación
@@ -49,6 +50,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/email-test"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <EmailTest />
           </ProtectedRoute>
         }
       />

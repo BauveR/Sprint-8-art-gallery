@@ -65,23 +65,54 @@ export async function sendShipmentNotification(params: {
   items: Array<{ titulo: string }>;
 }) {
   try {
+    console.log('📧 Iniciando envío de email de envío...');
+    console.log('📧 Parámetros:', {
+      to_email: params.to_email,
+      to_name: params.to_name,
+      order_id: params.order_id,
+      tracking_number: params.tracking_number,
+      carrier: params.carrier,
+      tracking_link: params.tracking_link,
+      items_count: params.items.length,
+    });
+    console.log('📧 Configuración EmailJS:', {
+      SERVICE_ID,
+      TEMPLATE_ID: TEMPLATES.SHIPMENT_NOTIFICATION,
+      PUBLIC_KEY: PUBLIC_KEY ? '✓ Configurada' : '✗ No configurada',
+    });
+
+    const templateParams = {
+      to_email: params.to_email,
+      to_name: params.to_name,
+      order_id: params.order_id,
+      tracking_number: params.tracking_number,
+      carrier: params.carrier || 'Servicio de paquetería',
+      tracking_link: params.tracking_link,
+      items_list: params.items.map((item) => item.titulo).join(', '),
+    };
+
+    console.log('📧 Template params:', templateParams);
+
     const response = await emailjs.send(
       SERVICE_ID,
       TEMPLATES.SHIPMENT_NOTIFICATION,
-      {
-        to_email: params.to_email,
-        to_name: params.to_name,
-        order_id: params.order_id,
-        tracking_number: params.tracking_number,
-        carrier: params.carrier || 'Servicio de paquetería',
-        tracking_link: params.tracking_link,
-        items_list: params.items.map((item) => item.titulo).join(', '),
-      }
+      templateParams
     );
-    console.log('Shipment notification email sent:', response);
+
+    console.log('✅ Email enviado exitosamente:', {
+      status: response.status,
+      text: response.text,
+      response: response,
+    });
+
     return response;
-  } catch (error) {
-    console.error('Error sending shipment notification email:', error);
+  } catch (error: any) {
+    console.error('❌ Error enviando email de envío:', {
+      error: error,
+      message: error?.message,
+      text: error?.text,
+      status: error?.status,
+    });
     throw error;
   }
 }
