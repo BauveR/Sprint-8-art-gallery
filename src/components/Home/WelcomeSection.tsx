@@ -78,6 +78,13 @@ export default function WelcomeSection() {
   // Estado para controlar la configuración de capas en tiempo real
   const [layerConfig, setLayerConfig] = useState(initialLayerConfig);
 
+  // Estado para prevenir flash durante hidratación
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const sectionRef = useRef<HTMLElement>(null);
 
   return (
@@ -248,10 +255,11 @@ export default function WelcomeSection() {
               alt="Background layer"
               className="layer-1 absolute h-auto object-contain gpu-accelerated"
               style={{
-                zIndex: 3
+                zIndex: 3,
+                opacity: isMounted ? undefined : 0
               }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={isMounted ? { opacity: 0 } : false}
+              animate={isMounted ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
@@ -261,10 +269,11 @@ export default function WelcomeSection() {
               alt="Second layer"
               className="layer-2 absolute h-auto object-contain gpu-accelerated"
               style={{
-                zIndex: 4
+                zIndex: 4,
+                clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
               }}
-              initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-              animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+              initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
+              animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
               transition={{
                 duration: 1.2,
                 delay: 0.3,
@@ -278,10 +287,11 @@ export default function WelcomeSection() {
               alt="Third layer"
               className="layer-3 absolute h-auto object-contain gpu-accelerated"
               style={{
-                zIndex: 5
+                zIndex: 5,
+                opacity: isMounted ? undefined : 0
               }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={isMounted ? { opacity: 0 } : false}
+              animate={isMounted ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
@@ -291,10 +301,11 @@ export default function WelcomeSection() {
               alt="Front layer"
               className="layer-4 absolute h-auto object-contain gpu-accelerated"
               style={{
-                zIndex: 6
+                zIndex: 6,
+                clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
               }}
-              initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-              animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+              initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
+              animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
               transition={{
                 duration: 1.2,
                 delay: 0.6,
@@ -309,8 +320,12 @@ export default function WelcomeSection() {
         <div className="w-full md:w-[35%] flex items-center justify-center md:justify-start px-[5%] order-2 md:order-2">
           <motion.div
             className="max-w-md gpu-accelerated"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            style={{
+              opacity: isMounted ? undefined : 0,
+              transform: isMounted ? undefined : 'translateX(20px)'
+            }}
+            initial={isMounted ? { opacity: 0, x: 20 } : false}
+            animate={isMounted ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             {/* SVG con efecto de rotación en color secundario */}
@@ -319,10 +334,12 @@ export default function WelcomeSection() {
               alt="Decorative rotating element"
               className="hidden md:block w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto mb-8 object-contain pointer-events-auto"
               style={{
-                filter: 'brightness(0) saturate(100%) invert(42%) sepia(13%) saturate(1018%) hue-rotate(198deg) brightness(94%) contrast(90%)'
+                filter: 'brightness(0) saturate(100%) invert(42%) sepia(13%) saturate(1018%) hue-rotate(198deg) brightness(94%) contrast(90%)',
+                opacity: isMounted ? undefined : 0,
+                transform: isMounted ? undefined : 'scale(0.8)'
               }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1, rotate: 360 }}
+              initial={isMounted ? { opacity: 0, scale: 0.8 } : false}
+              animate={isMounted ? { opacity: 1, scale: 1, rotate: 360 } : {}}
               transition={{
                 opacity: { duration: 1 },
                 scale: { duration: 1 },
@@ -349,10 +366,11 @@ export default function WelcomeSection() {
           height: '10vh',
           scaleY: lineScale,
           opacity: lineOpacity,
-          originY: 1
+          originY: 1,
+          clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
         }}
-        initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-        animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+        initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
+        animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
         transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
       />
     </section>
