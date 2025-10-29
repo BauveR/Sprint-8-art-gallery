@@ -93,9 +93,9 @@ export default function WelcomeSection() {
     loadedImagesCount.current += 1;
     if (loadedImagesCount.current >= totalImages) {
       // Pequeño delay para asegurar que todas las imágenes estén renderizadas
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         setImagesLoaded(true);
-      }, 50);
+      });
     }
   };
 
@@ -105,7 +105,11 @@ export default function WelcomeSection() {
     <section
       ref={sectionRef}
       className="relative min-h-screen w-full overflow-hidden touch-pan-y welcome-section"
-      style={{ backgroundColor: '#191E2C' }}
+      style={{
+        backgroundColor: '#191E2C',
+        opacity: imagesLoaded ? 1 : 0,
+        transition: 'opacity 0.4s ease-in-out'
+      }}
     >
       {/* Panel de Control Visual - Solo en desarrollo */}
       {false && process.env.NODE_ENV === 'development' && (
@@ -261,6 +265,12 @@ export default function WelcomeSection() {
 
         {/* Columna Izquierda - 60% con capas de imágenes */}
         <div className="w-full md:w-[60%] h-[50vh] md:h-screen relative order-1 md:order-1 px-4 md:px-0">
+          {/* Skeleton loader mientras cargan las imágenes */}
+          {!imagesLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-[80%] h-[60%] bg-gradient-to-br from-[#191E2C] via-[#2a2f3f] to-[#191E2C] rounded-lg animate-pulse" />
+            </div>
+          )}
           <div className="absolute inset-0 flex items-center justify-center">
 
             {/* Capa 1 (Fondo) - piedra_svgs-20 - Aparece suavemente */}
