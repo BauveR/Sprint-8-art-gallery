@@ -19,7 +19,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '20%', left: '-6%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '33%', left: '-5%' } as Position,     // 📱 Posición tablet (igual que desktop)
-      desktop: { top: '10%', left: '0%' } as Position    // 🖥️ Posición desktop
+      desktop: { top: '20%', left: '0%' } as Position    // 🖥️ Posición desktop
     }
   },
 
@@ -33,7 +33,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '20%', left: '5%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '35%', left: '0%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '18%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '25%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
@@ -47,7 +47,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '15%', left: '0%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '33%', left: '-5%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '10%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '20%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
@@ -61,7 +61,7 @@ const initialLayerConfig: LayerConfig = {
    position: {
       mobile: { top: '20%', left: '55%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '35%', left: '55%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '18%', left: '62%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '25%', left: '62%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 };
@@ -359,7 +359,7 @@ export default function WelcomeSection() {
 
       {/* Línea vertical animada para scroll - desaparece al salir de WelcomeSection */}
       <motion.div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[40] w-[2.5px] bg-gradient-to-b from-[#5F6D9A] to-transparent"
+        className="absolute bottom-[5vh] left-1/2 -translate-x-1/2 z-[40] w-[2.5px] bg-gradient-to-b from-[#5F6D9A] to-transparent"
         style={{
           height: '10vh',
           scaleY: lineScale,
