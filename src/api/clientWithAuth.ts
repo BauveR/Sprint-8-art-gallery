@@ -37,16 +37,21 @@ function toQuery(params?: Record<string, any>): string {
 // Obtener el token de Firebase
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const user = auth.currentUser;
+  console.log('[Auth] Current user:', user ? user.email : 'NO USER');
+
   if (user) {
     try {
       const token = await user.getIdToken();
+      console.log('[Auth] Token obtained, length:', token.length);
       return {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       };
     } catch (error) {
-      console.error("Error obteniendo token:", error);
+      console.error("[Auth] Error obteniendo token:", error);
     }
+  } else {
+    console.warn('[Auth] No current user - request will be unauthenticated');
   }
   return { "Content-Type": "application/json" };
 }
