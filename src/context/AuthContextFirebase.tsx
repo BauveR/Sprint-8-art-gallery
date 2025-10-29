@@ -33,15 +33,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper para determinar el rol del usuario
-function getUserRole(email: string): UserRole {
-  // Admin si el email es admin@gallery.com
-  if (email === "admin@gallery.com") {
-    return "admin";
-  }
-  return "user";
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -49,12 +40,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Escuchar cambios en el estado de autenticación
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        // Obtener el rol desde Custom Claims del token
+        let role: UserRole = "user";
+        try {
+          const idTokenResult = await firebaseUser.getIdTokenResult();
+          role = (idTokenResult.claims.role as UserRole) || "user";
+          console.log("[Auth] User role from token:", role);
+        } catch (error) {
+          console.error("[Auth] Error getting token claims:", error);
+          // Fallback: si el email es admin@gallery.com, asignar admin
+          if (firebaseUser.email === "admin@gallery.com") {
+            role = "admin";
+          }
+        }
+
         const userData: User = {
           uid: firebaseUser.uid,
           email: firebaseUser.email || "",
-          role: getUserRole(firebaseUser.email || ""),
+          role: role,
           name: firebaseUser.displayName || firebaseUser.email || "User",
         };
         setUser(userData);
