@@ -62,7 +62,7 @@ export default function ShopPage() {
               </div>
               {/* Degradado de derecha indicando más contenido */}
               <div
-                className="absolute top-0 right-0 bottom-8 w-32 md:w-48 pointer-events-none"
+                className="absolute top-0 right-0 bottom-8 w-28 md:w-40 pointer-events-none"
                 style={{
                   background: 'linear-gradient(to right, transparent 0%, #5F6D9A 100%)'
                 }}
