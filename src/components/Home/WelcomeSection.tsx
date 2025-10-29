@@ -256,7 +256,7 @@ export default function WelcomeSection() {
               className="layer-1 absolute h-auto object-contain gpu-accelerated"
               style={{
                 zIndex: 3,
-                opacity: isMounted ? undefined : 0
+                opacity: isMounted ? 1 : 0
               }}
               initial={isMounted ? { opacity: 0 } : false}
               animate={isMounted ? { opacity: 1 } : {}}
@@ -270,7 +270,7 @@ export default function WelcomeSection() {
               className="layer-2 absolute h-auto object-contain gpu-accelerated"
               style={{
                 zIndex: 4,
-                clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
+                clipPath: isMounted ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
               }}
               initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
               animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
@@ -288,7 +288,7 @@ export default function WelcomeSection() {
               className="layer-3 absolute h-auto object-contain gpu-accelerated"
               style={{
                 zIndex: 5,
-                opacity: isMounted ? undefined : 0
+                opacity: isMounted ? 1 : 0
               }}
               initial={isMounted ? { opacity: 0 } : false}
               animate={isMounted ? { opacity: 1 } : {}}
@@ -302,7 +302,7 @@ export default function WelcomeSection() {
               className="layer-4 absolute h-auto object-contain gpu-accelerated"
               style={{
                 zIndex: 6,
-                clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
+                clipPath: isMounted ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
               }}
               initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
               animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
@@ -321,8 +321,7 @@ export default function WelcomeSection() {
           <motion.div
             className="max-w-md gpu-accelerated"
             style={{
-              opacity: isMounted ? undefined : 0,
-              transform: isMounted ? undefined : 'translateX(20px)'
+              opacity: isMounted ? 1 : 0
             }}
             initial={isMounted ? { opacity: 0, x: 20 } : false}
             animate={isMounted ? { opacity: 1, x: 0 } : {}}
@@ -335,8 +334,7 @@ export default function WelcomeSection() {
               className="hidden md:block w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto mb-8 object-contain pointer-events-auto"
               style={{
                 filter: 'brightness(0) saturate(100%) invert(42%) sepia(13%) saturate(1018%) hue-rotate(198deg) brightness(94%) contrast(90%)',
-                opacity: isMounted ? undefined : 0,
-                transform: isMounted ? undefined : 'scale(0.8)'
+                opacity: isMounted ? 1 : 0
               }}
               initial={isMounted ? { opacity: 0, scale: 0.8 } : false}
               animate={isMounted ? { opacity: 1, scale: 1, rotate: 360 } : {}}
@@ -367,7 +365,7 @@ export default function WelcomeSection() {
           scaleY: lineScale,
           opacity: lineOpacity,
           originY: 1,
-          clipPath: isMounted ? undefined : 'inset(0% 0% 100% 0%)'
+          clipPath: isMounted ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
         }}
         initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
         animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
