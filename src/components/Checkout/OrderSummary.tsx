@@ -44,8 +44,9 @@ export default function OrderSummary({ isProcessing, onSubmit }: OrderSummaryPro
         <Button
           type="button"
           onClick={onSubmit}
-          className="w-full"
-          size="lg"
+          variant="glass"
+          className="text-xl md:text-xl px-16 md:px-6 py-3 md:py-1.5 border-0 mb-0 w-full"
+          style={{ backgroundColor: '#8FDF00' }}
           disabled={isProcessing}
         >
           {isProcessing ? "Procesando..." : "Confirmar Compra"}

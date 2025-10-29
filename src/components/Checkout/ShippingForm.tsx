@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ShippingFormProps } from "../../types/components";
 import { useFormValidation } from "../../hooks/useFormValidation";
@@ -29,10 +29,7 @@ export default function ShippingForm({ formData, onChange }: ShippingFormProps) 
 
   return (
     <Card className="dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10">
-      <CardHeader>
-        <CardTitle>Información de Envío</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         {/* Información de contacto */}
         <div>
           <label className="block text-sm font-medium mb-2">Email *</label>
