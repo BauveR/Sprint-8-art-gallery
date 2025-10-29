@@ -87,9 +87,8 @@ export default function AddressSelector({ formData, onChange, onSelectAddress }:
   if (direcciones.length === 0 || showNewForm) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Información de Envío</h3>
-          {direcciones.length > 0 && (
+        {direcciones.length > 0 && (
+          <div className="flex items-center justify-end">
             <Button
               type="button"
               variant="outline"
@@ -98,8 +97,8 @@ export default function AddressSelector({ formData, onChange, onSelectAddress }:
             >
               Ver direcciones guardadas
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         <ShippingForm formData={formData} onChange={onChange} />
 

@@ -51,14 +51,14 @@ function CheckoutForm() {
 
   // Formulario de checkout
   return (
-    <PublicLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+    <PublicLayout noPadding={true}>
+      <div className="max-w-7xl mx-auto px-4 pt-20 md:pt-24 pb-8">
+        <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Formularios de envío y pago */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Columna izquierda - Información de envío */}
+            <div className="space-y-6">
               {user ? (
                 <AddressSelector
                   formData={formData}
@@ -82,11 +82,11 @@ function CheckoutForm() {
                   <ShippingForm formData={formData} onChange={handleChange} />
                 </>
               )}
-              <PaymentForm />
             </div>
 
-            {/* Resumen del pedido */}
-            <div className="lg:col-span-1">
+            {/* Columna derecha - Información de pago y resumen */}
+            <div className="space-y-6">
+              <PaymentForm />
               <OrderSummary isProcessing={isProcessing} onSubmit={() => handleSubmit(new Event("submit") as any)} />
             </div>
           </div>
