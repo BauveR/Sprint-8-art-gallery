@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
+import { obrasService } from "../services/obrasService";
 import { Obra, ObraInput } from "../types";
 
 type Sort = { key: string; dir: "asc" | "desc" };
@@ -41,7 +42,7 @@ export function useObras(opts?: { sort?: Sort; page?: number; pageSize?: number 
 export function useCreateObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: ObraInput) => api.post<{ id_obra: number }>("/obras", input),
+    mutationFn: (input: ObraInput) => obrasService.create(input),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
@@ -50,7 +51,7 @@ export function useUpdateObra() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { id: number; input: ObraInput }) =>
-      api.put<{ ok: true }>(`/obras/${p.id}`, p.input),
+      obrasService.update(p.id, p.input),
     onSuccess: async () => {
       console.log("[useUpdateObra] Invalidando queries...");
       await qc.invalidateQueries({ queryKey: ["obras"] });
@@ -66,7 +67,7 @@ export function useUpdateObra() {
 export function useRemoveObra() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => api.del(`/obras/${id}`),
+    mutationFn: (id: number) => obrasService.remove(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
@@ -75,7 +76,7 @@ export function useAsignarTienda() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { id_obra: number; id_tienda: number; fecha_entrada?: string | null }) =>
-      api.post<{ ok: true }>(`/obras/${p.id_obra}/asignar-tienda`, p),
+      obrasService.asignarTienda(p.id_obra, p.id_tienda, p.fecha_entrada),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
@@ -84,7 +85,7 @@ export function useSacarTienda() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { id_obra: number; fecha_salida?: string | null }) =>
-      api.post<{ ok: true }>(`/obras/${p.id_obra}/sacar-tienda`, p),
+      obrasService.sacarTienda(p.id_obra, p.fecha_salida),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
@@ -93,7 +94,7 @@ export function useAsignarExpo() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { id_obra: number; id_expo: number }) =>
-      api.post<{ ok: true }>(`/obras/${p.id_obra}/asignar-expo`, p),
+      obrasService.asignarExpo(p.id_obra, p.id_expo),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
@@ -102,7 +103,7 @@ export function useQuitarExpo() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { id_obra: number; id_expo: number }) =>
-      api.post<{ ok: true }>(`/obras/${p.id_obra}/quitar-expo`, p),
+      obrasService.quitarExpo(p.id_obra, p.id_expo),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["obras"] }),
   });
 }
