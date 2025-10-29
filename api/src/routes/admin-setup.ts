@@ -22,12 +22,22 @@ router.post("/set-admin-role", async (req, res) => {
   try {
     const { email, secret } = req.body;
 
+    // Log para debugging (TEMPORAL)
+    console.log(`[Admin Setup] Received secret: ${secret ? 'PROVIDED' : 'MISSING'}`);
+    console.log(`[Admin Setup] Expected secret: ${SETUP_SECRET ? 'CONFIGURED' : 'NOT CONFIGURED'}`);
+    console.log(`[Admin Setup] Secrets match: ${secret === SETUP_SECRET}`);
+
     // Validar secret
     if (!secret || secret !== SETUP_SECRET) {
       console.warn(`[Admin Setup] Unauthorized attempt to set admin role`);
       return res.status(403).json({
         error: "Unauthorized",
-        message: "Invalid secret key"
+        message: "Invalid secret key",
+        debug: {
+          receivedSecretLength: secret?.length || 0,
+          expectedSecretLength: SETUP_SECRET?.length || 0,
+          secretsMatch: secret === SETUP_SECRET
+        }
       });
     }
 

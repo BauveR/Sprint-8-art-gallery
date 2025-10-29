@@ -89,6 +89,11 @@ app.use(
         return callback(null, true);
       }
 
+      // Permitir URLs de preview de Vercel (formato: sprint-8-art-gallery-*.vercel.app)
+      if (origin && /^https:\/\/sprint-8-art-gallery-[a-z0-9-]+\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+
       console.warn(`[CORS] Blocked request from origin: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     },
