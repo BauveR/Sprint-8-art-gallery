@@ -8,9 +8,8 @@ import ObraImageGallery from "../components/Obra/ObraImageGallery";
 import ObraInfo from "../components/Obra/ObraInfo";
 import ObraActions from "../components/Obra/ObraActions";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { imagenesService } from "../services/imageService";
-import { ObraImagen } from "../types";
+import { ObraImagen } from "../types/domain";
 
 export default function ObraDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,14 +50,8 @@ export default function ObraDetailPage() {
   };
 
   return (
-    <PublicLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Botón de regreso */}
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Volver
-        </Button>
-
+    <PublicLayout backgroundColor="#ffffff" noPadding={true}>
+      <div className="max-w-7xl mx-auto px-4 pt-20 md:pt-36 pb-8">
         {/* Contenido principal */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Galería de imágenes */}

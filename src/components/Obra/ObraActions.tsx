@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Check } from "lucide-react";
 import { formatPrice } from "../../utils/formatters";
 import { ObraActionsProps } from "../../types/components";
@@ -19,9 +18,17 @@ export default function ObraActions({
   if (isInExhibition) {
     return (
       <div className="border-t pt-4">
-        <Badge variant="outline" className="text-lg px-4 py-2">
-          Obra en exposición - No disponible para venta
-        </Badge>
+        <a
+          href="mailto:jesus.velazquez.bau500@gmail.com?subject=Consulta sobre obra en exposición"
+        >
+          <Button
+            variant="glass"
+            className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+            style={{ backgroundColor: '#8FDF00' }}
+          >
+            Disponible para colecciones
+          </Button>
+        </a>
       </div>
     );
   }
@@ -33,27 +40,34 @@ export default function ObraActions({
         <p className="text-3xl font-bold text-primary">${formatPrice(obra.precio_salida)}</p>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3">
         <Button
-          className="flex-1"
+          variant="glass"
+          className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+          style={{ backgroundColor: '#8FDF00' }}
           onClick={onAddToCart}
           disabled={!canPurchase || isInCart}
         >
           {isInCart ? (
             <>
-              <Check className="h-5 w-5 mr-2" />
+              <Check className="h-6 w-6 md:h-5 md:w-5 mr-2" />
               En el carrito
             </>
           ) : (
             <>
-              <ShoppingCart className="h-5 w-5 mr-2" />
+              <ShoppingCart className="h-6 w-6 md:h-5 md:w-5 mr-2" />
               {canPurchase ? "Agregar al carrito" : "No disponible"}
             </>
           )}
         </Button>
 
         {isInCart && (
-          <Button variant="outline" onClick={() => navigate("/cart")}>
+          <Button
+            variant="glass"
+            className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+            style={{ backgroundColor: '#8FDF00' }}
+            onClick={() => navigate("/cart")}
+          >
             Ver carrito
           </Button>
         )}
