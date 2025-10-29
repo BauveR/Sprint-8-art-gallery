@@ -3,8 +3,9 @@ import { auth } from "../config/firebase";
 const BASE = import.meta.env.VITE_API_URL || "/api";
 
 // Log para debug en desarrollo
-console.log('[API Config] Base URL:', BASE);
-console.log('[API Config] Environment:', import.meta.env.MODE);
+console.log('[API Config WITH AUTH] Base URL:', BASE);
+console.log('[API Config WITH AUTH] Environment:', import.meta.env.MODE);
+console.log('[API Config WITH AUTH] Version: 2.0');
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
