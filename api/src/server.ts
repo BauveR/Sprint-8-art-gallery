@@ -52,7 +52,7 @@ app.use(
 // Security: Rate Limiting - Prevent brute force and DDoS
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Límite de 100 requests por IP
+  max: 500, // Límite de 500 requests por IP (aumentado para uso normal)
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
