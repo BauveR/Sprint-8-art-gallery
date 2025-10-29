@@ -5,7 +5,7 @@ const BASE = import.meta.env.VITE_API_URL || "/api";
 // Log para debug en desarrollo
 console.log('[API Config WITH AUTH] Base URL:', BASE);
 console.log('[API Config WITH AUTH] Environment:', import.meta.env.MODE);
-console.log('[API Config WITH AUTH] Version: 2.0');
+console.log('[API Config WITH AUTH] Version: 2.1');
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -37,24 +37,36 @@ function toQuery(params?: Record<string, any>): string {
 
 // Obtener el token de Firebase
 async function getAuthHeaders(): Promise<Record<string, string>> {
+  // Esperar a que Firebase cargue el usuario actual si está disponible
   const user = auth.currentUser;
-  console.log('[Auth] Current user:', user ? user.email : 'NO USER');
 
-  if (user) {
+  // Si no hay usuario de inmediato, esperar un momento por si está cargando
+  if (!user) {
+    console.warn('[Auth] No immediate user, waiting for Firebase to load...');
+    // Esperar 100ms por si Firebase está inicializando
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  const currentUser = auth.currentUser;
+  console.log('[Auth] Current user:', currentUser ? currentUser.email : 'NO USER');
+
+  if (currentUser) {
     try {
-      const token = await user.getIdToken();
+      const token = await currentUser.getIdToken(true); // force refresh
       console.log('[Auth] Token obtained, length:', token.length);
+      console.log('[Auth] Token (first 20 chars):', token.substring(0, 20) + '...');
       return {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       };
     } catch (error) {
       console.error("[Auth] Error obteniendo token:", error);
+      throw new Error("Failed to get authentication token");
     }
   } else {
-    console.warn('[Auth] No current user - request will be unauthenticated');
+    console.error('[Auth] No current user after wait - request will FAIL');
+    throw new Error("User not authenticated");
   }
-  return { "Content-Type": "application/json" };
 }
 
 export const api = {
