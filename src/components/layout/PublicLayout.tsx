@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContextFirebase";
 import LogoLoop from "./LogoLoop";
@@ -16,13 +16,13 @@ export default function PublicLayout({ children, noPadding = false }: PublicLayo
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate("/");
-  };
+  }, [logout, navigate]);
 
-  // Mobile Dock Items
-  const mobileDockItems = [
+  // Mobile Dock Items - Memorized to prevent infinite re-renders
+  const mobileDockItems = useMemo(() => [
     {
       icon: <Home size={20} />,
       label: "Inicio",
@@ -67,7 +67,7 @@ export default function PublicLayout({ children, noPadding = false }: PublicLayo
             onClick: () => navigate("/login")
           }
         ])
-  ];
+  ], [isAuthenticated, user?.role, navigate, handleLogout]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 flex flex-col relative">
