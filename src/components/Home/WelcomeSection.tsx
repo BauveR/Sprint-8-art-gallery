@@ -80,10 +80,24 @@ export default function WelcomeSection() {
 
   // Estado para prevenir flash durante hidratación
   const [isMounted, setIsMounted] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const loadedImagesCount = useRef(0);
+  const totalImages = 4; // 4 capas de imágenes
 
   useEffect(() => {
+    // Marcar como montado inmediatamente
     setIsMounted(true);
   }, []);
+
+  const handleImageLoad = () => {
+    loadedImagesCount.current += 1;
+    if (loadedImagesCount.current >= totalImages) {
+      // Pequeño delay para asegurar que todas las imágenes estén renderizadas
+      setTimeout(() => {
+        setImagesLoaded(true);
+      }, 50);
+    }
+  };
 
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -254,12 +268,13 @@ export default function WelcomeSection() {
               src="https://res.cloudinary.com/dmweipuof/image/upload/f_auto,q_auto/v1761525149/piedra_svgs-20_z4icw9.png"
               alt="Background layer"
               className="layer-1 absolute h-auto object-contain gpu-accelerated"
+              onLoad={handleImageLoad}
               style={{
                 zIndex: 3,
-                opacity: isMounted ? 1 : 0
+                opacity: isMounted && imagesLoaded ? 1 : 0
               }}
-              initial={isMounted ? { opacity: 0 } : false}
-              animate={isMounted ? { opacity: 1 } : {}}
+              initial={isMounted && imagesLoaded ? { opacity: 0 } : false}
+              animate={isMounted && imagesLoaded ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
@@ -268,12 +283,13 @@ export default function WelcomeSection() {
               src="/Piedra art home page-16.svg"
               alt="Second layer"
               className="layer-2 absolute h-auto object-contain gpu-accelerated"
+              onLoad={handleImageLoad}
               style={{
                 zIndex: 4,
-                clipPath: isMounted ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
+                clipPath: isMounted && imagesLoaded ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
               }}
-              initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
-              animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
+              initial={isMounted && imagesLoaded ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
+              animate={isMounted && imagesLoaded ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
               transition={{
                 duration: 1.2,
                 delay: 0.3,
@@ -286,12 +302,13 @@ export default function WelcomeSection() {
               src="https://res.cloudinary.com/dmweipuof/image/upload/f_auto,q_auto/v1761525166/piedra_svgs-21_eicqd2.png"
               alt="Third layer"
               className="layer-3 absolute h-auto object-contain gpu-accelerated"
+              onLoad={handleImageLoad}
               style={{
                 zIndex: 5,
-                opacity: isMounted ? 1 : 0
+                opacity: isMounted && imagesLoaded ? 1 : 0
               }}
-              initial={isMounted ? { opacity: 0 } : false}
-              animate={isMounted ? { opacity: 1 } : {}}
+              initial={isMounted && imagesLoaded ? { opacity: 0 } : false}
+              animate={isMounted && imagesLoaded ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
 
@@ -300,12 +317,13 @@ export default function WelcomeSection() {
               src="/piedra  svgs-15.svg"
               alt="Front layer"
               className="layer-4 absolute h-auto object-contain gpu-accelerated"
+              onLoad={handleImageLoad}
               style={{
                 zIndex: 6,
-                clipPath: isMounted ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
+                clipPath: isMounted && imagesLoaded ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)'
               }}
-              initial={isMounted ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
-              animate={isMounted ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
+              initial={isMounted && imagesLoaded ? { clipPath: 'inset(0% 0% 100% 0%)' } : false}
+              animate={isMounted && imagesLoaded ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}
               transition={{
                 duration: 1.2,
                 delay: 0.6,
