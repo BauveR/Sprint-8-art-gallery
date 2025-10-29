@@ -19,13 +19,13 @@ export default function ObraImageGallery({ images, obraId, obraTitulo }: ObraIma
           <img
             src={images[selectedImageIndex].url}
             alt={obraTitulo}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
           <ObraImage
             obraId={obraId}
             alt={obraTitulo}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         )}
       </div>
