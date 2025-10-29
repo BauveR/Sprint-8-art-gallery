@@ -72,7 +72,7 @@ export default function CartPage() {
 
           {/* Resumen */}
           <div className="lg:sticky lg:top-24 h-fit">
-            <div className="border border-foreground/10 p-8 space-y-6">
+            <div className="border border-foreground/10 p-8 space-y-6 rounded-lg">
               <h2 className="text-2xl font-light tracking-wide">Resumen</h2>
 
               <div className="space-y-4 py-6 border-y border-foreground/10">
@@ -93,7 +93,9 @@ export default function CartPage() {
 
               <div className="space-y-3 pt-4">
                 <Button
-                  className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 rounded-none tracking-wide"
+                  variant="glass"
+                  className="text-xl md:text-xl px-16 md:px-6 py-3 md:py-1.5 border-0 mb-0 w-full"
+                  style={{ backgroundColor: '#8FDF00' }}
                   onClick={handleCheckout}
                 >
                   {isAuthenticated ? "Proceder al pago" : "Iniciar sesión"}

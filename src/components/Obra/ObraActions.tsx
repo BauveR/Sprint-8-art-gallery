@@ -23,7 +23,7 @@ export default function ObraActions({
         >
           <Button
             variant="glass"
-            className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+            className="text-xl md:text-xl px-16 md:px-6 py-3 md:py-1.5 border-0 mb-0 w-full md:w-[40%]"
             style={{ backgroundColor: '#8FDF00' }}
           >
             Disponible para colecciones
@@ -43,7 +43,7 @@ export default function ObraActions({
       <div className="flex flex-col gap-3">
         <Button
           variant="glass"
-          className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+          className="text-xl md:text-xl px-16 md:px-6 py-3 md:py-1.5 border-0 mb-0 w-full md:w-[40%]"
           style={{ backgroundColor: '#8FDF00' }}
           onClick={onAddToCart}
           disabled={!canPurchase || isInCart}
@@ -64,7 +64,7 @@ export default function ObraActions({
         {isInCart && (
           <Button
             variant="glass"
-            className="text-xl md:text-3xl px-16 md:px-10 py-3 md:py-2 border-0 mb-0 w-full"
+            className="text-xl md:text-xl px-16 md:px-6 py-3 md:py-1.5 border-0 mb-0 w-full md:w-[40%]"
             style={{ backgroundColor: '#8FDF00' }}
             onClick={() => navigate("/cart")}
           >
