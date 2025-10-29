@@ -41,23 +41,32 @@ export default function ShopPage() {
               </p>
             </div>
           ) : (
-            <div
-              className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 scrollbar-hide"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                scrollBehavior: 'smooth',
-              }}
-            >
-              {availableObras.map((obra) => (
-                <div key={obra.id_obra} className="flex-none w-[300px] md:w-[350px] lg:w-[400px] snap-center">
-                  <ObraCard
-                    obra={obra}
-                    onAddToCart={handleAddToCart}
-                    onViewDetails={() => navigate(`/obra/${obra.id_obra}`)}
-                  />
-                </div>
-              ))}
+            <div className="relative">
+              <div
+                className="flex gap-8 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-8 scrollbar-hide"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  scrollBehavior: 'smooth',
+                }}
+              >
+                {availableObras.map((obra) => (
+                  <div key={obra.id_obra} className="flex-none w-[300px] md:w-[350px] lg:w-[400px] snap-center">
+                    <ObraCard
+                      obra={obra}
+                      onAddToCart={handleAddToCart}
+                      onViewDetails={() => navigate(`/obra/${obra.id_obra}`)}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Degradado de derecha indicando más contenido */}
+              <div
+                className="absolute top-0 right-0 bottom-8 w-28 md:w-40 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to right, transparent 0%, #5F6D9A 100%)'
+                }}
+              />
             </div>
           )}
         </div>

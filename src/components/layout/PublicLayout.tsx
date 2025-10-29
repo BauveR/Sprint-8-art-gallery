@@ -10,9 +10,10 @@ import { Home, Store, ShoppingCart, Package, Settings, LogOut, User } from "luci
 interface PublicLayoutProps {
   children: ReactNode;
   noPadding?: boolean;
+  backgroundColor?: string;
 }
 
-export default function PublicLayout({ children, noPadding = false }: PublicLayoutProps) {
+export default function PublicLayout({ children, noPadding = false, backgroundColor }: PublicLayoutProps) {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -70,7 +71,15 @@ export default function PublicLayout({ children, noPadding = false }: PublicLayo
   ], [isAuthenticated, user?.role, navigate, handleLogout]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 flex flex-col relative">
+    <div
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundColor: backgroundColor || undefined,
+        ...(!backgroundColor && {
+          background: 'linear-gradient(to bottom right, rgb(250 250 250), rgb(244 244 245))'
+        })
+      }}
+    >
       <LogoLoop />
       <PillNav />
       <main className={`flex-1 ${noPadding ? "" : "pt-40 md:pt-44 pb-24 md:pb-0"}`}>

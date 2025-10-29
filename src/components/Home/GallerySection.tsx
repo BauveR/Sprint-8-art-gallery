@@ -101,7 +101,7 @@ export default function GallerySection({ obras }: GallerySectionProps) {
 
           {/* Slider Horizontal */}
           <motion.div
-            className="w-full gpu-accelerated"
+            className="w-full gpu-accelerated relative"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -144,6 +144,13 @@ export default function GallerySection({ obras }: GallerySectionProps) {
                 </motion.div>
               ))}
             </div>
+            {/* Degradado de derecha indicando más contenido */}
+            <div
+              className="absolute top-0 right-0 bottom-8 w-28 md:w-40 pointer-events-none"
+              style={{
+                background: 'linear-gradient(to right, transparent 0%, #ffffff 100%)'
+              }}
+            />
           </motion.div>
         </div>
       </div>
