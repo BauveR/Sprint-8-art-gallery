@@ -38,7 +38,7 @@ Sprint-8-art-gallery/
 ### Frontend Core
 | Purpose | Technology | Version |
 |---------|-----------|---------|
-| Framework | React | 19.1.1 |
+| Framework | React | 19.1.1 | 
 | Build Tool | Vite | 7.1.7 |
 | Language | TypeScript | 5.8.3 |
 | Styling | TailwindCSS | 4.1.13 |
@@ -375,6 +375,7 @@ npm run test            # Vitest tests
 | Mobile responsive | TailwindCSS breakpoints | Complete |
 
 ---
+}
 
 ## Testing
 

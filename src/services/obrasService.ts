@@ -2,9 +2,17 @@ import { api as apiWithAuth } from "../api/clientWithAuth";
 import { api } from "../api/client";
 import { Obra, ObraInput } from "../types";
 
+// Debug: verificar que apiWithAuth está definido
+console.log('[obrasService] apiWithAuth loaded:', !!apiWithAuth);
+console.log('[obrasService] apiWithAuth.post type:', typeof apiWithAuth?.post);
+
 export const obrasService = {
   list: () => api.get<Obra[]>("/obras"), // Público - sin auth
-  create: (input: ObraInput) => apiWithAuth.post<{ id_obra: number }>("/obras", input), // Admin - con auth
+  create: (input: ObraInput) => {
+    console.log('[obrasService] create called with:', input);
+    console.log('[obrasService] using apiWithAuth.post');
+    return apiWithAuth.post<{ id_obra: number }>("/obras", input);
+  }, // Admin - con auth
   update: (id: number, input: ObraInput) => apiWithAuth.put<{ ok: true }>(`/obras/${id}`, input), // Admin - con auth
   remove: (id: number) => apiWithAuth.del(`/obras/${id}`), // Admin - con auth
 
