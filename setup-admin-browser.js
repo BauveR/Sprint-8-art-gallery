@@ -14,8 +14,8 @@
   console.log('🚀 Iniciando configuración de admin...');
 
   // IMPORTANTE: Cambia este secret por el que configuraste en Railway
-  const SECRET = 'change-me-in-production';
-  const EMAIL = 'admin@gallery.com';
+  const SECRET = 'piedra-admin-setup-2024';
+  const EMAIL = 'rick.bauve@gmail.com';
   const API_URL = 'https://sprint-8-art-gallery-production.up.railway.app';
 
   try {
@@ -52,7 +52,7 @@
       if (response.status === 403) {
         console.error('\n⚠️  El secret es incorrecto. Verifica que coincida con ADMIN_SETUP_SECRET en Railway.\n');
       } else if (response.status === 404) {
-        console.error('\n⚠️  No se encontró el usuario. Verifica que admin@gallery.com esté registrado en Firebase.\n');
+        console.error('\n⚠️  No se encontró el usuario. Verifica que rick.bauve@gmail.com esté registrado en Firebase.\n');
       }
 
       return { success: false, error: data };

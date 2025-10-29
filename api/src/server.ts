@@ -24,6 +24,10 @@ try {
 
 const app = express();
 
+// Trust proxy - Required for Railway/Render to get correct client IP
+// Fixes: ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+app.set('trust proxy', true);
+
 // Security: Helmet - Configure security headers
 app.use(
   helmet({
