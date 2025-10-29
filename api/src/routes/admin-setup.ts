@@ -25,6 +25,8 @@ router.post("/set-admin-role", async (req, res) => {
     // Log para debugging (TEMPORAL)
     console.log(`[Admin Setup] Received secret: ${secret ? 'PROVIDED' : 'MISSING'}`);
     console.log(`[Admin Setup] Expected secret: ${SETUP_SECRET ? 'CONFIGURED' : 'NOT CONFIGURED'}`);
+    console.log(`[Admin Setup] Received (first 10 chars): ${secret?.substring(0, 10)}...`);
+    console.log(`[Admin Setup] Expected (first 10 chars): ${SETUP_SECRET?.substring(0, 10)}...`);
     console.log(`[Admin Setup] Secrets match: ${secret === SETUP_SECRET}`);
 
     // Validar secret
