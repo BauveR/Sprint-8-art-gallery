@@ -46,6 +46,7 @@ export function useAddToCart() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservas"] });
+      queryClient.invalidateQueries({ queryKey: ["obras"] });
     },
   });
 }
