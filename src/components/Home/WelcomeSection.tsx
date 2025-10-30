@@ -19,7 +19,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '20%', left: '-6%' } as Position,     // 📱 Posición móvil (igual que desktop)
       tablet: { top: '33%', left: '-5%' } as Position,     // 📱 Posición tablet (igual que desktop)
-      desktop: { top: '20%', left: '0%' } as Position    // 🖥️ Posición desktop
+      desktop: { top: '10%', left: '0%' } as Position    // 🖥️ Posición desktop
     }
   },
 
@@ -33,7 +33,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '20%', left: '5%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '35%', left: '0%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '25%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '15%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
@@ -47,7 +47,7 @@ const initialLayerConfig: LayerConfig = {
     position: {
       mobile: { top: '15%', left: '0%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '33%', left: '-5%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '20%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '10%', left: '0%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 
@@ -61,7 +61,7 @@ const initialLayerConfig: LayerConfig = {
    position: {
       mobile: { top: '20%', left: '55%' } as Position,   // 📱 Posición móvil - Ajustar valor
       tablet: { top: '35%', left: '55%' } as Position,   // 📱 Posición tablet - Ajustar valor
-      desktop: { top: '25%', left: '62%' } as Position   // 🖥️ Posición desktop - Ajustar valor
+      desktop: { top: '15%', left: '62%' } as Position   // 🖥️ Posición desktop - Ajustar valor
     }
   },
 };
@@ -71,9 +71,8 @@ const initialLayerConfig: LayerConfig = {
 export default function WelcomeSection() {
   const { scrollY } = useScroll();
 
-  // Desaparecer la línea cuando se acerca al final de la sección (aproximadamente 100vh - 5vh)
-  const lineScale = useTransform(scrollY, [window.innerHeight * 0.95, window.innerHeight], [1, 0]);
-  const lineOpacity = useTransform(scrollY, [window.innerHeight * 0.95, window.innerHeight], [1, 0]);
+  // Estado para la altura del viewport (para evitar diferencias entre dev y producción)
+  const [viewportHeight, setViewportHeight] = useState(0);
 
   // Estado para controlar la configuración de capas en tiempo real
   const [layerConfig, setLayerConfig] = useState(initialLayerConfig);
@@ -82,12 +81,37 @@ export default function WelcomeSection() {
   const [isMounted, setIsMounted] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const loadedImagesCount = useRef(0);
-  const totalImages = 4; // 4 capas de imágenes
+  const totalImages = 4;
 
   useEffect(() => {
-    // Marcar como montado inmediatamente
     setIsMounted(true);
+
+    // Establecer altura inicial del viewport
+    setViewportHeight(window.innerHeight);
+
+    // Actualizar altura si cambia el tamaño de la ventana
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+
+  // Desaparecer la línea cuando se acerca al final de la sección
+  const lineScale = useTransform(
+    scrollY,
+    [viewportHeight * 0.95, viewportHeight],
+    [1, 0]
+  );
+  const lineOpacity = useTransform(
+    scrollY,
+    [viewportHeight * 0.95, viewportHeight],
+    [1, 0]
+  );
 
   const handleImageLoad = () => {
     loadedImagesCount.current += 1;
