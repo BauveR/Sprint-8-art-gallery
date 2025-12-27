@@ -29,4 +29,5 @@ export const IMAGE_ERRORS = {
   INVALID_TYPE: 'Tipo de archivo no permitido. Usa JPG, PNG, WEBP o GIF.',
   UPLOAD_FAILED: 'Error al subir la imagen. Inténtalo de nuevo.',
   DELETE_FAILED: 'Error al eliminar la imagen.',
+  CLOUDINARY_UPLOAD_FAILED: 'Error al subir la imagen a Cloudinary. Verifica tu conexión e inténtalo de nuevo.',
 } as const;

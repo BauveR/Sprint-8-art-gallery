@@ -51,7 +51,7 @@ export const obraInputSchema = z.object({
   id_expo: z.number().int().positive().nullable().optional(),
 });
 
-// Schema para actualizaciones parciales (todos los campos opcionales)
+
 export const obraUpdateSchema = z.object({
   autor: z.string().min(1).optional(),
   titulo: z.string().min(1).optional(),

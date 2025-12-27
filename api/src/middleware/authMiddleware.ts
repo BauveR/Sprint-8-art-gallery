@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getAuth } from "../config/firebase-admin";
 
-// Extender el tipo Request para incluir el usuario autenticado
 declare global {
   namespace Express {
     interface Request {
@@ -14,11 +13,7 @@ declare global {
   }
 }
 
-/**
- * Middleware para verificar el token de Firebase
- * El token debe venir en el header Authorization como "Bearer <token>"
- * Extrae el rol desde Custom Claims de Firebase (NO desde el frontend)
- */
+
 export async function verifyFirebaseToken(
   req: Request,
   res: Response,
@@ -39,14 +34,13 @@ export async function verifyFirebaseToken(
       return;
     }
 
-    // Verificar el token con Firebase Admin SDK
+    
     const decodedToken = await getAuth().verifyIdToken(token);
 
-    // IMPORTANTE: Obtener rol desde Custom Claims (backend), NO desde frontend
-    // Los Custom Claims son seguros porque solo el backend puede modificarlos
+    
     const role = (decodedToken.role as string) || "user";
 
-    // Agregar información del usuario al request
+    
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
@@ -85,7 +79,7 @@ export async function optionalAuth(
     }
   } catch (error) {
     console.error("[Optional Auth] Error verifying token:", error);
-    // No fallar, simplemente continuar sin usuario
+    
   }
 
   next();

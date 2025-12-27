@@ -1,0 +1,67 @@
+# Configuración de Render para Art Gallery API
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API (Node.js + Express)
+  - type: web
+    name: art-gallery-api
+    runtime: node
+    region: oregon  # Cambia a tu región preferida (oregon, frankfurt, singapore)
+    plan: free  # Plan gratuito (750 hrs/mes)
+    buildCommand: cd api && npm install && npm run build
+    startCommand: cd api && npm start
+    healthCheckPath: /api/health
+
+    # Variables de entorno (configura los valores en Render Dashboard)
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Base de datos MySQL/PlanetScale
+      - key: DB_HOST
+        sync: false  # Configura manualmente en Render
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        value: 3306
+
+      # Cloudinary
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      # Stripe
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+      # Firebase
+      - key: FIREBASE_SERVICE_ACCOUNT_PATH
+        value: ./firebase-service-account.json
+
+      # Admin Setup
+      - key: ADMIN_SETUP_SECRET
+        sync: false
+
+      # Frontend URL (se configura después de desplegar en Vercel)
+      - key: FRONTEND_URL
+        sync: false
+
+      # Puerto (Render lo configura automáticamente)
+      - key: PORT
+        value: 3000
+
+# NOTA: Este archivo es opcional. Puedes configurar manualmente desde el dashboard de Render.
+# Para usar este archivo:
+# 1. Haz commit y push a GitHub
+# 2. En Render, selecciona "New → Blueprint"
+# 3. Conecta tu repo
+# 4. Render detectará este archivo automáticamente

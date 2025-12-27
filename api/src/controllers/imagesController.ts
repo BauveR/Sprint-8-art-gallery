@@ -33,6 +33,68 @@ export async function listByObra(req: Request, res: Response, next: NextFunction
   } catch (e) { next(e); }
 }
 
+/**
+ * ✨ NUEVO ENDPOINT - Guardar URL de imagen en la base de datos
+ *
+ * Este endpoint recibe una URL de Cloudinary ya subida y la guarda en la base de datos.
+ * Se usa cuando el frontend sube directamente a Cloudinary (modo DIRECT_TO_CLOUDINARY).
+ *
+ * DIFERENCIAS CON uploadForObra:
+ * - No usa Multer (no procesa archivos)
+ * - No sube a Cloudinary (la imagen ya está subida)
+ * - Solo guarda la URL en MySQL
+ *
+ * BODY: { url: string }
+ * RESPONSE: { id: number, url: string }
+ */
+export async function saveImageUrl(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id_obra = Number(req.params.id);
+    if (Number.isNaN(id_obra)) throw new Error("ID inválido");
+
+    const { url } = req.body;
+    if (!url || typeof url !== "string") {
+      return res.status(400).json({ error: "URL requerida" });
+    }
+
+    // Validar que la URL sea de Cloudinary (seguridad básica)
+    if (!url.includes("res.cloudinary.com")) {
+      return res.status(400).json({ error: "URL inválida. Debe ser de Cloudinary." });
+    }
+
+    console.log(`[SaveURL] Saving image URL for obra ${id_obra}: ${url}`);
+
+    // Guardar URL en la base de datos
+    const { id } = await svc.addImagen(id_obra, url);
+    console.log(`[SaveURL] URL saved to DB with id: ${id}`);
+
+    res.status(201).json({ id, url });
+  } catch (e) {
+    console.error("[SaveURL] Error:", e);
+    next(e);
+  }
+}
+
+/**
+ * ⚠️ ENDPOINT ORIGINAL - Upload vía backend con Multer
+ *
+ * Este endpoint recibe un archivo, lo procesa con Multer y lo sube a Cloudinary.
+ * Requiere que el backend esté corriendo (Railway/local).
+ *
+ * VENTAJAS:
+ * - Control total sobre el archivo antes de subirlo
+ * - Validación en servidor
+ * - Transformaciones personalizadas
+ *
+ * DESVENTAJAS:
+ * - Requiere Railway corriendo ($$$)
+ * - Más lento (doble upload)
+ *
+ * PARA REACTIVAR:
+ * 1. Cambia CURRENT_UPLOAD_MODE a 'VIA_BACKEND' en frontend (src/config/cloudinary.ts)
+ * 2. Asegúrate que Railway/backend esté corriendo
+ * 3. La ruta POST /obras/:id/imagenes con Multer seguirá funcionando
+ */
 export async function uploadForObra(req: MulterReq, res: Response, next: NextFunction) {
   try {
     const id_obra = Number(req.params.id);

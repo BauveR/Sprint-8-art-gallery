@@ -21,7 +21,7 @@ export default function ShippingForm({ formData, onChange }: ShippingFormProps) 
 
   const handleChangeWithValidation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     onChange(e);
-    // Validate on change only if there's already an error
+    
     if (errors[e.target.name]) {
       validateField(e.target.name as keyof CheckoutFormData, e.target.value);
     }

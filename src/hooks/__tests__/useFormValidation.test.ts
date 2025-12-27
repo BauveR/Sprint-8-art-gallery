@@ -1,47 +1,31 @@
-/**
- * Tests para el hook de validación de formulario
- *
- * Este archivo contiene tests simples para aprender testing en React
- * Cada test valida un campo específico del formulario de checkout
- */
+
 
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useFormValidation } from '../useFormValidation';
 
-// ============================================
-// GUÍA PARA PRINCIPIANTES
-// ============================================
-// describe(): Agrupa tests relacionados
-// it() o test(): Define un test individual
-// expect(): Verifica que algo sea verdadero
-// renderHook(): Renderiza un hook de React para testing
-// act(): Ejecuta acciones que actualizan el estado
-// ============================================
+
 
 describe('useFormValidation - Validación de Campos de Envío', () => {
 
-  // ====================================
-  // TESTS DE EMAIL
-  // ====================================
 
   it('debe validar email vacío', () => {
-    // Paso 1: Renderizar el hook
+    
     const { result } = renderHook(() => useFormValidation());
 
-    // Paso 2: Validar un email vacío
+    
     act(() => {
       const error = result.current.validateField('email', '');
     });
 
-    // Paso 3: Verificar que hay un error
+    
     expect(result.current.errors.email).toBe('El email es requerido');
   });
 
   it('debe validar email con formato inválido', () => {
     const { result } = renderHook(() => useFormValidation());
 
-    // Email sin @
+    
     act(() => {
       result.current.validateField('email', 'emailinvalido');
     });
@@ -52,18 +36,15 @@ describe('useFormValidation - Validación de Campos de Envío', () => {
   it('debe aceptar email válido', () => {
     const { result } = renderHook(() => useFormValidation());
 
-    // Email correcto
+    
     act(() => {
       result.current.validateField('email', 'usuario@ejemplo.com');
     });
 
-    // No debe haber error
+    
     expect(result.current.errors.email).toBe('');
   });
 
-  // ====================================
-  // TESTS DE NOMBRE
-  // ====================================
 
   it('debe validar nombre vacío', () => {
     const { result } = renderHook(() => useFormValidation());

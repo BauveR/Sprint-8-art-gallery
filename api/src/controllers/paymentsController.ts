@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { asyncHandler } from "../utils/helpers";
 import * as obrasService from "../services/obrasService";
 
-// Validar que existe la clave de Stripe
+
 const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
 if (!stripeKey) {
   console.error("[Stripe] STRIPE_SECRET_KEY no está configurada");
@@ -15,11 +15,7 @@ const stripe = new Stripe(stripeKey || "", {
   apiVersion: "2025-09-30.clover",
 });
 
-/**
- * Crear Payment Intent de Stripe
- * POST /api/payments/create-payment-intent
- * Body: { items: Array<{ id_obra: number, titulo: string, precio: number }> }
- */
+
 export const createPaymentIntent = asyncHandler(
   async (req: Request, res: Response) => {
     const { items } = req.body;
@@ -28,19 +24,19 @@ export const createPaymentIntent = asyncHandler(
       return res.status(400).json({ error: "Items array is required" });
     }
 
-    // Calcular el total
+   
     const amount = items.reduce(
       (sum: number, item: any) => sum + Number(item.precio),
       0
     );
 
-    // Stripe requiere el monto en centavos
+  
     const amountInCents = Math.round(amount * 100);
 
-    // Crear Payment Intent
+   
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
-      currency: "usd", // Cambia según tu moneda
+      currency: "usd", 
       metadata: {
         obra_ids: items.map((item: any) => item.id_obra).join(","),
         order_id: `ORDER_${Date.now()}`,
@@ -58,11 +54,7 @@ export const createPaymentIntent = asyncHandler(
   }
 );
 
-/**
- * Confirmar pago exitoso
- * POST /api/payments/confirm
- * Body: { paymentIntentId: string, obra_ids: number[], buyer_name: string, buyer_email: string, shipping_data: object }
- */
+
 export const confirmPayment = asyncHandler(
   async (req: Request, res: Response) => {
     const { paymentIntentId, obra_ids, buyer_name, buyer_email, shipping_data } = req.body;
@@ -71,7 +63,7 @@ export const confirmPayment = asyncHandler(
       return res.status(400).json({ error: "Invalid request data" });
     }
 
-    // Verificar el pago con Stripe
+   
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== "succeeded") {
@@ -81,11 +73,11 @@ export const confirmPayment = asyncHandler(
       });
     }
 
-    // Importar ordersService
+   
     const ordersService = require("../services/ordersService");
     const obrasRepo = require("../repositories/obrasRepo");
 
-    // Obtener información de las obras para la orden
+   
     const obrasData = await Promise.all(
       obra_ids.map(async (id: number) => {
         const obra = await obrasRepo.findObraById(id);
@@ -100,10 +92,10 @@ export const confirmPayment = asyncHandler(
 
     const subtotal = obrasData.reduce((sum, item) => sum + item.precio, 0);
 
-    // Obtener el ID del usuario autenticado (si existe)
+    
     const userId = req.user?.uid || "anonymous";
 
-    // Crear la orden en la tabla ordenes
+
     const order = await ordersService.createOrder({
       id_user: userId,
       user_email: buyer_email,
@@ -119,7 +111,7 @@ export const confirmPayment = asyncHandler(
       status: "paid",
     });
 
-    // Actualizar el estado de las obras a "procesando_envio" con info del comprador
+    
     for (const obraId of obra_ids) {
       await obrasService.updateObra(Number(obraId), {
         estado_venta: "procesando_envio",
@@ -145,10 +137,7 @@ export const confirmPayment = asyncHandler(
   }
 );
 
-/**
- * Webhook de Stripe para eventos
- * POST /api/payments/webhook
- */
+
 export const stripeWebhook = asyncHandler(
   async (req: Request, res: Response) => {
     const sig = req.headers["stripe-signature"] as string;
@@ -168,12 +157,12 @@ export const stripeWebhook = asyncHandler(
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Manejar diferentes tipos de eventos
+    
     switch (event.type) {
       case "payment_intent.succeeded":
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log("PaymentIntent succeeded:", paymentIntent.id);
-        // Aquí puedes actualizar la base de datos, enviar emails, etc.
+        
         break;
 
       case "payment_intent.payment_failed":

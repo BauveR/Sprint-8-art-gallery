@@ -83,7 +83,7 @@ export default function HeroSection() {
                 position={{
                   mobile: [0.5, -0.2, .7],
                   tablet: [0.8, 0, 0],
-                  desktop: [0, -0.6, 0]
+                  desktop: [0.2, -0.3, 0]
                 }}
                 scale={{ mobile: 70, tablet: 80, desktop: 80 }}
                 className="w-full h-full"

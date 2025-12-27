@@ -1,13 +1,4 @@
-/**
- * E2E Test: Upload Obra (Artwork)
- *
- * Tests the complete flow of creating an artwork:
- * 1. Admin authentication
- * 2. Create obra with valid data
- * 3. Verify obra was created
- * 4. Retrieve the created obra
- * 5. Cleanup: delete the created obra
- */
+
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import request from "supertest";
@@ -17,14 +8,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Mock Firebase Admin Auth
+
 vi.mock("../src/config/firebase-admin", () => ({
   initializeFirebaseAdmin: vi.fn(),
   getAuth: vi.fn(() => ({
     verifyIdToken: vi.fn().mockResolvedValue({
       uid: "test-admin-uid",
       email: "admin@test.com",
-      role: "admin", // Custom claim
+      role: "admin", 
     }),
     getUserByEmail: vi.fn(),
     setCustomUserClaims: vi.fn(),
@@ -32,7 +23,7 @@ vi.mock("../src/config/firebase-admin", () => ({
   })),
 }));
 
-// Create test app
+
 const app = express();
 app.use(express.json());
 app.use("/api", routes);
@@ -105,7 +96,7 @@ describe("E2E: Upload Obra", () => {
 
     expect(response.body).toEqual({ ok: true });
 
-    // Verify the update
+    
     const getResponse = await request(app).get("/api/obras").expect(200);
 
     const updatedObra = getResponse.body.find(
@@ -132,7 +123,7 @@ describe("E2E: Upload Obra", () => {
 
   it("Step 5: Should fail to create obra with invalid data", async () => {
     const invalidObra = {
-      autor: "", // Invalid: empty string
+      autor: "", 
       titulo: "Test",
     };
 
@@ -141,7 +132,7 @@ describe("E2E: Upload Obra", () => {
       .set("Authorization", `Bearer ${adminToken}`)
       .send(invalidObra);
 
-    // Should return error status (400 or 500)
+  
     expect(response.status).toBeGreaterThanOrEqual(400);
 
     console.log(`✓ Invalid data rejected with status: ${response.status}`);
@@ -155,7 +146,7 @@ describe("E2E: Upload Obra", () => {
 
     console.log(`✓ Obra ${createdObraId} deleted successfully`);
 
-    // Verify it's deleted
+   
     const getResponse = await request(app).get("/api/obras").expect(200);
 
     const deletedObra = getResponse.body.find(
@@ -168,11 +159,3 @@ describe("E2E: Upload Obra", () => {
   });
 });
 
-/**
- * NOTES FOR RUNNING THIS TEST:
- *
- * 1. This test uses mocked Firebase Admin authentication
- * 2. The test creates a real obra in the database and cleans it up after
- * 3. Run with: npm test obra-upload.e2e.test.ts
- * 4. Ensure your test database is configured properly
- */

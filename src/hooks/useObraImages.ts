@@ -1,13 +1,12 @@
 import { useState, useRef } from "react";
 import { imagenesService } from "../services/imageService";
+import { CURRENT_UPLOAD_MODE } from "../config/cloudinary";
+import { IMAGE_LIMITS, IMAGE_ERRORS } from "../constants/images";
 
 type ObraImagen = {
   id: number;
   url: string;
 };
-
-const MAX_IMAGES = 3;
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
 export function useObraImages() {
   const [images, setImages] = useState<ObraImagen[]>([]);
@@ -24,21 +23,54 @@ export function useObraImages() {
     }
   };
 
+  /**
+   * ✨ NUEVO - Upload con soporte para dos modos
+   *
+   * Dependiendo de CURRENT_UPLOAD_MODE en src/config/cloudinary.ts:
+   *
+   * 1. DIRECT_TO_CLOUDINARY (actual):
+   *    - Sube directamente desde navegador a Cloudinary
+   *    - Luego guarda la URL en la base de datos
+   *    - No requiere Railway/backend para el upload
+   *
+   * 2. VIA_BACKEND (original, comentado abajo):
+   *    - Sube al backend que procesa con Multer
+   *    - Backend sube a Cloudinary
+   *    - Requiere Railway/backend corriendo
+   */
   const uploadImage = async (obraId: number, file: File) => {
     // Validar tamaño
-    if (file.size > MAX_IMAGE_SIZE) {
-      throw new Error("La imagen no debe superar 2MB. Por favor, selecciona una imagen más pequeña.");
+    if (file.size > IMAGE_LIMITS.MAX_SIZE_BYTES) {
+      throw new Error(IMAGE_ERRORS.MAX_SIZE);
     }
 
     // Validar límite de imágenes
-    if (images.length >= MAX_IMAGES) {
-      throw new Error(`Solo puedes tener un máximo de ${MAX_IMAGES} imágenes por obra.`);
+    if (images.length >= IMAGE_LIMITS.MAX_COUNT) {
+      throw new Error(IMAGE_ERRORS.MAX_COUNT);
     }
 
     setUploading(true);
     try {
-      await imagenesService.uploadForObra(obraId, file);
-      await loadImages(obraId);
+      if (CURRENT_UPLOAD_MODE === 'DIRECT_TO_CLOUDINARY') {
+        // ✨ MODO NUEVO - Upload directo a Cloudinary
+        console.log('[Upload] Modo: DIRECT_TO_CLOUDINARY');
+
+        // 1. Subir archivo directamente a Cloudinary
+        const cloudinaryUrl = await imagenesService.uploadDirectToCloudinary(file);
+        console.log('[Upload] Imagen subida a Cloudinary:', cloudinaryUrl);
+
+        // 2. Guardar la URL en la base de datos
+        await imagenesService.saveImageUrl(obraId, cloudinaryUrl);
+        console.log('[Upload] URL guardada en base de datos');
+
+        // 3. Recargar lista de imágenes
+        await loadImages(obraId);
+      } else {
+        // ⚠️ MODO ORIGINAL - Upload vía backend (requiere Railway)
+        console.log('[Upload] Modo: VIA_BACKEND');
+        await imagenesService.uploadForObra(obraId, file);
+        await loadImages(obraId);
+      }
 
       // Reset file input
       if (fileInputRef.current) {
@@ -74,6 +106,6 @@ export function useObraImages() {
     uploadImage,
     deleteImage,
     resetImages,
-    canUploadMore: images.length < MAX_IMAGES,
+    canUploadMore: images.length < IMAGE_LIMITS.MAX_COUNT,
   };
 }
