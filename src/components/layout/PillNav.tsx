@@ -1,39 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContextFirebase";
-import { useCart } from "../../context/CartContext";
-import { Button } from "@/components/ui/button";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LogOut, User, ShoppingCart, Store, Package, Settings } from "lucide-react";
+import { Store } from "lucide-react";
 
 export default function PillNav() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { totalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const navRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Navegación items
   const navItems = [
     { path: "/", label: "Inicio", icon: null },
     { path: "/shop", label: "Tienda", icon: Store },
-    ...(isAuthenticated
-      ? [{ path: "/my-orders", label: "Mis Compras", icon: Package }]
-      : []),
   ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Actualizar indicador cuando cambia la ruta
   useEffect(() => {
@@ -42,7 +23,7 @@ export default function PillNav() {
       setActiveIndex(currentIndex);
       updateIndicator(currentIndex);
     }
-  }, [location.pathname, navItems.length]);
+  }, [location.pathname]);
 
   const updateIndicator = (index: number) => {
     const item = itemsRef.current[index];
@@ -54,11 +35,6 @@ export default function PillNav() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
   const handleNavClick = (path: string, index: number) => {
     setActiveIndex(index);
     navigate(path);
@@ -68,7 +44,7 @@ export default function PillNav() {
     <header className="fixed top-4 md:top-[72px] left-0 right-0 z-40 transition-all duration-300">
       <nav className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-end h-16 relative">
-          {/* Right side actions - Posicionado a la derecha */}
+          {/* Right side actions */}
           <div className="hidden md:flex items-center gap-2">
             {/* Pill Navigation */}
             <div
@@ -107,71 +83,10 @@ export default function PillNav() {
               })}
             </div>
 
-            {/* Cart */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/cart")}
-              className="relative rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
-
-            {/* Admin Dashboard Button - Solo visible para administradores */}
-            {isAuthenticated && user?.role === 'admin' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/20 text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300"
-                title="Ir al Dashboard de Administración"
-              >
-                <Settings className="h-5 w-5" />
-                <span className="hidden lg:inline ml-2">Admin</span>
-              </Button>
-            )}
-
             {/* Theme Toggle */}
             <ThemeToggle />
-
-            {/* Auth Section */}
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">{user?.name}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-medium">
-                    {user?.role}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline ml-2">Cerrar Sesión</span>
-                </Button>
-              </div>
-            ) : (
-              <Button
-                size="sm"
-                onClick={() => navigate("/login")}
-                className="rounded-full bg-orange-500 hover:bg-orange-600 text-white"
-              >
-                <User className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Iniciar Sesión</span>
-              </Button>
-            )}
           </div>
         </div>
-
       </nav>
     </header>
   );

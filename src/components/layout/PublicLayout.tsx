@@ -1,11 +1,10 @@
-import { ReactNode, useMemo, useCallback } from "react";
+import { ReactNode, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContextFirebase";
 import LogoLoop from "./LogoLoop";
 import PillNav from "./PillNav";
 import Footer from "./Footer";
 import MobileDock from "@/components/ui/mobile-dock";
-import { Home, Store, ShoppingCart, Package, Settings, LogOut, User } from "lucide-react";
+import { Home, Store } from "lucide-react";
 
 interface PublicLayoutProps {
   children: ReactNode;
@@ -15,14 +14,7 @@ interface PublicLayoutProps {
 
 export default function PublicLayout({ children, noPadding = false, backgroundColor }: PublicLayoutProps) {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
 
-  const handleLogout = useCallback(() => {
-    logout();
-    navigate("/");
-  }, [logout, navigate]);
-
-  // Mobile Dock Items - Memorized to prevent infinite re-renders
   const mobileDockItems = useMemo(() => [
     {
       icon: <Home size={20} />,
@@ -34,41 +26,7 @@ export default function PublicLayout({ children, noPadding = false, backgroundCo
       label: "Tienda",
       onClick: () => navigate("/shop")
     },
-    {
-      icon: <ShoppingCart size={20} />,
-      label: "Carrito",
-      onClick: () => navigate("/cart")
-    },
-    ...(isAuthenticated
-      ? [
-          {
-            icon: <Package size={20} />,
-            label: "Mis Compras",
-            onClick: () => navigate("/my-orders")
-          },
-          ...(user?.role === 'admin'
-            ? [
-                {
-                  icon: <Settings size={20} />,
-                  label: "Admin",
-                  onClick: () => navigate("/dashboard")
-                }
-              ]
-            : []),
-          {
-            icon: <LogOut size={20} />,
-            label: "Logout",
-            onClick: handleLogout
-          }
-        ]
-      : [
-          {
-            icon: <User size={20} />,
-            label: "Login",
-            onClick: () => navigate("/login")
-          }
-        ])
-  ], [isAuthenticated, user?.role, navigate, handleLogout]);
+  ], [navigate]);
 
   return (
     <div

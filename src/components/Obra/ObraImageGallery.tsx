@@ -35,7 +35,7 @@ export default function ObraImageGallery({ images, obraId, obraTitulo }: ObraIma
         <div className="grid grid-cols-4 gap-2">
           {images.map((image, index) => (
             <button
-              key={image.id_imagen}
+              key={image.id}
               onClick={() => setSelectedImageIndex(index)}
               className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
                 selectedImageIndex === index

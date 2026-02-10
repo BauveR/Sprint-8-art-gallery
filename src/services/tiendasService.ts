@@ -1,10 +1,21 @@
-import { api as apiWithAuth } from "../api/clientWithAuth";
-import { api } from "../api/client";
-import { Tienda, TiendaInput } from "../types";
+import { Tienda, Obra } from "../types";
 
 export const tiendasService = {
-  list: () => api.get<Tienda[]>("/tiendas"), // Público - sin auth
-  create: (input: TiendaInput) => apiWithAuth.post<{ id_tienda: number }>("/tiendas", input), // Admin - con auth
-  update: (id: number, input: TiendaInput) => apiWithAuth.put<{ ok: true }>(`/tiendas/${id}`, input), // Admin - con auth
-  remove: (id: number) => apiWithAuth.del(`/tiendas/${id}`), // Admin - con auth
+  list: async (): Promise<Tienda[]> => {
+    const res = await fetch("/data/obras.json");
+    if (!res.ok) throw new Error("Error cargando tiendas");
+    const obras: Obra[] = await res.json();
+    const map = new Map<number, Tienda>();
+    for (const o of obras) {
+      if (o.id_tienda && o.tienda_nombre) {
+        map.set(o.id_tienda, {
+          id_tienda: o.id_tienda,
+          nombre: o.tienda_nombre,
+          lat: 0,
+          lng: 0,
+        });
+      }
+    }
+    return Array.from(map.values());
+  },
 };

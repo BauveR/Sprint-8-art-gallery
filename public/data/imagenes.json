@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "id_obra": 1,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761767737/art-gallery/obras/wrhuydyrktmnckskc7fq.jpg",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "id_obra": 2,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761767228/art-gallery/obras/uvmtoygy3snzmkohkavj.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "id_obra": 3,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761767150/art-gallery/obras/xg6mk6apsh2ftqwx8gob.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "id_obra": 4,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761767081/art-gallery/obras/nwdizt5vmslr5z1yr2cx.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "id_obra": 5,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761766930/art-gallery/obras/hgj4vczqzmbzgxd2jfme.jpg",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "id_obra": 6,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761756828/art-gallery/obras/j5lawlxmrssmemqnnm2d.jpg",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 7,
+    "id_obra": 7,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1760540930/art-gallery/obras/audrhyezt5mcohp642lk.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 8,
+    "id_obra": 8,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1760540325/art-gallery/obras/rv265cp7cy1t2ykipbp4.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  }
+]

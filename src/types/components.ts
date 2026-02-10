@@ -3,7 +3,7 @@
  */
 
 import { ReactNode } from "react";
-import type { Obra, ObraImagen } from "./domain";
+import type { Obra, ObraImagen } from "../types";
 import type { Order } from "./orders";
 import type { CheckoutFormData } from "./forms";
 
@@ -14,7 +14,6 @@ import type { CheckoutFormData } from "./forms";
  */
 export interface ObraCardProps {
   obra: Obra;
-  onAddToCart: (obra: Obra) => void;
   onViewDetails: () => void;
 }
 

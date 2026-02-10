@@ -1,10 +1,23 @@
-import { api as apiWithAuth } from "../api/clientWithAuth";
-import { api } from "../api/client";
-import { Expo, ExpoInput } from "../types";
+import { Expo, Obra } from "../types";
 
 export const exposService = {
-  list: () => api.get<Expo[]>("/expos"), // Público - sin auth
-  create: (input: ExpoInput) => apiWithAuth.post<{ id_expo: number }>("/expos", input), // Admin - con auth
-  update: (id: number, input: ExpoInput) => apiWithAuth.put<{ ok: true }>(`/expos/${id}`, input), // Admin - con auth
-  remove: (id: number) => apiWithAuth.del(`/expos/${id}`), // Admin - con auth
+  list: async (): Promise<Expo[]> => {
+    const res = await fetch("/data/obras.json");
+    if (!res.ok) throw new Error("Error cargando exposiciones");
+    const obras: Obra[] = await res.json();
+    const map = new Map<number, Expo>();
+    for (const o of obras) {
+      if (o.id_expo && o.expo_nombre) {
+        map.set(o.id_expo, {
+          id_expo: o.id_expo,
+          nombre: o.expo_nombre,
+          lat: 0,
+          lng: 0,
+          fecha_inicio: "",
+          fecha_fin: "",
+        });
+      }
+    }
+    return Array.from(map.values());
+  },
 };
