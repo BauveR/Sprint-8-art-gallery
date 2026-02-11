@@ -46,5 +46,35 @@
     "id_obra": 8,
     "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1760540325/art-gallery/obras/rv265cp7cy1t2ykipbp4.png",
     "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 9,
+    "id_obra": 9,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761210816/art-gallery/obras/uywvgou0ehrqshzw0y8j.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 10,
+    "id_obra": 10,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761210769/art-gallery/obras/h0ntayepjyyykxkykjal.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 11,
+    "id_obra": 11,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761210728/art-gallery/obras/mkzu65r88cw1pctfioot.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 12,
+    "id_obra": 12,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761210687/art-gallery/obras/uf9oixhakm7p3lnhhvaf.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 13,
+    "id_obra": 13,
+    "url": "https://res.cloudinary.com/dmweipuof/image/upload/v1761210645/art-gallery/obras/afruh4igngrggt7dth4s.png",
+    "created_at": "2025-01-01T00:00:00.000Z"
   }
 ]

@@ -25,9 +25,6 @@ export default function Footer() {
             <Link to="/shop" className="hover:underline">
               Tienda
             </Link>
-            <Link to="/cart" className="hover:underline">
-              Carrito
-            </Link>
           </div>
 
           {/* Info */}

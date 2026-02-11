@@ -128,9 +128,10 @@ export default function WelcomeSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen w-full overflow-hidden touch-pan-y welcome-section"
+      className="relative min-h-screen w-full touch-pan-y welcome-section"
       style={{
         backgroundColor: '#191E2C',
+        clipPath: 'inset(0 0 0 0)',
         opacity: imagesLoaded ? 1 : 0,
         transition: 'opacity 0.4s ease-in-out'
       }}
@@ -258,8 +259,8 @@ export default function WelcomeSection() {
         }
       `}</style>
       {/* Fondo LiquidEther - entre el fondo y el primer SVG */}
-      <div className="absolute inset-0 z-[1] w-full h-full">
-        <div className="w-full h-full min-w-full min-h-full">
+      <div className="absolute inset-0 z-[1] w-full h-full pointer-events-none">
+        <div className="w-full h-full min-w-full min-h-full pointer-events-none">
           <LiquidEther
             colors={['#E60A62', '#077EED', '#F08E05']}
             mouseForce={14}

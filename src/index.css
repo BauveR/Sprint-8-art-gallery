@@ -117,20 +117,15 @@
   }
 
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
     width: 100%;
     min-width: 100%;
-    /* Optimización de scroll */
-    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
-    overflow-x: hidden;
     width: 100%;
     min-width: 100%;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
   }
 
   /* Liquid glass effect for inputs in dark mode */
